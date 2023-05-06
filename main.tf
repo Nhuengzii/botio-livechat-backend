@@ -2,12 +2,6 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
-resource "aws_api_gateway_deployment" "botio_rest_api_deployment" {
-  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 
 resource "aws_api_gateway_stage" "botio_rest_api_test_stage" {
   stage_name    = "test"
@@ -49,6 +43,13 @@ resource "aws_iam_role" "assume_role_lambda" {
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role_lambda" {
   role       = aws_iam_role.assume_role_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_api_gateway_deployment" "botio_rest_api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 output "botio_invoke_url" {
