@@ -51,7 +51,7 @@ resource "aws_lambda_permission" "validate_facebook_webhook_handler_allow_execut
 
 resource "null_resource" "build_validate_facebook_webhook_handler" {
   triggers = {
-    always_run = timestamp()
+    source_code_hash = "${filebase64sha256("validate_facebook_webhook_handler/src/main.go")}"
   }
   provisioner "local-exec" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./validate_facebook_webhook_handler/src/ -o ../bin/main"
