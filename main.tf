@@ -2,6 +2,18 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+resource "aws_api_gateway_deployment" "botio_rest_api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "botio_rest_api_test_stage" {
+  stage_name    = "test"
+  deployment_id = aws_api_gateway_deployment.botio_rest_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
+}
 resource "aws_api_gateway_rest_api" "botio_rest_api" {
   name        = "botio_rest_api"
   description = "Api endpoint for interacting with botio"
