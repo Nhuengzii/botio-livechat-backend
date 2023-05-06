@@ -50,6 +50,7 @@ resource "aws_api_gateway_deployment" "botio_rest_api_deployment" {
   lifecycle {
     create_before_destroy = true
   }
+  depends_on = [ aws_api_gateway_method.validate_facebook_webhook ]
 }
 
 output "botio_invoke_url" {
