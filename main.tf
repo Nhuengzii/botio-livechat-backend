@@ -18,3 +18,23 @@ resource "aws_api_gateway_resource" "shop_id" {
   parent_id   = aws_api_gateway_resource.shops.id
   path_part   = "{shop_id}"
 }
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "assume_role_lambda" {
+  name               = "assume_role_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
