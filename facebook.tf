@@ -4,9 +4,15 @@ resource "aws_api_gateway_resource" "facebook" {
   path_part   = "facebook"
 }
 
-resource "aws_api_gateway_resource" "facebook_webhook" {
+resource "aws_api_gateway_resource" "facebook_page_id" {
   rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
   parent_id   = aws_api_gateway_resource.facebook.id
+  path_part   = "{page_id}"
+}
+
+resource "aws_api_gateway_resource" "facebook_webhook" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.facebook_page_id.id
   path_part   = "webhook"
 }
 
