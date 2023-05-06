@@ -41,6 +41,13 @@ resource "aws_lambda_function" "validate_facebook_webhook_handler" {
   source_code_hash = filebase64sha256("validate_facebook_webhook_handler/src/main.go")
   depends_on       = [data.archive_file.validate_facebook_webhook_handler]
 }
+resource "aws_lambda_permission" "validate_facebook_webhook_handler_allow_execution_from_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.validate_facebook_webhook_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
+}
 
 resource "null_resource" "build_validate_facebook_webhook_handler" {
   triggers = {
