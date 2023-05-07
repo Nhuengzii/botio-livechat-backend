@@ -112,6 +112,16 @@ resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
   depends_on       = [data.archive_file.standardize_facebook_webhook_handler]
 }
 
+resource "aws_lambda_function" "save_facebook_recieved_message_handler" {
+  filename         = "save_facebook_recieved_message/save_facebook_recieved_message_handler.zip"
+  function_name    = "save_facebook_recieved_message_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("save_facebook_recieved_message_handler/src/main.go")
+  depends_on       = [data.archive_file.save_facebook_recieved_message_handler]
+}
+
 resource "aws_lambda_permission" "validate_facebook_webhook_handler_allow_execution_from_api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -138,6 +148,15 @@ resource "null_resource" "build_standardize_facebook_webhook_handler" {
   }
 }
 
+resource "null_resource" "build_save_facebook_recieved_message_handler" {
+  triggers = {
+    source_code_hash = "${filebase64sha256("save_facebook_recieved_message_handler/src/main.go")}"
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./save_facebook_recieved_message_handler/src/ -o ../bin/main ."
+  }
+}
+
 data "archive_file" "validate_facebook_webhook_handler" {
   type        = "zip"
   source_file = "./validate_facebook_webhook_handler/bin/main"
@@ -152,6 +171,12 @@ data "archive_file" "standardize_facebook_webhook_handler" {
   depends_on  = [null_resource.build_standardize_facebook_webhook_handler]
 }
 
+data "archive_file" "save_facebook_recieved_message_handler" {
+  type        = "zip"
+  source_file = "./save_facebook_recieved_message_handler/src/main.go"
+  output_path = "./save_facebook_recieved_message_handler/save_facebook_recieved_message_handler.zip"
+  depends_on  = [null_resource.build_save_facebook_recieved_message_handler]
+}
 
 
 resource "null_resource" "watch_validate_facebook_webhook_handler" {
@@ -166,4 +191,11 @@ resource "null_resource" "watch_standardize_facebook_webhook_handler" {
     source_code_hash = filebase64sha256("standardize_facebook_webhook_handler/src/main.go")
   }
   depends_on = [null_resource.build_standardize_facebook_webhook_handler]
+}
+
+resource "null_resource" "watch_save_facebook_recieved_message_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("save_facebook_recieved_message_handler/src/main.go")
+  }
+  depends_on = [null_resource.build_save_facebook_recieved_message_handler]
 }
