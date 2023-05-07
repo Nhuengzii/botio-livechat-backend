@@ -91,6 +91,9 @@ resource "aws_sns_topic_subscription" "line_receive_message_to_database" {
   endpoint  = aws_sqs_queue.line_receive_message_to_database.arn
 }
 
+resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
+  name = "line_webhook_to_standardize_facebook_webhook_handler"
+}
 resource "null_resource" "build_validate_line_webhook_handler" {
   triggers = {
     source_code_hash = filebase64sha256("validate_line_webhook_handler/src/main.go")
