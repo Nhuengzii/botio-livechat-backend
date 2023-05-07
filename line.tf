@@ -346,6 +346,13 @@ resource "null_resource" "watch_post_line_message_handler" {
   depends_on = [null_resource.build_post_line_message_handler]
 }
 
+data "archive_file" "get_line_messages_handler" {
+  type        = "zip"
+  source_file = "get_line_messages_handler/bin/main"
+  output_path = "get_line_messages_handler/get_line_messages_handler.zip"
+  depends_on  = [null_resource.build_get_line_messages_handler]
+}
+
 data "archive_file" "get_line_conversations_handler" {
   type        = "zip"
   source_file = "get_line_conversations_handler/bin/main"
