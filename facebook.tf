@@ -22,6 +22,13 @@ resource "aws_api_gateway_method" "get_validate_facebook_webhook" {
   authorization = "NONE"
   http_method   = "GET"
 }
+resource "aws_api_gateway_method" "post_validate_facebook_webhook" {
+  rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
+  resource_id   = aws_api_gateway_resource.facebook_webhook.id
+  authorization = "NONE"
+  http_method   = "POST"
+}
+
 
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
   http_method             = aws_api_gateway_method.validate_facebook_webhook.http_method
