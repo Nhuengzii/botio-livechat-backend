@@ -160,6 +160,14 @@ resource "aws_lambda_permission" "post_line_message_handler_allow_execution_from
   source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
 }
 
+resource "aws_lambda_permission" "get_line_conversations_handler_allow_execution_from_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_line_conversations_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
+}
+
 
 
 resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
@@ -338,6 +346,11 @@ resource "null_resource" "watch_post_line_message_handler" {
   depends_on = [null_resource.build_post_line_message_handler]
 }
 
+data "archive_file" "get_line_conversations_handler" {
+  type        = "zip"
+  source_file = "get_line_conversations_handler/bin/main"
+  output_path = "get_line_conversations_handler/get_line_conversations_handler.zip"
+}
 
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
