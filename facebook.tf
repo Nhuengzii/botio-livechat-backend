@@ -77,9 +77,6 @@ resource "aws_sns_topic_subscription" "facebook_recieve_message_to_frontend" {
   endpoint  = aws_sqs_queue.facebook_receive_message_to_frontend.arn
 }
 
-
-
-
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
   http_method             = aws_api_gateway_method.get_validate_facebook_webhook.http_method
   resource_id             = aws_api_gateway_resource.facebook_webhook.id
