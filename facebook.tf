@@ -67,6 +67,13 @@ resource "aws_lambda_function" "validate_facebook_webhook_handler" {
   runtime          = "go1.x"
   source_code_hash = filebase64sha256("validate_facebook_webhook_handler/src/main.go")
   depends_on       = [data.archive_file.validate_facebook_webhook_handler]
+  environment {
+    variables = {
+      SQS_QUEUE_URL = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.url
+      SQS_QUEUE_ARN = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
+      foo           = "bar"
+    }
+  }
 }
 
 resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
