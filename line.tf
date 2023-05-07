@@ -42,12 +42,27 @@ resource "aws_lambda_permission" "validate_line_webhook_handler_allow_execution_
 resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
   name = "line_webhook_to_standardize_facebook_webhook_handler"
 }
+
+resource "aws_lambda_event_source_mapping" "event_source_mapping_line_webhook_to_standardize_line_webhook_handler" {
+  event_source_arn = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
+  function_name    = aws_lambda_function.standardize_line_webhook_handler.function_name
+  batch_size       = 1
+}
+
 resource "null_resource" "build_validate_line_webhook_handler" {
   triggers = {
     source_code_hash = filebase64sha256("validate_line_webhook_handler/src/main.go")
   }
   provisioner "local-exec" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./validate_line_webhook_handler/src/ -o ../bin/main ."
+  }
+}
+resource "null_resource" "build_standardize_line_webhook_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("standardize_line_webhook_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./standardize_line_webhook_handler/src/ -o ../bin/main ."
   }
 }
 
@@ -57,11 +72,23 @@ resource "null_resource" "watch_validate_line_webhook_handler" {
   }
   depends_on = [null_resource.build_validate_line_webhook_handler]
 }
+resource "null_resource" "watch_standardize_line_webhook_handler" {
+  triggers = {
+    standardize_line_webhook_handler = aws_lambda_function.standardize_line_webhook_handler.qualified_arn
+  }
+  depends_on = [null_resource.build_validate_line_webhook_handler]
+}
 
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
   source_dir  = "validate_line_webhook_handler"
   output_path = "validate_line_webhook_handler/validate_line_webhook_handler.zip"
+}
+
+data "archive_file" "standardize_line_webhook_handler" {
+  type        = "zip"
+  source_dir  = "standardize_line_webhook_handler"
+  output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
 }
 
 resource "aws_lambda_function" "validate_line_webhook_handler" {
@@ -79,4 +106,20 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
       foo           = "bar"
     }
   }
+}
+
+resource "aws_lambda_function" "standardize_line_webhook_handler" {
+  filename      = data.archive_file.standardize_line_webhook_handler.output_path
+  function_name = "standardize_line_webhook_handler"
+  role          = aws_iam_role.assume_role_lambda.arn
+  handler       = "main"
+  runtime       = "go1.x"
+  environment {
+    variables = {
+      SQS_QUEUE_URL = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
+      SQS_QUEUE_ARN = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
+      foo           = "bar"
+    }
+  }
+  depends_on = [data.archive_file.standardize_line_webhook_handler]
 }
