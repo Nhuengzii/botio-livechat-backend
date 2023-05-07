@@ -61,6 +61,18 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_line_webhook_to
   batch_size       = 1
 }
 
+resource "aws_lambda_event_source_mapping" "event_source_mapping_line_receive_message_to_frontend" {
+  event_source_arn = aws_sqs_queue.line_receive_message_to_frontend.arn
+  function_name    = aws_lambda_function.send_line_received_message_handler.function_name
+  batch_size       = 1
+}
+
+resource "aws_lambda_event_source_mapping" "event_source_mapping_line_receive_message_to_database" {
+  event_source_arn = aws_sqs_queue.line_receive_message_to_database.arn
+  function_name    = aws_lambda_function.save_line_received_message_handler.function_name
+  batch_size       = 1
+}
+
 resource "aws_sns_topic_subscription" "line_receive_message_to_frontend" {
   topic_arn = aws_sns_topic.line_receive_message.arn
   protocol  = "sqs"
@@ -90,6 +102,24 @@ resource "null_resource" "build_standardize_line_webhook_handler" {
   }
 }
 
+resource "null_resource" "build_send_line_received_message_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("send_line_received_message_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./send_line_received_message_handler/src/ -o ../bin/main ."
+  }
+}
+
+resource "null_resource" "build_save_line_received_message_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("save_line_received_message_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./save_line_received_message_handler/src/ -o ../bin/main ."
+  }
+}
+
 resource "null_resource" "watch_validate_line_webhook_handler" {
   triggers = {
     validate_line_webhook_handler = aws_lambda_function.validate_line_webhook_handler.qualified_arn
@@ -103,6 +133,20 @@ resource "null_resource" "watch_standardize_line_webhook_handler" {
   depends_on = [null_resource.build_validate_line_webhook_handler]
 }
 
+resource "null_resource" "watch_send_line_received_message_handler" {
+  triggers = {
+    send_line_received_message_handler = aws_lambda_function.send_line_received_message_handler.qualified_arn
+  }
+  depends_on = [null_resource.build_send_line_received_message_handler]
+}
+
+resource "null_resource" "watch_save_line_received_message_handler" {
+  triggers = {
+    save_line_received_message_handler = aws_lambda_function.save_line_received_message_handler.qualified_arn
+  }
+  depends_on = [null_resource.build_save_line_received_message_handler]
+}
+
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
   source_dir  = "validate_line_webhook_handler"
@@ -113,6 +157,20 @@ data "archive_file" "standardize_line_webhook_handler" {
   type        = "zip"
   source_dir  = "standardize_line_webhook_handler"
   output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
+}
+
+data "archive_file" "save_line_received_message_handler" {
+  type        = "zip"
+  source_file = "save_line_received_message_handler/bin/main"
+  output_path = "save_line_received_message_handler/save_line_recieved_message_handler.zip"
+  depends_on  = [null_resource.build_save_line_received_message_handler]
+}
+
+data "archive_file" "send_line_received_message_handler" {
+  type        = "zip"
+  source_file = "send_line_received_message_handler/bin/main"
+  output_path = "send_line_received_message_handler/send_line_received_message_handler.zip"
+  depends_on  = [null_resource.build_send_line_received_message_handler]
 }
 
 resource "aws_lambda_function" "validate_line_webhook_handler" {
@@ -146,4 +204,22 @@ resource "aws_lambda_function" "standardize_line_webhook_handler" {
     }
   }
   depends_on = [data.archive_file.standardize_line_webhook_handler]
+}
+
+resource "aws_lambda_function" "save_line_received_message_handler" {
+  filename      = "save_line_received_message_handler/save_line_recieved_message_handler.zip"
+  function_name = "save_line_received_message_handler"
+  role          = aws_iam_role.assume_role_lambda.arn
+  handler       = "main"
+  runtime       = "go1.x"
+  depends_on    = [data.archive_file.save_line_received_message_handler]
+}
+
+resource "aws_lambda_function" "send_line_received_message_handler" {
+  filename      = "send_line_received_message_handler/send_line_received_message_handler.zip"
+  function_name = "send_line_received_message_handler"
+  role          = aws_iam_role.assume_role_lambda.arn
+  handler       = "main"
+  runtime       = "go1.x"
+  depends_on    = [data.archive_file.send_line_received_message_handler]
 }
