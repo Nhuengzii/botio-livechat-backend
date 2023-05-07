@@ -38,6 +38,15 @@ resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.validate_facebook_webhook_handler.invoke_arn
 }
+resource "aws_api_gateway_integration" "post_validate_facebook_webhook" {
+  http_method             = aws_api_gateway_method.post_validate_facebook_webhook.http_method
+  resource_id             = aws_api_gateway_resource.facebook_webhook.id
+  rest_api_id             = aws_api_gateway_rest_api.botio_rest_api.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.validate_facebook_webhook_handler.invoke_arn
+}
+
 
 resource "aws_lambda_function" "validate_facebook_webhook_handler" {
   filename         = "validate_facebook_webhook_handler/validate_facebook_webhook_handler.zip"
