@@ -16,12 +16,22 @@ resource "aws_api_gateway_resource" "line_webhook" {
   path_part   = "webhook"
 }
 
+<<<<<<< HEAD
+=======
+resource "aws_api_gateway_method" "get_validate_line_webhook" {
+  rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
+  resource_id   = aws_api_gateway_resource.line_webhook.id
+  authorization = "NONE"
+  http_method   = "GET"
+}
+>>>>>>> d7f7a66 (create basic line endpoints for webhook)
 resource "aws_api_gateway_method" "post_validate_line_webhook" {
   rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
   resource_id   = aws_api_gateway_resource.line_webhook.id
   authorization = "NONE"
   http_method   = "POST"
 }
+<<<<<<< HEAD
 
 resource "aws_api_gateway_integration" "post_validate_line_webhook" {
   http_method             = aws_api_gateway_method.post_validate_line_webhook.http_method
@@ -223,3 +233,5 @@ resource "aws_lambda_function" "send_line_received_message_handler" {
   runtime       = "go1.x"
   depends_on    = [data.archive_file.send_line_received_message_handler]
 }
+=======
+>>>>>>> d7f7a66 (create basic line endpoints for webhook)
