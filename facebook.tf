@@ -33,16 +33,16 @@ resource "aws_sqs_queue" "facebook_webhook_to_standardize_facebook_webhook_handl
   name = "facebook_webhook_to_standardize_facebook_webhook_handler"
 }
 
-resource "aws_sns_topic" "facebook_recieve_message" {
-  name = "facebook_recieve_message"
+resource "aws_sns_topic" "facebook_receive_message" {
+  name = "facebook_receive_message"
 }
 
-resource "aws_sqs_queue" "facebook_recieve_message_to_database" {
-  name = "facebook_recieve_message_to_database"
+resource "aws_sqs_queue" "facebook_receive_message_to_database" {
+  name = "facebook_receive_message_to_database"
 }
 
-resource "aws_sqs_queue" "facebook_recieve_message_to_frontend" {
-  name = "facebook_recieve_message_to_frontend"
+resource "aws_sqs_queue" "facebook_receive_message_to_frontend" {
+  name = "facebook_receive_message_to_frontend"
 }
 
 
@@ -52,29 +52,29 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhoo
   batch_size       = 1
 }
 
-resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_save_facebook_recieved_message_handler" {
-  event_source_arn = aws_sqs_queue.facebook_recieve_message_to_database.arn
-  function_name    = aws_lambda_function.save_facebook_recieved_message_handler.arn
+resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_save_facebook_received_message_handler" {
+  event_source_arn = aws_sqs_queue.facebook_receive_message_to_database.arn
+  function_name    = aws_lambda_function.save_facebook_received_message_handler.arn
   batch_size       = 1
 }
 
-resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_send_facebook_recieved_message_handler" {
-  event_source_arn = aws_sqs_queue.facebook_recieve_message_to_frontend.arn
-  function_name    = aws_lambda_function.send_facebook_recieved_message_handler.arn
+resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_send_facebook_received_message_handler" {
+  event_source_arn = aws_sqs_queue.facebook_receive_message_to_frontend.arn
+  function_name    = aws_lambda_function.send_facebook_received_message_handler.arn
   batch_size       = 1
 }
 
 
 resource "aws_sns_topic_subscription" "facebook_recieve_message_to_database" {
-  topic_arn = aws_sns_topic.facebook_recieve_message.arn
+  topic_arn = aws_sns_topic.facebook_receive_message.arn
   protocol  = "sqs"
-  endpoint  = aws_sqs_queue.facebook_recieve_message_to_database.arn
+  endpoint  = aws_sqs_queue.facebook_receive_message_to_database.arn
 }
 
 resource "aws_sns_topic_subscription" "facebook_recieve_message_to_frontend" {
-  topic_arn = aws_sns_topic.facebook_recieve_message.arn
+  topic_arn = aws_sns_topic.facebook_receive_message.arn
   protocol  = "sqs"
-  endpoint  = aws_sqs_queue.facebook_recieve_message_to_frontend.arn
+  endpoint  = aws_sqs_queue.facebook_receive_message_to_frontend.arn
 }
 
 
@@ -125,24 +125,24 @@ resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
   depends_on       = [data.archive_file.standardize_facebook_webhook_handler]
 }
 
-resource "aws_lambda_function" "save_facebook_recieved_message_handler" {
-  filename         = "save_facebook_recieved_message_handler/save_facebook_recieved_message_handler.zip"
-  function_name    = "save_facebook_recieved_message_handler"
+resource "aws_lambda_function" "save_facebook_received_message_handler" {
+  filename         = "save_facebook_received_message_handler/save_facebook_recieved_message_handler.zip"
+  function_name    = "save_facebook_received_message_handler"
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("save_facebook_recieved_message_handler/src/main.go")
-  depends_on       = [data.archive_file.save_facebook_recieved_message_handler]
+  source_code_hash = filebase64sha256("save_facebook_received_message_handler/src/main.go")
+  depends_on       = [data.archive_file.save_facebook_received_message_handler]
 }
 
-resource "aws_lambda_function" "send_facebook_recieved_message_handler" {
-  filename         = "send_facebook_recieved_message_handler/send_facebook_recieved_message_handler.zip"
-  function_name    = "send_facebook_recieved_message_handler"
+resource "aws_lambda_function" "send_facebook_received_message_handler" {
+  filename         = "send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip"
+  function_name    = "send_facebook_received_message_handler"
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("send_facebook_recieved_message_handler/src/main.go")
-  depends_on       = [data.archive_file.send_facebook_recieved_message_handler]
+  source_code_hash = filebase64sha256("send_facebook_received_message_handler/src/main.go")
+  depends_on       = [data.archive_file.send_facebook_received_message_handler]
 }
 
 resource "aws_lambda_permission" "validate_facebook_webhook_handler_allow_execution_from_api_gateway" {
@@ -171,21 +171,21 @@ resource "null_resource" "build_standardize_facebook_webhook_handler" {
   }
 }
 
-resource "null_resource" "build_save_facebook_recieved_message_handler" {
+resource "null_resource" "build_save_facebook_received_message_handler" {
   triggers = {
-    source_code_hash = "${filebase64sha256("save_facebook_recieved_message_handler/src/main.go")}"
+    source_code_hash = "${filebase64sha256("save_facebook_received_message_handler/src/main.go")}"
   }
   provisioner "local-exec" {
-    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./save_facebook_recieved_message_handler/src/ -o ../bin/main ."
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./save_facebook_received_message_handler/src/ -o ../bin/main ."
   }
 }
 
-resource "null_resource" "build_send_facebook_recieved_message_handler" {
+resource "null_resource" "build_send_facebook_received_message_handler" {
   triggers = {
-    source_code_hash = "${filebase64sha256("send_facebook_recieved_message_handler/src/main.go")}"
+    source_code_hash = "${filebase64sha256("send_facebook_received_message_handler/src/main.go")}"
   }
   provisioner "local-exec" {
-    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./send_facebook_recieved_message_handler/src/ -o ../bin/main ."
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./send_facebook_received_message_handler/src/ -o ../bin/main ."
   }
 }
 
@@ -204,18 +204,18 @@ data "archive_file" "standardize_facebook_webhook_handler" {
   depends_on  = [null_resource.build_standardize_facebook_webhook_handler]
 }
 
-data "archive_file" "save_facebook_recieved_message_handler" {
+data "archive_file" "save_facebook_received_message_handler" {
   type        = "zip"
-  source_file = "./save_facebook_recieved_message_handler/src/main.go"
-  output_path = "./save_facebook_recieved_message_handler/save_facebook_recieved_message_handler.zip"
-  depends_on  = [null_resource.build_save_facebook_recieved_message_handler]
+  source_file = "./save_facebook_received_message_handler/src/main.go"
+  output_path = "./save_facebook_received_message_handler/save_facebook_recieved_message_handler.zip"
+  depends_on  = [null_resource.build_save_facebook_received_message_handler]
 }
 
-data "archive_file" "send_facebook_recieved_message_handler" {
+data "archive_file" "send_facebook_received_message_handler" {
   type        = "zip"
-  source_file = "./send_facebook_recieved_message_handler/src/main.go"
-  output_path = "./send_facebook_recieved_message_handler/send_facebook_recieved_message_handler.zip"
-  depends_on  = [null_resource.build_send_facebook_recieved_message_handler]
+  source_file = "./send_facebook_received_message_handler/src/main.go"
+  output_path = "./send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip"
+  depends_on  = [null_resource.build_send_facebook_received_message_handler]
 }
 
 
@@ -233,16 +233,16 @@ resource "null_resource" "watch_standardize_facebook_webhook_handler" {
   depends_on = [null_resource.build_standardize_facebook_webhook_handler]
 }
 
-resource "null_resource" "watch_save_facebook_recieved_message_handler" {
+resource "null_resource" "watch_save_facebook_received_message_handler" {
   triggers = {
-    source_code_hash = filebase64sha256("save_facebook_recieved_message_handler/src/main.go")
+    source_code_hash = filebase64sha256("save_facebook_received_message_handler/src/main.go")
   }
-  depends_on = [null_resource.build_save_facebook_recieved_message_handler]
+  depends_on = [null_resource.build_save_facebook_received_message_handler]
 }
 
-resource "null_resource" "watch_send_facebook_recieved_message_handler" {
+resource "null_resource" "watch_send_facebook_received_message_handler" {
   triggers = {
-    source_code_hash = filebase64sha256("send_facebook_recieved_message_handler/src/main.go")
+    source_code_hash = filebase64sha256("send_facebook_received_message_handler/src/main.go")
   }
-  depends_on = [null_resource.build_send_facebook_recieved_message_handler]
+  depends_on = [null_resource.build_send_facebook_received_message_handler]
 }
