@@ -268,21 +268,21 @@ data "archive_file" "validate_facebook_webhook_handler" {
 
 data "archive_file" "standardize_facebook_webhook_handler" {
   type        = "zip"
-  source_file = "./standardize_facebook_webhook_handler/src/main.go"
+  source_file = "./standardize_facebook_webhook_handler/bin/main"
   output_path = "./standardize_facebook_webhook_handler/standardize_facebook_webhook_handler.zip"
   depends_on  = [null_resource.build_standardize_facebook_webhook_handler]
 }
 
 data "archive_file" "post_facebook_message_handler" {
   type        = "zip"
-  source_file = "./post_facebook_message_handler/src/main.go"
+  source_file = "./post_facebook_message_handler/bin/main"
   output_path = "./post_facebook_message_handler/post_facebook_message_handler.zip"
   depends_on  = [null_resource.build_post_facebook_message_handler]
 }
 
 data "archive_file" "get_facebook_messages_handler" {
   type        = "zip"
-  source_file = "./get_facebook_messages_handler/src/main.go"
+  source_file = "./get_facebook_messages_handler/bin/main"
   output_path = "./get_facebook_messages_handler/get_facebook_messages_handler.zip"
   depends_on  = [null_resource.build_get_facebook_messages_handler]
 }
