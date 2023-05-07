@@ -391,6 +391,7 @@ data "archive_file" "get_facebook_conversation_handler" {
   output_path = "./get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
   depends_on  = [null_resource.build_get_facebook_conversation_handler]
 }
+
 resource "null_resource" "watch_validate_facebook_webhook_handler" {
   triggers = {
     source_code_hash = filebase64sha256("validate_facebook_webhook_handler/src/main.go")
