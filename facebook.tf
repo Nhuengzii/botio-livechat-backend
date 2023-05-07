@@ -29,6 +29,17 @@ resource "aws_api_gateway_method" "post_validate_facebook_webhook" {
   http_method   = "POST"
 }
 
+resource "aws_sqs_queue" "facebook_webhook_to_standardize_facebook_webhook_handler" {
+  name = "facebook_webhook_to_standardize_facebook_webhook_handler"
+}
+
+resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhook_to_standardize_facebook_webhook_handler" {
+  event_source_arn = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
+  function_name    = aws_lambda_function.standardize_facebook_webhook_handler.arn
+  batch_size       = 1
+}
+
+
 
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
   http_method             = aws_api_gateway_method.get_validate_facebook_webhook.http_method
