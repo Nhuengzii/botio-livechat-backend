@@ -33,6 +33,10 @@ resource "aws_sqs_queue" "facebook_webhook_to_standardize_facebook_webhook_handl
   name = "facebook_webhook_to_standardize_facebook_webhook_handler"
 }
 
+resource "aws_sns_topic" "facebook_recieve_message" {
+  name = "facebook_recieve_message"
+}
+
 resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhook_to_standardize_facebook_webhook_handler" {
   event_source_arn = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
   function_name    = aws_lambda_function.standardize_facebook_webhook_handler.arn
