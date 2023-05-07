@@ -17,3 +17,5 @@ post_line_message_handler/bin/*
 post_line_message_handler/post_line_message_handler.zip
 get_facebook_messages_handler/bin/*
 get_facebook_messages_handler/get_facebook_messages_handler.zip
+get_facebook_conversation_handler/bin/*
+get_facebook_conversation_handler/get_facebook_conversation_handler.zip
