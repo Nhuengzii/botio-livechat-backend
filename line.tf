@@ -43,6 +43,14 @@ resource "aws_sns_topic" "line_receive_message" {
   name = "line_receive_message"
 }
 
+resource "aws_sqs_queue" "line_receive_message_to_frontend" {
+  name = "line_receive_message_to_frontend"
+}
+
+resource "aws_sqs_queue" "line_receive_message_to_database" {
+  name = "line_receive_message_to_database"
+}
+
 resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
   name = "line_webhook_to_standardize_facebook_webhook_handler"
 }
@@ -51,6 +59,18 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_line_webhook_to
   event_source_arn = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
   function_name    = aws_lambda_function.standardize_line_webhook_handler.function_name
   batch_size       = 1
+}
+
+resource "aws_sns_topic_subscription" "line_receive_message_to_frontend" {
+  topic_arn = aws_sns_topic.line_receive_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.line_receive_message_to_frontend.arn
+}
+
+resource "aws_sns_topic_subscription" "line_receive_message_to_database" {
+  topic_arn = aws_sns_topic.line_receive_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.line_receive_message_to_database.arn
 }
 
 resource "null_resource" "build_validate_line_webhook_handler" {
