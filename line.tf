@@ -39,8 +39,8 @@ resource "aws_lambda_permission" "validate_line_webhook_handler_allow_execution_
   source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
 }
 
-resource "aws_sns_topic" "line_recive_message" {
-  name = "line_recive_message"
+resource "aws_sns_topic" "line_receive_message" {
+  name = "line_receive_message"
 }
 
 resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
