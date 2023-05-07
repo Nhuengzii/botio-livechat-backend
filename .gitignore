@@ -39,3 +39,5 @@ get_facebook_messages_handler/bin/*
 get_facebook_messages_handler/get_facebook_messages_handler.zip
 get_facebook_conversation_handler/bin/*
 get_facebook_conversation_handler/get_facebook_conversation_handler.zip
+get_line_conversations_handler/bin/*
+get_line_conversations_handler/get_line_conversations_handler.zip
