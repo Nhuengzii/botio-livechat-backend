@@ -16,6 +16,27 @@ resource "aws_api_gateway_resource" "facebook_webhook" {
   path_part   = "webhook"
 }
 
+resource "aws_api_gateway_resource" "facebook_conversation" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.facebook_page_id.id
+  path_part   = "conversations"
+}
+
+resource "aws_api_gateway_resource" "facebook_conversation_id" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.facebook_conversation.id
+  path_part   = "{conversation_id}"
+}
+
+resource "aws_api_gateway_resource" "facebook_message" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.facebook_conversation_id.id
+  path_part   = "messages"
+}
+
+
+
+
 resource "aws_api_gateway_method" "get_validate_facebook_webhook" {
   rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
   resource_id   = aws_api_gateway_resource.facebook_webhook.id
