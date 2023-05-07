@@ -41,6 +41,12 @@ resource "aws_api_gateway_method" "post_facebook_message" {
   authorization = "NONE"
 }
 
+resource "aws_api_gateway_method" "get_facebook_messages" {
+  http_method = "GET"
+  resource_id = aws_api_gateway_resource.facebook_message.id
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+}
+
 
 
 resource "aws_api_gateway_method" "get_validate_facebook_webhook" {
@@ -102,6 +108,15 @@ resource "aws_sns_topic_subscription" "facebook_recieve_message_to_frontend" {
   topic_arn = aws_sns_topic.facebook_receive_message.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.facebook_receive_message_to_frontend.arn
+}
+
+resource "aws_api_gateway_integration" "get_facebook_messages" {
+  http_method             = aws_api_gateway_method.get_facebook_messages.http_method
+  resource_id             = aws_api_gateway_resource.facebook_message.id
+  rest_api_id             = aws_api_gateway_rest_api.botio_rest_api.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.get_facebook_messages_handler.invoke_arn
 }
 
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
@@ -187,6 +202,16 @@ resource "aws_lambda_function" "post_facebook_message_handler" {
   depends_on       = [data.archive_file.post_facebook_message_handler]
 }
 
+resource "aws_lambda_function" "get_facebook_messages_handler" {
+  filename         = "get_facebook_messages_handler/get_facebook_messages_handler.zip"
+  function_name    = "get_facebook_messages_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("get_facebook_messages_handler/src/main.go")
+  depends_on       = [data.archive_file.get_facebook_messages_handler]
+}
+
 resource "aws_lambda_permission" "validate_facebook_webhook_handler_allow_execution_from_api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -202,6 +227,15 @@ resource "aws_lambda_permission" "post_facebook_message_handler_allow_execution_
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
 }
+
+resource "aws_lambda_permission" "get_facebook_messages_handler_allow_execution_from_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_facebook_messages_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
+}
+
 
 
 resource "null_resource" "build_validate_facebook_webhook_handler" {
@@ -248,6 +282,15 @@ resource "null_resource" "build_post_facebook_message_handler" {
   }
 }
 
+resource "null_resource" "build_get_facebook_messages_handler" {
+  triggers = {
+    source_code_hash = "${filebase64sha256("get_facebook_messages_handler/src/main.go")}"
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./get_facebook_messages_handler/src/ -o ../bin/main ."
+  }
+}
+
 data "archive_file" "validate_facebook_webhook_handler" {
   type        = "zip"
   source_file = "./validate_facebook_webhook_handler/bin/main"
@@ -282,6 +325,13 @@ data "archive_file" "send_facebook_received_message_handler" {
   output_path = "./send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip"
   depends_on  = [null_resource.build_send_facebook_received_message_handler]
 }
+data "archive_file" "get_facebook_messages_handler" {
+  type        = "zip"
+  source_file = "./get_facebook_messages_handler/src/main.go"
+  output_path = "./get_facebook_messages_handler/get_facebook_messages_handler.zip"
+  depends_on  = [null_resource.build_get_facebook_messages_handler]
+}
+
 
 resource "null_resource" "watch_validate_facebook_webhook_handler" {
   triggers = {
@@ -315,4 +365,11 @@ resource "null_resource" "watch_post_facebook_message_handler" {
     source_code_hash = filebase64sha256("post_facebook_message_handler/src/main.go")
   }
   depends_on = [null_resource.build_post_facebook_message_handler]
+}
+
+resource "null_resource" "watch_get_facebook_messages_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("get_facebook_messages_handler/src/main.go")
+  }
+  depends_on = [null_resource.build_get_facebook_messages_handler]
 }
