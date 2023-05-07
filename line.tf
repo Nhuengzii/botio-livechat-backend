@@ -21,6 +21,7 @@ resource "aws_api_gateway_method" "get_validate_line_webhook" {
   authorization = "NONE"
   http_method   = "GET"
 }
+
 resource "aws_api_gateway_method" "post_validate_line_webhook" {
   rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
   resource_id   = aws_api_gateway_resource.line_webhook.id
@@ -176,6 +177,13 @@ data "archive_file" "send_line_received_message_handler" {
   source_file = "send_line_received_message_handler/bin/main"
   output_path = "send_line_received_message_handler/send_line_received_message_handler.zip"
   depends_on  = [null_resource.build_send_line_received_message_handler]
+}
+
+
+data "archive_file" "validate_line_webhook_handler" {
+  type        = "zip"
+  source_dir  = "validate_line_webhook_handler"
+  output_path = "validate_line_webhook_handler/validate_line_webhook_handler.zip"
 }
 
 resource "aws_lambda_function" "validate_line_webhook_handler" {
