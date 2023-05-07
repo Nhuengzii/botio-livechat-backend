@@ -52,6 +52,19 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhoo
   batch_size       = 1
 }
 
+resource "aws_sns_topic_subscription" "facebook_recieve_message_to_database" {
+  topic_arn = aws_sns_topic.facebook_recieve_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.facebook_recieve_message_to_database.arn
+}
+
+resource "aws_sns_topic_subscription" "facebook_recieve_message_to_frontend" {
+  topic_arn = aws_sns_topic.facebook_recieve_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.facebook_recieve_message_to_frontend.arn
+}
+
+
 
 
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
