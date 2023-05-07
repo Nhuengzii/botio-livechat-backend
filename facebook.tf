@@ -52,6 +52,13 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhoo
   batch_size       = 1
 }
 
+resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_save_facebook_recieved_message_handler" {
+  event_source_arn = aws_sqs_queue.facebook_recieve_message_to_database.arn
+  function_name    = aws_lambda_function.save_facebook_recieved_message_handler.arn
+  batch_size       = 1
+}
+
+
 resource "aws_sns_topic_subscription" "facebook_recieve_message_to_database" {
   topic_arn = aws_sns_topic.facebook_recieve_message.arn
   protocol  = "sqs"
