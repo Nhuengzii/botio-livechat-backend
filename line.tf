@@ -301,24 +301,28 @@ data "archive_file" "get_line_conversations_handler" {
   type        = "zip"
   source_file = "get_line_conversations_handler/bin/main"
   output_path = "get_line_conversations_handler/get_line_conversations_handler.zip"
+  depends_on  = [null_resource.build_get_line_conversations_handler]
 }
 
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
   source_file = "validate_line_webhook_handler/bin/main"
   output_path = "validate_line_webhook_handler/validate_line_webhook_handler.zip"
+  depends_on  = [null_resource.build_validate_line_webhook_handler]
 }
 
 data "archive_file" "standardize_line_webhook_handler" {
   type        = "zip"
   source_file = "standardize_line_webhook_handler/bin/main"
   output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
+  depends_on  = [null_resource.build_standardize_line_webhook_handler]
 }
 
 data "archive_file" "post_line_message_handler" {
   type        = "zip"
   source_dir  = "post_line_message_handler"
   output_path = "post_line_message_handler/post_line_message_handler.zip"
+  depends_on  = [null_resource.build_post_line_message_handler]
 }
 
 resource "aws_lambda_function" "validate_line_webhook_handler" {
