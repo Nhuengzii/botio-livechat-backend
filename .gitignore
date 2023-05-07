@@ -33,3 +33,5 @@ get_line_messages_handler/bin/*
 get_line_messages_handler/get_line_messages_handler.zip
 post_facebook_message_handler/bin/*
 post_facebook_message_handler/post_facebook_message_handler.zip
+post_line_message_handler/bin/*
+post_line_message_handler/post_line_message_handler.zip
