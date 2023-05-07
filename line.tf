@@ -305,13 +305,13 @@ data "archive_file" "get_line_conversations_handler" {
 
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
-  source_dir  = "validate_line_webhook_handler"
+  source_file = "validate_line_webhook_handler/bin/main"
   output_path = "validate_line_webhook_handler/validate_line_webhook_handler.zip"
 }
 
 data "archive_file" "standardize_line_webhook_handler" {
   type        = "zip"
-  source_dir  = "standardize_line_webhook_handler"
+  source_file = "standardize_line_webhook_handler/bin/main"
   output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
 }
 
