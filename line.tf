@@ -39,6 +39,9 @@ resource "aws_lambda_permission" "validate_line_webhook_handler_allow_execution_
   source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
 }
 
+resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
+  name = "line_webhook_to_standardize_facebook_webhook_handler"
+}
 resource "null_resource" "build_validate_line_webhook_handler" {
   triggers = {
     source_code_hash = filebase64sha256("validate_line_webhook_handler/src/main.go")
@@ -69,4 +72,11 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
   runtime          = "go1.x"
   source_code_hash = filebase64sha256("validate_line_webhook_handler/src/main.go")
   depends_on       = [data.archive_file.validate_line_webhook_handler]
+  environment {
+    variables = {
+      SQS_QUEUE_URL = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
+      SQS_QUEUE_ARN = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
+      foo           = "bar"
+    }
+  }
 }
