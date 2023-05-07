@@ -54,6 +54,11 @@ resource "aws_api_gateway_method" "get_facebook_messages" {
   rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
   authorization = "NONE"
 }
+resource "aws_api_gateway_method" "get_facebook_messages" {
+  http_method = "GET"
+  resource_id = aws_api_gateway_resource.facebook_message.id
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+}
 
 
 
@@ -332,7 +337,6 @@ resource "null_resource" "build_get_facebook_conversation_handler" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./get_facebook_conversation_handler/src/ -o ../bin/main ."
   }
 }
-
 data "archive_file" "validate_facebook_webhook_handler" {
   type        = "zip"
   source_file = "./validate_facebook_webhook_handler/bin/main"
@@ -387,7 +391,6 @@ data "archive_file" "get_facebook_conversation_handler" {
   output_path = "./get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
   depends_on  = [null_resource.build_get_facebook_conversation_handler]
 }
-
 resource "null_resource" "watch_validate_facebook_webhook_handler" {
   triggers = {
     source_code_hash = filebase64sha256("validate_facebook_webhook_handler/src/main.go")
