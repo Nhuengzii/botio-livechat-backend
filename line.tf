@@ -149,20 +149,20 @@ resource "null_resource" "watch_save_line_received_message_handler" {
 
 data "archive_file" "validate_line_webhook_handler" {
   type        = "zip"
-  source_dir  = "validate_line_webhook_handler"
+  source_file = "validate_line_webhook_handler/bin/main"
   output_path = "validate_line_webhook_handler/validate_line_webhook_handler.zip"
 }
 
 data "archive_file" "standardize_line_webhook_handler" {
   type        = "zip"
-  source_dir  = "standardize_line_webhook_handler"
+  source_file = "standardize_line_webhook_handler/bin/main"
   output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
 }
 
 data "archive_file" "save_line_received_message_handler" {
   type        = "zip"
   source_file = "save_line_received_message_handler/bin/main"
-  output_path = "save_line_received_message_handler/save_line_recieved_message_handler.zip"
+  output_path = "save_line_received_message_handler/save_line_received_message_handler.zip"
   depends_on  = [null_resource.build_save_line_received_message_handler]
 }
 
