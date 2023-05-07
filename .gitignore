@@ -5,3 +5,5 @@ terraform.tfstate
 terraform.tfstate.backup
 validate_facebook_webhook_handler/bin/*
 validate_facebook_webhook_handler/validate_facebook_webhook_handler.zip
+standardize_facebook_webhook_handler/bin/*
+standardize_facebook_webhook_handler/standardize_facebook_webhook_handler.zip
