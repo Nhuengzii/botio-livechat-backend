@@ -120,7 +120,7 @@ resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
 }
 
 resource "aws_lambda_function" "save_facebook_recieved_message_handler" {
-  filename         = "save_facebook_recieved_message/save_facebook_recieved_message_handler.zip"
+  filename         = "save_facebook_recieved_message_handler/save_facebook_recieved_message_handler.zip"
   function_name    = "save_facebook_recieved_message_handler"
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
