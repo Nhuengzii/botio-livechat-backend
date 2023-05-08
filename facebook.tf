@@ -341,6 +341,7 @@ data "archive_file" "get_facebook_conversation_handler" {
   type        = "zip"
   source_file = "get_facebook_conversation_handler/bin/main"
   output_path = "get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
+  depends_on  = [null_resource.build_get_facebook_conversation_handler]
 }
 
 data "archive_file" "validate_facebook_webhook_handler" {
