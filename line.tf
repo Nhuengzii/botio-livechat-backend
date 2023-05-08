@@ -406,7 +406,7 @@ resource "aws_lambda_function" "get_line_messages_handler" {
 }
 
 resource "aws_lambda_function" "save_line_received_message_handler" {
-  filename      = "save_line_received_message_handler/save_line_recieved_message_handler.zip"
+  filename      = "save_line_received_message_handler/save_line_received_message_handler.zip"
   function_name = "save_line_received_message_handler"
   role          = aws_iam_role.assume_role_lambda.arn
   handler       = "main"

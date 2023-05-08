@@ -371,12 +371,6 @@ data "archive_file" "post_facebook_message_handler" {
   depends_on  = [null_resource.build_post_facebook_message_handler]
 }
 
-data "archive_file" "post_facebook_message_handler" {
-  type        = "zip"
-  source_file = "./post_facebook_message_handler/bin/main"
-  output_path = "./post_facebook_message_handler/post_facebook_message_handler.zip"
-  depends_on  = [null_resource.build_post_facebook_message_handler]
-}
 
 data "archive_file" "get_facebook_messages_handler" {
   type        = "zip"
