@@ -198,6 +198,13 @@ resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.standardize_facebook_webhook_handler.output_base64sha256
   depends_on       = [data.archive_file.standardize_facebook_webhook_handler]
+  environment {
+    variables = {
+      SNS_TOPIC_ARN = aws_sns_topic.facebook_receive_message.arn
+      SNS_TOPIC_URL = aws_sns_topic.facebook_receive_message.arn
+      foo           = "bar"
+    }
+  }
 }
 
 resource "aws_lambda_function" "post_facebook_message_handler" {
