@@ -102,6 +102,7 @@ resource "aws_api_gateway_integration" "get_facebook_messages" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_facebook_messages_handler.invoke_arn
 }
+
 resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_recieve_message_to_save_facebook_received_message_handler" {
   event_source_arn = aws_sqs_queue.facebook_receive_message_to_database.arn
   function_name    = aws_lambda_function.save_facebook_received_message_handler.arn
@@ -126,8 +127,6 @@ resource "aws_sns_topic_subscription" "facebook_recieve_message_to_frontend" {
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.facebook_receive_message_to_frontend.arn
 }
-
-
 
 resource "aws_api_gateway_integration" "get_validate_facebook_webhook" {
   http_method             = aws_api_gateway_method.get_validate_facebook_webhook.http_method
@@ -318,6 +317,7 @@ resource "null_resource" "build_get_facebook_conversation_handler" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./get_facebook_conversation_handler/src/ -o ../bin/main ."
   }
 }
+
 resource "null_resource" "build_save_facebook_received_message_handler" {
   triggers = {
     source_code_hash = "${filebase64sha256("save_facebook_received_message_handler/src/main.go")}"
@@ -362,6 +362,13 @@ data "archive_file" "send_facebook_received_message_handler" {
   source_file = "./send_facebook_received_message_handler/bin/main"
   output_path = "./send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip"
   depends_on  = [null_resource.build_send_facebook_received_message_handler]
+}
+
+data "archive_file" "post_facebook_message_handler" {
+  type        = "zip"
+  source_file = "./post_facebook_message_handler/bin/main"
+  output_path = "./post_facebook_message_handler/post_facebook_message_handler.zip"
+  depends_on  = [null_resource.build_post_facebook_message_handler]
 }
 
 data "archive_file" "post_facebook_message_handler" {

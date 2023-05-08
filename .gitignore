@@ -11,7 +11,6 @@ validate_line_webhook_handler/bin/*
 validate_line_webhook_handler/validate_line_webhook_handler.zip
 standardize_line_webhook_handler/bin/*
 standardize_line_webhook_handler/standardize_line_webhook_handler.zip
-<<<<<<< HEAD
 post_facebook_message_handler/bin/*
 post_facebook_message_handler/post_facebook_message_handler.zip
 post_line_message_handler/bin/*
@@ -24,7 +23,6 @@ get_line_conversations_handler/bin/*
 get_line_conversations_handler/get_line_conversations_handler.zip
 get_line_messages_handler/bin/*
 get_line_messages_handler/get_line_messages_handler.zip
-=======
 save_facebook_received_message_handler/bin/*
 save_facebook_received_message_handler/save_facebook_recieved_message_handler.zip
 send_facebook_received_message_handler/bin/*
@@ -33,4 +31,3 @@ send_line_received_message_handler/bin/*
 send_line_received_message_handler/send_line_received_message_handler.zip
 save_line_received_message_handler/bin/*
 save_line_received_message_handler/save_line_received_message_handler.zip
->>>>>>> 61af4e3f1b019cb5b10feb180a32b6836aeda30d
