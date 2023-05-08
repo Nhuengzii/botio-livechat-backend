@@ -321,7 +321,13 @@ resource "aws_lambda_function" "standardize_line_webhook_handler" {
   handler          = "main"
   runtime          = "go1.x"
   source_code_hash = data.archive_file.standardize_line_webhook_handler.output_base64sha256
-  depends_on       = [data.archive_file.standardize_line_webhook_handler]
+  environment {
+    variables = {
+      SNS_TOPIC_ARN  = aws_sns_topic.line_receive_message.arn
+      SNS_TOPIC_NAME = aws_sns_topic.line_receive_message.name
+    }
+  }
+  depends_on = [data.archive_file.standardize_line_webhook_handler]
 }
 
 resource "aws_lambda_function" "post_line_message_handler" {
