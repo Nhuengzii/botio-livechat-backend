@@ -508,3 +508,21 @@ resource "aws_lambda_function" "get_line_messages_handler" {
   source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
   depends_on       = [data.archive_file.get_line_messages_handler]
 }
+
+resource "aws_lambda_function" "save_line_received_message_handler" {
+  filename      = "save_line_received_message_handler/save_line_received_message_handler.zip"
+  function_name = "save_line_received_message_handler"
+  role          = aws_iam_role.assume_role_lambda.arn
+  handler       = "main"
+  runtime       = "go1.x"
+  depends_on    = [data.archive_file.save_line_received_message_handler]
+}
+
+resource "aws_lambda_function" "send_line_received_message_handler" {
+  filename      = "send_line_received_message_handler/send_line_received_message_handler.zip"
+  function_name = "send_line_received_message_handler"
+  role          = aws_iam_role.assume_role_lambda.arn
+  handler       = "main"
+  runtime       = "go1.x"
+  depends_on    = [data.archive_file.send_line_received_message_handler]
+}

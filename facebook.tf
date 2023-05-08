@@ -378,6 +378,15 @@ data "archive_file" "send_facebook_received_message_handler" {
   output_path = "./send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip"
   depends_on  = [null_resource.build_send_facebook_received_message_handler]
 }
+
+data "archive_file" "post_facebook_message_handler" {
+  type        = "zip"
+  source_file = "./post_facebook_message_handler/bin/main"
+  output_path = "./post_facebook_message_handler/post_facebook_message_handler.zip"
+  depends_on  = [null_resource.build_post_facebook_message_handler]
+}
+
+
 data "archive_file" "get_facebook_messages_handler" {
   type        = "zip"
   source_file = "./get_facebook_messages_handler/bin/main"
