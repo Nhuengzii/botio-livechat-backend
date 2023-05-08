@@ -230,19 +230,6 @@ resource "null_resource" "build_get_line_conversations_handler" {
 }
 
 
-resource "null_resource" "watch_get_line_messages_handler" {
-  triggers = {
-    source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
-  }
-  depends_on = [null_resource.build_get_line_messages_handler]
-}
-
-resource "null_resource" "watch_get_line_conversations_handler" {
-  triggers = {
-    get_line_conversations_handler = aws_lambda_function.get_line_conversations_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_get_line_conversations_handler]
-}
 
 resource "null_resource" "build_send_line_received_message_handler" {
   triggers = {
@@ -267,40 +254,6 @@ resource "null_resource" "get_line_conversations_handler" {
     source_code_hash = filebase64sha256("get_line_conversations_handler/src/main.go")
   }
   depends_on = [data.archive_file.get_line_conversations_handler]
-}
-
-
-resource "null_resource" "watch_validate_line_webhook_handler" {
-  triggers = {
-    validate_line_webhook_handler = aws_lambda_function.validate_line_webhook_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_validate_line_webhook_handler]
-}
-resource "null_resource" "watch_standardize_line_webhook_handler" {
-  triggers = {
-    standardize_line_webhook_handler = aws_lambda_function.standardize_line_webhook_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_validate_line_webhook_handler]
-}
-
-resource "null_resource" "watch_send_line_received_message_handler" {
-  triggers = {
-    send_line_received_message_handler = aws_lambda_function.send_line_received_message_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_send_line_received_message_handler]
-}
-
-resource "null_resource" "watch_save_line_received_message_handler" {
-  triggers = {
-    save_line_received_message_handler = aws_lambda_function.save_line_received_message_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_save_line_received_message_handler]
-}
-resource "null_resource" "watch_post_line_message_handler" {
-  triggers = {
-    post_line_message_handler = aws_lambda_function.post_line_message_handler.qualified_arn
-  }
-  depends_on = [null_resource.build_post_line_message_handler]
 }
 
 data "archive_file" "get_line_messages_handler" {
@@ -358,7 +311,7 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("validate_line_webhook_handler/src/main.go")
+  source_code_hash = data.archive_file.validate_line_webhook_handler.output_base64sha256
   depends_on       = [data.archive_file.validate_line_webhook_handler]
   environment {
     variables = {
@@ -370,11 +323,12 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
 }
 
 resource "aws_lambda_function" "standardize_line_webhook_handler" {
-  filename      = data.archive_file.standardize_line_webhook_handler.output_path
-  function_name = "standardize_line_webhook_handler"
-  role          = aws_iam_role.assume_role_lambda.arn
-  handler       = "main"
-  runtime       = "go1.x"
+  filename         = data.archive_file.standardize_line_webhook_handler.output_path
+  function_name    = "standardize_line_webhook_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = data.archive_file.standardize_line_webhook_handler.output_base64sha256
   environment {
     variables = {
       SQS_QUEUE_URL = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
@@ -391,7 +345,7 @@ resource "aws_lambda_function" "post_line_message_handler" {
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("post_line_message_handler/src/main.go")
+  source_code_hash = data.archive_file.post_line_message_handler.output_base64sha256
   depends_on       = [data.archive_file.post_line_message_handler]
 }
 
@@ -401,7 +355,7 @@ resource "aws_lambda_function" "get_line_conversations_handler" {
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("get_line_conversations_handler/src/main.go")
+  source_code_hash = data.archive_file.get_line_conversations_handler.output_base64sha256
   depends_on       = [data.archive_file.get_line_conversations_handler]
 }
 
@@ -411,24 +365,26 @@ resource "aws_lambda_function" "get_line_messages_handler" {
   role             = aws_iam_role.assume_role_lambda.arn
   handler          = "main"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
+  source_code_hash = data.archive_file.get_line_messages_handler.output_base64sha256
   depends_on       = [data.archive_file.get_line_messages_handler]
 }
 
 resource "aws_lambda_function" "save_line_received_message_handler" {
-  filename      = "save_line_received_message_handler/save_line_received_message_handler.zip"
-  function_name = "save_line_received_message_handler"
-  role          = aws_iam_role.assume_role_lambda.arn
-  handler       = "main"
-  runtime       = "go1.x"
-  depends_on    = [data.archive_file.save_line_received_message_handler]
+  filename         = "save_line_received_message_handler/save_line_received_message_handler.zip"
+  function_name    = "save_line_received_message_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  source_code_hash = data.archive_file.save_line_received_message_handler.output_base64sha256
+  handler          = "main"
+  runtime          = "go1.x"
+  depends_on       = [data.archive_file.save_line_received_message_handler]
 }
 
 resource "aws_lambda_function" "send_line_received_message_handler" {
-  filename      = "send_line_received_message_handler/send_line_received_message_handler.zip"
-  function_name = "send_line_received_message_handler"
-  role          = aws_iam_role.assume_role_lambda.arn
-  handler       = "main"
-  runtime       = "go1.x"
-  depends_on    = [data.archive_file.send_line_received_message_handler]
+  filename         = "send_line_received_message_handler/send_line_received_message_handler.zip"
+  function_name    = "send_line_received_message_handler"
+  source_code_hash = data.archive_file.send_line_received_message_handler.output_base64sha256
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  depends_on       = [data.archive_file.send_line_received_message_handler]
 }
