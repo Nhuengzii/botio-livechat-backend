@@ -16,8 +16,6 @@ resource "aws_api_gateway_resource" "line_webhook" {
   path_part   = "webhook"
 }
 
-
-
 resource "aws_api_gateway_resource" "line_conversation" {
   rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
   parent_id   = aws_api_gateway_resource.line_page_id.id
@@ -323,14 +321,7 @@ resource "aws_lambda_function" "standardize_line_webhook_handler" {
   handler          = "main"
   runtime          = "go1.x"
   source_code_hash = data.archive_file.standardize_line_webhook_handler.output_base64sha256
-  environment {
-    variables = {
-      SQS_QUEUE_URL = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
-      SQS_QUEUE_ARN = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
-      foo           = "bar"
-    }
-  }
-  depends_on = [data.archive_file.standardize_line_webhook_handler]
+  depends_on       = [data.archive_file.standardize_line_webhook_handler]
 }
 
 resource "aws_lambda_function" "post_line_message_handler" {
