@@ -339,7 +339,7 @@ resource "null_resource" "build_get_facebook_messages_handler" {
 
 data "archive_file" "get_facebook_conversation_handler" {
   type        = "zip"
-  source_file = "get_facebook_conversation_handler/src/main.go"
+  source_file = "get_facebook_conversation_handler/bin/main"
   output_path = "get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
 }
 
