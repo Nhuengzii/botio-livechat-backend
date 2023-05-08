@@ -60,6 +60,24 @@ resource "aws_api_gateway_resource" "line_message" {
 }
 
 
+resource "aws_api_gateway_resource" "line_conversation" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.line_page_id.id
+  path_part   = "conversations"
+}
+
+resource "aws_api_gateway_resource" "line_conversation_id" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.line_conversation.id
+  path_part   = "{conversation_id}"
+}
+
+resource "aws_api_gateway_resource" "line_message" {
+  rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
+  parent_id   = aws_api_gateway_resource.line_conversation_id.id
+  path_part   = "messages"
+}
+
 resource "aws_api_gateway_method" "post_validate_line_webhook" {
   rest_api_id   = aws_api_gateway_rest_api.botio_rest_api.id
   resource_id   = aws_api_gateway_resource.line_webhook.id
@@ -106,7 +124,6 @@ resource "aws_api_gateway_integration" "get_line_conversations" {
   uri                     = aws_lambda_function.get_line_conversations_handler.invoke_arn
 }
 
-
 resource "aws_api_gateway_integration" "post_validate_line_webhook" {
   http_method             = aws_api_gateway_method.post_validate_line_webhook.http_method
   resource_id             = aws_api_gateway_resource.line_webhook.id
@@ -137,6 +154,22 @@ resource "aws_lambda_permission" "validate_line_webhook_handler_allow_execution_
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.validate_line_webhook_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
+}
+
+resource "aws_lambda_permission" "post_line_message_handler_allow_execution_from_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.post_line_message_handler.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
+}
+
+resource "aws_lambda_permission" "get_line_conversations_handler_allow_execution_from_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_line_conversations_handler.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.botio_rest_api.execution_arn}/*/*/*"
 }
@@ -178,6 +211,15 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping_line_webhook_to
   event_source_arn = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
   function_name    = aws_lambda_function.standardize_line_webhook_handler.function_name
   batch_size       = 1
+}
+
+resource "null_resource" "build_get_line_messages_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./get_line_messages_handler/src/ -o ../bin/main ."
+  }
 }
 
 resource "aws_lambda_event_source_mapping" "event_source_mapping_line_receive_message_to_frontend" {
@@ -257,6 +299,45 @@ resource "null_resource" "build_standardize_line_webhook_handler" {
   }
 }
 
+resource "null_resource" "build_post_line_message_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("post_line_message_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./post_line_message_handler/src/ -o ../bin/main ."
+  }
+}
+
+resource "null_resource" "build_get_line_conversations_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("get_line_conversations_handler/src/main.go")
+  }
+  provisioner "local-exec" {
+    command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./get_line_conversations_handler/src/ -o ../bin/main ."
+  }
+}
+
+resource "null_resource" "get_line_conversations_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("get_line_conversations_handler/src/main.go")
+  }
+  depends_on = [data.archive_file.get_line_conversations_handler]
+}
+
+resource "null_resource" "watch_get_line_messages_handler" {
+  triggers = {
+    source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
+  }
+  depends_on = [null_resource.build_get_line_messages_handler]
+}
+
+resource "null_resource" "watch_get_line_conversations_handler" {
+  triggers = {
+    get_line_conversations_handler = aws_lambda_function.get_line_conversations_handler.qualified_arn
+  }
+  depends_on = [null_resource.build_get_line_conversations_handler]
+}
+
 resource "null_resource" "build_send_line_received_message_handler" {
   triggers = {
     source_code_hash = filebase64sha256("send_line_received_message_handler/src/main.go")
@@ -326,6 +407,27 @@ resource "null_resource" "watch_standardize_line_webhook_handler" {
   depends_on = [null_resource.build_validate_line_webhook_handler]
 }
 
+resource "null_resource" "watch_post_line_message_handler" {
+  triggers = {
+    post_line_message_handler = aws_lambda_function.post_line_message_handler.qualified_arn
+  }
+  depends_on = [null_resource.build_post_line_message_handler]
+}
+
+data "archive_file" "get_line_messages_handler" {
+  type        = "zip"
+  source_file = "get_line_messages_handler/bin/main"
+  output_path = "get_line_messages_handler/get_line_messages_handler.zip"
+  depends_on  = [null_resource.build_get_line_messages_handler]
+}
+
+data "archive_file" "get_line_conversations_handler" {
+  type        = "zip"
+  source_file = "get_line_conversations_handler/bin/main"
+  output_path = "get_line_conversations_handler/get_line_conversations_handler.zip"
+  depends_on  = [null_resource.build_get_line_conversations_handler]
+}
+
 resource "null_resource" "watch_send_line_received_message_handler" {
   triggers = {
     send_line_received_message_handler = aws_lambda_function.send_line_received_message_handler.qualified_arn
@@ -372,6 +474,13 @@ data "archive_file" "standardize_line_webhook_handler" {
   source_file = "standardize_line_webhook_handler/bin/main"
   output_path = "standardize_line_webhook_handler/standardize_line_webhook_handler.zip"
   depends_on  = [null_resource.build_standardize_line_webhook_handler]
+}
+
+data "archive_file" "post_line_message_handler" {
+  type        = "zip"
+  source_file = "post_line_message_handler/bin/main"
+  output_path = "post_line_message_handler/post_line_message_handler.zip"
+  depends_on  = [null_resource.build_post_line_message_handler]
 }
 
 data "archive_file" "save_line_received_message_handler" {
@@ -462,8 +571,38 @@ resource "aws_lambda_function" "standardize_line_webhook_handler" {
   depends_on = [data.archive_file.standardize_line_webhook_handler]
 }
 
+resource "aws_lambda_function" "post_line_message_handler" {
+  filename         = data.archive_file.post_line_message_handler.output_path
+  function_name    = "post_line_message_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("post_line_message_handler/src/main.go")
+  depends_on       = [data.archive_file.post_line_message_handler]
+}
+
+resource "aws_lambda_function" "get_line_conversations_handler" {
+  filename         = data.archive_file.get_line_conversations_handler.output_path
+  function_name    = "get_line_conversations_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("get_line_conversations_handler/src/main.go")
+  depends_on       = [data.archive_file.get_line_conversations_handler]
+}
+
+resource "aws_lambda_function" "get_line_messages_handler" {
+  filename         = data.archive_file.get_line_messages_handler.output_path
+  function_name    = "get_line_messages_handler"
+  role             = aws_iam_role.assume_role_lambda.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("get_line_messages_handler/src/main.go")
+  depends_on       = [data.archive_file.get_line_messages_handler]
+}
+
 resource "aws_lambda_function" "save_line_received_message_handler" {
-  filename      = "save_line_received_message_handler/save_line_recieved_message_handler.zip"
+  filename      = "save_line_received_message_handler/save_line_received_message_handler.zip"
   function_name = "save_line_received_message_handler"
   role          = aws_iam_role.assume_role_lambda.arn
   handler       = "main"
