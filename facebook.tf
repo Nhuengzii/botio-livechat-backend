@@ -284,6 +284,8 @@ resource "aws_lambda_permission" "get_facebook_conversation_handler_allow_execut
 resource "null_resource" "build_validate_facebook_webhook_handler" {
   triggers = {
     source_code_hash = "${filebase64sha256("validate_facebook_webhook_handler/src/main.go")}"
+    source_code_hash1 = "${filebase64sha256("validate_facebook_webhook_handler/src/sendQueueMessage.go")}"
+    source_code_hash2 = "${filebase64sha256("validate_facebook_webhook_handler/src/verificationCheck.go")}"
   }
   provisioner "local-exec" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./validate_facebook_webhook_handler/src/ -o ../bin/main ."
@@ -293,6 +295,10 @@ resource "null_resource" "build_validate_facebook_webhook_handler" {
 resource "null_resource" "build_standardize_facebook_webhook_handler" {
   triggers = {
     source_code_hash = "${filebase64sha256("standardize_facebook_webhook_handler/src/main.go")}"
+    source_code_hash1 = "${filebase64sha256("standardize_facebook_webhook_handler/src/recieveMessage.go")}"
+    source_code_hash2 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardMessage.go")}"
+    source_code_hash3 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardize.go")}"
+    
   }
   provisioner "local-exec" {
     command = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./standardize_facebook_webhook_handler/src/ -o ../bin/main ."

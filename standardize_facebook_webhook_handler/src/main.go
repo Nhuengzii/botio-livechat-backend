@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,10 +13,28 @@ func main() {
 	lambda.Start(handle)
 }
 
-func handle(ctx context.Context, sqsEvent events.SQSEvent) error {
+func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	log.Println("Facebook Message Standardizer handler")
-	for _, message := range sqsEvent.Records {
-		log.Printf("The message body is : %s\n", message.Body)
+	var recieveMessage RecieveMessage
+	var standardMessages []StandardMessage
+	for _, record := range sqsEvent.Records {
+		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
+		if err != nil {
+			log.Printf("Error unmarshal Record.Body : %v\n", err)
+			return
+		}
+		for _, message := range recieveMessage.Entry {
+			if messaging := message.MessageDatas; messaging != nil {
+				log.Println("messaging field found in recievedMessage")
+				//standardize messaging hooks
+				Standardize(messaging, message.PageID, &standardMessages)
+			}
+		}
 	}
-	return nil
+
+	for _, message := range standardMessages {
+		log.Println("standardMessages")
+		log.Printf("%v\n", message)
+	}
+	return
 }
