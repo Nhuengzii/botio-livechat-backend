@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
+// TODO: validate facebook post request
 func main() {
 	lambda.Start(Handler)
 }

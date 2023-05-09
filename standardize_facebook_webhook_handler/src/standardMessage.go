@@ -9,7 +9,7 @@ type StandardMessage struct {
 	Source         Source       `json:"source"`
 	Message        string       `json:"message"`
 	Attachments    []Attachment `json:"attachments"`
-	ReplyTo        ReplyMessage `json:"replyTo,omitempty"`
+	ReplyTo        ReplyMessage `json:"replyTo"`
 }
 
 type Source struct {

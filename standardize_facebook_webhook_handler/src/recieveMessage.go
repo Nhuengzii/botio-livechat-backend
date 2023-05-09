@@ -15,14 +15,14 @@ type MessageData struct {
 	Sender    User    `json:"sender"`
 	Recipient User    `json:"recipient"`
 	Timestamp int64   `json:"timestamp"`
-	Message   Message `json:"message,omitempty"`
+	Message   Message `json:"message"`
 }
 
 type Message struct {
 	MessageID   string       `json:"mid"`
-	Text        string       `json:"text,omitempty"`
-	Attachments []Attachment `json:"attachments,omitempty"`
-	ReplyTo     ReplyMessage `json:"reply_to,omitempty"`
+	Text        string       `json:"text"`
+	Attachments []Attachment `json:"attachments"`
+	ReplyTo     ReplyMessage `json:"reply_to"`
 }
 
 type User struct {
