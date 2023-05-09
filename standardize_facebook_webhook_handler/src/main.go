@@ -32,9 +32,13 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		}
 	}
 
+	err := sendSnsMessage(&standardMessages)
+	if err != nil {
+		log.Println("Error sending SQS message :", err)
+	}
 	for _, message := range standardMessages {
 		log.Println("standardMessages")
-		log.Printf("%v\n", message)
+		log.Printf("%+v\n", message)
 	}
 	return
 }
