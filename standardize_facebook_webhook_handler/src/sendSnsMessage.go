@@ -10,6 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
+type SnsMessage struct {
+	Default string `json:"default"`
+}
+
 func sendSnsMessage(standardMessages *[]StandardMessage) error {
 	topicArn := os.Getenv("SNS_TOPIC_ARN")
 	sess := session.New(&aws.Config{})
@@ -21,9 +25,17 @@ func sendSnsMessage(standardMessages *[]StandardMessage) error {
 			return err
 		}
 
+		snsMessage := SnsMessage{
+			Default: string(message),
+		}
+		snsByte, err := json.Marshal(snsMessage)
+		if err != nil {
+			return err
+		}
+
 		result, err := svc.Publish(&sns.PublishInput{
 			MessageStructure: aws.String("json"),
-			Message:          aws.String(string(message)),
+			Message:          aws.String(string(snsByte)),
 			TopicArn:         &topicArn,
 		})
 		if err != nil {
