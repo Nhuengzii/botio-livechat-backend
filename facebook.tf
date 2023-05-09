@@ -89,7 +89,7 @@ resource "aws_sqs_queue" "facebook_receive_message_to_frontend" {
 resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhook_to_standardize_facebook_webhook_handler" {
   event_source_arn = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
   function_name    = aws_lambda_function.standardize_facebook_webhook_handler.arn
-  batch_size       = 1
+  batch_size       = 10
 }
 
 
