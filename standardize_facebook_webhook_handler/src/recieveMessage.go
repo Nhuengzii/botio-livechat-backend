@@ -15,7 +15,7 @@ type MessageData struct {
 	Sender    User    `json:"sender"`
 	Recipient User    `json:"recipient"`
 	Timestamp int64   `json:"timestamp"`
-	Message   Message `json:"message"`
+	Message   Message `json:"message,omitempty"`
 }
 
 type Message struct {
