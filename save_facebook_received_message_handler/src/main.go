@@ -1,7 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"log"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+)
 
 func main() {
-	fmt.Println("Hello Jom Doe")
+	lambda.Start(handle)
+}
+
+func handle(ctx context.Context, sqsEvent events.SQSEvent) {
+	log.Println("facebook database handler")
+	for _, record := range sqsEvent.Records {
+		log.Println(record)
+	}
+	return
 }

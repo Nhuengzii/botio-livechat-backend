@@ -12,7 +12,6 @@ import (
 func main() {
 	lambda.Start(handle)
 }
-
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	log.Println("Facebook Message Standardizer handler")
 	var recieveMessage RecieveMessage
@@ -34,7 +33,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 
 	err := sendSnsMessage(&standardMessages)
 	if err != nil {
-		log.Println("Error sending SQS message :", err)
+		log.Println("Error sending SNS message :", err)
 	}
 	return
 }

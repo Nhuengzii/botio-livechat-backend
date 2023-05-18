@@ -16,10 +16,11 @@ type SnsMessage struct {
 
 func sendSnsMessage(standardMessages *[]StandardMessage) error {
 	topicArn := os.Getenv("SNS_TOPIC_ARN")
+	log.Println(topicArn)
 	sess := session.New(&aws.Config{})
 	svc := sns.New(sess)
 	log.Println("Attempt publishing message from facebook standardizer to SNS")
-	for _, standardMessage := range *standardMessages {
+	for _, standardMessage := range *standardMessages { //TODO: determine if send as a batch is better?
 		message, err := json.Marshal(standardMessage)
 		if err != nil {
 			return err
