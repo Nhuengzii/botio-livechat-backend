@@ -93,7 +93,8 @@ data "aws_iam_policy_document" "sqs_allow_send_message_from_facebook_receive_mes
     ]
     effect = "Allow"
     resources = [
-      aws_sqs_queue.facebook_receive_message_to_database.arn
+      aws_sqs_queue.facebook_receive_message_to_database.arn,
+      aws_sqs_queue.facebook_receive_message_to_frontend.arn
     ]
     principals {
       type        = "Service"
