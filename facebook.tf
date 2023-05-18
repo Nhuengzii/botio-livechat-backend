@@ -85,6 +85,38 @@ resource "aws_sqs_queue" "facebook_receive_message_to_frontend" {
   name = "facebook_receive_message_to_frontend"
 }
 
+data "aws_iam_policy_document" "sqs_allow_send_message_from_facebook_receive_message_topic" {
+  statement {
+    sid = "AllowSendMessageFromFacebookReceiveMessageTopic"
+    actions = [
+      "sqs:SendMessage"
+    ]
+    effect = "Allow"
+    resources = [
+      aws_sqs_queue.facebook_receive_message_to_database.arn
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.facebook_receive_message.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "facebook_receive_message_to_database_allow_send_message_from_facebook_receive_message_topic" {
+  queue_url = aws_sqs_queue.facebook_receive_message_to_database.id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_facebook_receive_message_topic.json
+}
+
+resource "aws_sqs_queue_policy" "facebook_recieve_message_to_frontend_allow_send_message_from_facebook_receive_message_topic" {
+  queue_url = aws_sqs_queue.facebook_receive_message_to_frontend.id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_facebook_receive_message_topic.json
+}
+
 
 resource "aws_lambda_event_source_mapping" "event_source_mapping_facebook_webhook_to_standardize_facebook_webhook_handler" {
   event_source_arn = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
@@ -283,7 +315,7 @@ resource "aws_lambda_permission" "get_facebook_conversation_handler_allow_execut
 
 resource "null_resource" "build_validate_facebook_webhook_handler" {
   triggers = {
-    source_code_hash = "${filebase64sha256("validate_facebook_webhook_handler/src/main.go")}"
+    source_code_hash  = "${filebase64sha256("validate_facebook_webhook_handler/src/main.go")}"
     source_code_hash1 = "${filebase64sha256("validate_facebook_webhook_handler/src/sendQueueMessage.go")}"
     source_code_hash2 = "${filebase64sha256("validate_facebook_webhook_handler/src/verificationCheck.go")}"
   }
@@ -294,7 +326,7 @@ resource "null_resource" "build_validate_facebook_webhook_handler" {
 
 resource "null_resource" "build_standardize_facebook_webhook_handler" {
   triggers = {
-    source_code_hash = "${filebase64sha256("standardize_facebook_webhook_handler/src/main.go")}"
+    source_code_hash  = "${filebase64sha256("standardize_facebook_webhook_handler/src/main.go")}"
     source_code_hash1 = "${filebase64sha256("standardize_facebook_webhook_handler/src/recieveMessage.go")}"
     source_code_hash2 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardMessage.go")}"
     source_code_hash3 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardize.go")}"
