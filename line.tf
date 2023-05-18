@@ -146,6 +146,38 @@ resource "aws_sqs_queue" "line_webhook_to_standardize_line_webhook_handler" {
   name = "line_webhook_to_standardize_facebook_webhook_handler"
 }
 
+data "aws_iam_policy_document" "sqs_allow_send_message_from_line_receive_message_topic" {
+  statement {
+    sid = "AllowSendMessageFromLineReceiveMessageTopic"
+    actions = [
+      "sqs:SendMessage"
+    ]
+    effect = "Allow"
+    resources = [
+      aws_sqs_queue.line_receive_message_to_database.arn,
+      aws_sqs_queue.line_receive_message_to_frontend.arn
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.line_receive_message.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "line_receive_message_to_database_allow_send_message_from_line_receive_message_topic" {
+  queue_url = aws_sqs_queue.facebook_receive_message_to_database.id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_line_receive_message_topic.json
+}
+
+resource "aws_sqs_queue_policy" "line_recieve_message_to_frontend_allow_send_message_from_line_receive_message_topic" {
+  queue_url = aws_sqs_queue.line_receive_message_to_frontend.id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_line_receive_message_topic.json
+}
 resource "aws_lambda_event_source_mapping" "event_source_mapping_line_webhook_to_standardize_line_webhook_handler" {
   event_source_arn = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
   function_name    = aws_lambda_function.standardize_line_webhook_handler.function_name
