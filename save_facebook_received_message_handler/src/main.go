@@ -13,15 +13,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const uri = "mongodb+srv://paff:thisispassword@botiolivechat.nevtjex.mongodb.net/?retryWrites=true&w=majority"
+const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
 
 func main() {
 	lambda.Start(handle)
 }
 
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
+	start := time.Now()
 	log.Println("facebook database handler")
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 
 	opts := options.Client().ApplyURI(uri)
@@ -45,9 +46,15 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		log.Println("Error Pinging DB : ", err)
 		return
 	}
-	log.Println("Successfully connect to MongoDB")
+	log.Println("Successfully  connect to MongoDB ", time.Since(start))
+
 	for _, record := range sqsEvent.Records {
-		log.Println(record)
+		err := WriteMessageDb(client, record)
+		if err != nil {
+			log.Println("Error Inserting doc to DB : ", err)
+		}
 	}
+
+	log.Println("Elapsed End: ", time.Since(start))
 	return
 }

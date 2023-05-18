@@ -12,6 +12,7 @@ import (
 func main() {
 	lambda.Start(handle)
 }
+
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	log.Println("Facebook Message Standardizer handler")
 	var recieveMessage RecieveMessage
@@ -19,19 +20,20 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil {
-			log.Printf("Error unmarshal Record.Body : %v\n", err)
+			log.Printf("Error  unmarshal Record.Body : %v\n", err)
 			return
 		}
 		for _, message := range recieveMessage.Entry {
 			if messaging := message.MessageDatas; messaging != nil {
-				log.Println("messaging field found in recievedMessage")
-				//standardize messaging hooks
+				log.Println("messaging  field found in recievedMessage")
+				// standardize messaging hooks
 				Standardize(messaging, message.PageID, &standardMessages)
 			}
 		}
 	}
 
 	err := sendSnsMessage(&standardMessages)
+	log.Printf("%+v", standardMessages)
 	if err != nil {
 		log.Println("Error sending SNS message :", err)
 	}
