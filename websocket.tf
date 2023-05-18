@@ -98,7 +98,7 @@ resource "aws_lambda_permission" "botio_livechat_websocket_default_handler_allow
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.botio_livechat_websocket_default_handler.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*}"
+  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*/$default"
 }
 
 resource "aws_lambda_permission" "botio_livechat_websocket_connect_handler_allow_execution_form_api_gateway" {
@@ -106,7 +106,7 @@ resource "aws_lambda_permission" "botio_livechat_websocket_connect_handler_allow
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.botio_livechat_websocket_connect_handler.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*}"
+  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*/$connect"
 }
 
 resource "aws_lambda_permission" "botio_livechat_websocket_disconnect_handler_allow_execution_form_api_gateway" {
@@ -114,7 +114,7 @@ resource "aws_lambda_permission" "botio_livechat_websocket_disconnect_handler_al
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.botio_livechat_websocket_disconnect_handler.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*}"
+  source_arn    = "${aws_apigatewayv2_api.botio_livechat_websocket.execution_arn}/*/$disconnect"
 }
 
 resource "null_resource" "build_botio_livechat_websocket_default_handler" {
