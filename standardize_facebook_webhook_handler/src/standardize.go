@@ -6,6 +6,7 @@ func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]
 	for _, messageData := range messageDatas {
 		newMessage := StandardMessage{
 			ShopID:         "1",
+			Platform:       "Facebook",
 			PageID:         pageID,
 			ConversationID: "t_2422534594589937",
 			MessageID:      messageData.Message.MessageID,
@@ -16,7 +17,9 @@ func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]
 			},
 			Message:     messageData.Message.Text,
 			Attachments: messageData.Message.Attachments,
-			ReplyTo:     messageData.Message.ReplyTo,
+			ReplyTo: ReplyMessage{
+				MessageId: messageData.Message.ReplyTo.MessageId,
+			},
 		}
 		*standardMessages = append(*standardMessages, newMessage)
 	}
