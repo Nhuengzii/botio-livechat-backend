@@ -21,7 +21,7 @@ func main() {
 
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	start := time.Now()
-	log.Println("facebook database handler")
+	log.Println("facebook database  handler")
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 

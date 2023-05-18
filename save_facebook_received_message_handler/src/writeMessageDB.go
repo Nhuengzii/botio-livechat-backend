@@ -22,8 +22,12 @@ func WriteMessageDb(client *mongo.Client, record events.SQSMessage) error {
 		return err
 	}
 	log.Printf("%+v", recieveMessage)
-
-	coll := client.Database("BotioLivechat").Collection("facebook_message")
+	// check if need to create conversation
+	err = ConversationCreate(client, recieveMessage)
+	if err != nil {
+		return err
+	}
+	coll := client.Database("BotioLivechat").Collection("facebook_messages")
 	result, err := coll.InsertOne(context.TODO(), recieveMessage)
 	if err != nil {
 		return err
