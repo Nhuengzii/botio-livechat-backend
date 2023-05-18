@@ -170,7 +170,7 @@ data "aws_iam_policy_document" "sqs_allow_send_message_from_line_receive_message
 }
 
 resource "aws_sqs_queue_policy" "line_receive_message_to_database_allow_send_message_from_line_receive_message_topic" {
-  queue_url = aws_sqs_queue.facebook_receive_message_to_database.id
+  queue_url = aws_sqs_queue.line_receive_message_to_database.id
   policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_line_receive_message_topic.json
 }
 
