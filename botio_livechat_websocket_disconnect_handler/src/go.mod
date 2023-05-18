@@ -1,0 +1,3 @@
+module botio_livechat_websocket_disconnect_handler
+
+go 1.20

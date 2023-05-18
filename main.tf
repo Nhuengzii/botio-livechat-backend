@@ -47,7 +47,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_role_lambda" {
   role       = aws_iam_role.assume_role_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+resource "aws_iam_role_policy_attachment" "lambda_basic_snsexecution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
 }
 
 resource "aws_api_gateway_deployment" "botio_rest_api_deployment" {

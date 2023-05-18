@@ -1,5 +1,6 @@
 .terraform
 .vscode
+.idea
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
@@ -55,3 +56,9 @@ get_line_conversations_handler/bin/*
 get_line_conversations_handler/get_line_conversations_handler.zip
 get_line_messages_handler/bin/*
 get_line_messages_handler/get_line_messages_handler.zip
+botio_livechat_websocket_default_handler/bin/*
+botio_livechat_websocket_default_handler/botio_livechat_websocket_default_handler.zip
+botio_livechat_websocket_connect_handler/bin/*
+botio_livechat_websocket_connect_handler/botio_livechat_websocket_connect_handler.zip
+botio_livechat_websocket_disconnect_handler/bin/*
+botio_livechat_websocket_disconnect_handler/botio_livechat_websocket_disconnect_handler.zip
