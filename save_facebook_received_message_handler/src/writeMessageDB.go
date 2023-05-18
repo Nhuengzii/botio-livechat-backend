@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -21,7 +22,7 @@ func WriteMessageDb(client *mongo.Client, record events.SQSMessage) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("%+v", recieveMessage)
+	discordLog(fmt.Sprintf("%+v", recieveMessage))
 	// check if need to create conversation
 	err = ConversationCreate(client, recieveMessage)
 	if err != nil {

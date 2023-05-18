@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -15,6 +16,7 @@ func main() {
 
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	log.Println("Facebook Message Standardizer handler")
+	start := time.Now()
 	var recieveMessage RecieveMessage
 	var standardMessages []StandardMessage
 	for _, record := range sqsEvent.Records {
@@ -38,5 +40,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	if err != nil {
 		log.Println("Error sending SNS message :", err)
 	}
+	log.Println("Elapsed: ", time.Since(start))
 	return
 }

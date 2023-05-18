@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,10 +24,28 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 			PageID:         recieveMessage.PageID,
 			ConversationID: recieveMessage.ConversationID,
 			ConversationPic: Payload{
-				Src: recieveMessage.ConversationID,
+				Src: "PlaceHolder",
 			},
+			UpdatedTime: recieveMessage.Timestamp,
+			Participants: []Participant{
+				{
+					UserID:   recieveMessage.Source.UserID,
+					Username: "PlaceHolder",
+					ProfilePic: Payload{
+						Src: "PlaceHolder",
+					},
+				},
+			},
+			LastActivity: recieveMessage.Message,
 		}
-		result, err := coll.InsertOne(ctx)
+		log.Printf("Doc : %+v", doc)
+		result, err := coll.InsertOne(ctx, doc)
+		if err != nil {
+			return err
+		}
+		log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
+	} else {
+		// TODO: update LastActivity, UpdatedTime if conversationExisted
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -36,7 +37,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 
 	defer func() {
 		if err = client.Disconnect(ctx); err != nil {
-			log.Println("Error disconnecting from mongo atlas : ", err)
+			log.Println("Error  disconnecting from mongo atlas : ", err)
 			return
 		}
 	}()
@@ -51,7 +52,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	for _, record := range sqsEvent.Records {
 		err := WriteMessageDb(client, record)
 		if err != nil {
-			log.Println("Error Inserting doc to DB : ", err)
+			discordLog(fmt.Sprintf("Error Inserting doc to DB : %v", err))
 		}
 	}
 
