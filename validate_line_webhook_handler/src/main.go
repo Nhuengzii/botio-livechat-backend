@@ -15,8 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-var channelSecret = os.Getenv("CHANNEL_SECRET")
-var qURL = os.Getenv("QUEUE_URL")
+var channelSecret = os.Getenv("LINE_CHANNEL_SECRET")
+var qURL = os.Getenv("SQS_QUEUE_URL")
 
 func signatureIsValid(channelSecret string, signature string, body []byte) bool {
 	decoded, err := base64.StdEncoding.DecodeString(signature)
