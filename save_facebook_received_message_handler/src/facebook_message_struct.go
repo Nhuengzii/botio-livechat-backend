@@ -2,7 +2,7 @@ package main
 
 type StandardMessage struct {
 	ShopID         string       `bson:"shopID"`
-	Platform       string       `bson:"Platform"`
+	Platform       string       `bson:"platform"`
 	PageID         string       `bson:"pageID"`
 	ConversationID string       `bson:"conversationID"`
 	MessageID      string       `bson:"messageID"`

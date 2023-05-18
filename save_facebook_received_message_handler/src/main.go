@@ -46,7 +46,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		log.Println("Error Pinging DB : ", err)
 		return
 	}
-	log.Println("Successfully  connect to MongoDB ", time.Since(start))
+	log.Println("Successfully connect to MongoDB ", time.Since(start))
 
 	for _, record := range sqsEvent.Records {
 		err := WriteMessageDb(client, record)

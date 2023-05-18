@@ -20,12 +20,13 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil {
-			log.Printf("Error  unmarshal Record.Body : %v\n", err)
+			log.Printf("Error unmarshal Record.Body: %v\n", err)
 			return
 		}
+		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
 			if messaging := message.MessageDatas; messaging != nil {
-				log.Println("messaging  field found in recievedMessage")
+				log.Println("messaging field found in recievedMessage")
 				// standardize messaging hooks
 				Standardize(messaging, message.PageID, &standardMessages)
 			}

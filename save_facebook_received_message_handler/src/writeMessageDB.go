@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/aws/aws-lambda-go/events"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -16,27 +17,14 @@ func WriteMessageDb(client *mongo.Client, record events.SQSMessage) error {
 	if err != nil {
 		return err
 	}
-
-	err = json.Unmarshal([]byte(recieveBody.Message), &recieveMessage)
+	err = bson.UnmarshalExtJSON([]byte(recieveBody.Message), true, &recieveMessage)
 	if err != nil {
 		return err
 	}
 	log.Printf("%+v", recieveMessage)
-	doc := StandardMessage{
-		ShopID:         recieveMessage.ShopID,
-		Platform:       "facebook",
-		PageID:         recieveMessage.PageID,
-		ConversationID: recieveMessage.ConversationID,
-		MessageID:      recieveMessage.MessageID,
-		Timestamp:      recieveMessage.Timestamp,
-		Source:         recieveMessage.Source,
-		Message:        recieveMessage.Message,
-		Attachments:    recieveMessage.Attachments,
-		ReplyTo:        recieveMessage.ReplyTo,
-	}
 
 	coll := client.Database("BotioLivechat").Collection("facebook_message")
-	result, err := coll.InsertOne(context.TODO(), doc)
+	result, err := coll.InsertOne(context.TODO(), recieveMessage)
 	if err != nil {
 		return err
 	}

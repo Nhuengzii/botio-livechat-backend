@@ -37,7 +37,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	} else if request.HTTPMethod == "POST" {
 		log.Println("POST method called")
 		start := time.Now()
-		//new session
+		// new session
 		sess, err := session.NewSession(&aws.Config{
 			Region: aws.String("ap-southeast-1"),
 		})
@@ -50,7 +50,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		queueUrl := os.Getenv("SQS_QUEUE_URL")
 		msg := request.Body
 
-		log.Println(msg)
 		SendQueueMessage(msg, sqsClient, queueUrl)
 		if err != nil {
 			log.Println(err)
@@ -69,5 +68,4 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	return response, nil
-
 }
