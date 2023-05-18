@@ -18,7 +18,7 @@ import (
 var channelSecret = os.Getenv("LINE_CHANNEL_SECRET")
 var qURL = os.Getenv("SQS_QUEUE_URL")
 
-func signatureIsValid(channelSecret string, signature string, body []byte) bool {
+func validateSignature(channelSecret string, signature string, body []byte) bool {
 	decoded, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		return false
@@ -36,7 +36,7 @@ func signatureIsValid(channelSecret string, signature string, body []byte) bool 
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	body := []byte(req.Body)
 	signature := req.Headers["x-line-signature"]
-	if !signatureIsValid(channelSecret, signature, body) {
+	if !validateSignature(channelSecret, signature, body) {
 		log.Println("Unauthorized")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 401,
@@ -52,7 +52,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	}
 	_, err := svc.SendMessage(params)
 	if err != nil {
-		log.Println("Cannot send message to SQS")
+		log.Println("Cannot send message to SQS", err)
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Cannot send message to SQS",
