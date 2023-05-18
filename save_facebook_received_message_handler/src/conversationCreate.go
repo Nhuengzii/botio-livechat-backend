@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -45,7 +46,19 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 		}
 		log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
 	} else {
-		// TODO: update LastActivity, UpdatedTime if conversationExisted
+		var update primitive.M
+		if recieveMessage.Message != "" {
+			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": recieveMessage.Message}}
+		} else {
+			attachType := recieveMessage.Attachments[0].AttachmentType
+			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": fmt.Sprintf("send a %v", attachType)}}
+		}
+		updateFilter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
+		result, err := coll.UpdateOne(ctx, updateFilter, update)
+		if err != nil {
+			return err
+		}
+		discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
 	}
 	return nil
 }
