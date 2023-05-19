@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// TODO: add check if message already exists update instead ***very important***
 func WriteMessageDb(client *mongo.Client, record events.SQSMessage) error {
 	var recieveBody RecievedAwsStruct
 	var recieveMessage StandardMessage
