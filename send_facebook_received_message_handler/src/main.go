@@ -103,6 +103,7 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		discordLog(fmt.Sprint("Got message: ", standardMessage.Message))
 		for _, key := range keys {
 			discordLog(fmt.Sprint("Sending message to: ", key))
+			discordLog(fmt.Sprint("Split key: ", strings.Split(key, ":")[1]))
 			sendMessage(svc, strings.Split(key, ":")[1], standardMessage.Message)
 		}
 	}
