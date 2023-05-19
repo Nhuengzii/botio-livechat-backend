@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import "github.com/aws/aws-lambda-go/lambda"
 
 func main() {
-	fmt.Println("Hello, World!")
+	lambda.Start(handler)
+}
+
+func handler() {
+	discordLog("get_facebook_conversation handler!!!")
 }
