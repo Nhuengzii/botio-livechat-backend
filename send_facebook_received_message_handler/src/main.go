@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 	"github.com/go-redis/redis/v8"
+	"strings"
 )
 
 type Source struct {
@@ -102,7 +103,7 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		discordLog(fmt.Sprint("Got message: ", standardMessage.Message))
 		for _, key := range keys {
 			discordLog(fmt.Sprint("Sending message to: ", key))
-			sendMessage(svc, key, standardMessage.Message)
+			sendMessage(svc, strings.Split(key, ":")[1], standardMessage.Message)
 		}
 	}
 }
