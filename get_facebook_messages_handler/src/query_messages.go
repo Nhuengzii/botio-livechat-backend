@@ -50,6 +50,11 @@ func QueryMessages(pageID string, conversationID string, outputMessage *OutputMe
 		discordLog(fmt.Sprintf("Error query with filter pageID:%v conversationID:%v Error : %v", pageID, conversationID, err))
 		return err
 	}
+	err = cur.All(ctx, &outputMessage.Messages)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error retrieving doc in cur.ALL : %v", err))
+		return err
+	}
 
 	return nil
 }
