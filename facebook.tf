@@ -278,6 +278,11 @@ resource "aws_lambda_function" "send_facebook_received_message_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.send_facebook_received_message_handler.output_base64sha256
   depends_on       = [data.archive_file.send_facebook_received_message_handler]
+  environment {
+    variables = {
+      WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
+    }
+  }
 }
 
 
