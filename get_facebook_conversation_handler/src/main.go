@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -31,8 +32,19 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, err
 	}
 
+	jsonBodyByte, err := json.Marshal(outputMessage)
+	jsonString := string(jsonBodyByte)
+	if err != nil {
+		discordLog(fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadGateway,
+		}, err
+	}
+
 	discordLog(fmt.Sprintf("Total Elasped time: %v", time.Since(start)))
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
+		Body:       jsonString,
 	}, nil
 }
