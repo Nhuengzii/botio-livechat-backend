@@ -35,12 +35,21 @@ func QueryMessages(pageID string, conversationID string, outputMessage *OutputMe
 	}()
 
 	// ping
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
+	if err := client.Database("admin").RunCommand(ctx, bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
 		log.Println("Error Pinging DB : ", err)
 		return err
 	}
 	log.Println("Successfully connect to MongoDB ", time.Since(start))
 	discordLog(fmt.Sprintf("Successfully connect to mongo Elasped : %v", time.Since(start)))
+
+	// start query
+	coll := client.Database("BotioLivechat").Collection("facebook_messages")
+	filter := bson.D{{"pageID", pageID}, {"conversationID", conversationID}}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error query with filter pageID:%v conversationID:%v Error : %v", pageID, conversationID, err))
+		return err
+	}
 
 	return nil
 }
