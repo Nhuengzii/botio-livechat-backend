@@ -33,12 +33,12 @@ func discordLog(content string) {
 
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
 	connectionID := request.RequestContext.ConnectionID
-	shopId := request.QueryStringParameters["shopId"]
+	// shopId := request.QueryStringParameters["shopId"]
 	discordLog(fmt.Sprint("Got connect: ", connectionID))
-	my_ctx := context.Background()
-	if err != nil {
-		discordLog(fmt.Sprint("Error setting current connection: ", err))
-	}
+	// my_ctx := context.Background()
+	// if err != nil {
+	// 	discordLog(fmt.Sprint("Error setting current connection: ", err))
+	// }
 	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
 	discordLog(fmt.Sprint("Endpoint: ", endpoint))
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
