@@ -1,7 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"net/http"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+)
 
 func main() {
-	fmt.Println("Hello, world!")
+	lambda.Start(handler)
+}
+
+func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	discordLog("facebook get messages handler!!!")
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+	}, nil
 }
