@@ -44,10 +44,16 @@ func QueryConversations(pageID string, outputMessage *OutputMessage) error {
 
 	// start query
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
-	filter := bson.D{{"pageID", pageID}}
+	filter := bson.D{{Key: "pageID", Value: pageID}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error query with filter pageID:%v Error : %v", pageID, err))
+		return err
+	}
+
+	err = cur.All(ctx, outputMessage)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error retrieving doc in cur.ALL : %v", err))
 		return err
 	}
 

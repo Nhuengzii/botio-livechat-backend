@@ -24,4 +24,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) {
 	if err != nil {
 		discordLog(fmt.Sprint(err))
 	}
+	for _, conversation := range outputMessage.Conversations {
+		discordLog(fmt.Sprintf("Last message in conversation %v is %v", conversation.ConversationID, conversation.LastActivity))
+	}
 }
