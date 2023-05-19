@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -41,6 +42,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		log.Println("Error sending SNS message :", err)
 		return
 	}
-	log.Println("Elapsed:", time.Since(start))
+	discordLog(fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return
 }

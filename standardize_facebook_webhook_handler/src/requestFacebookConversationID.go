@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func RequestFacebookConversationID(messageData MessageData, pageID string) (string, error) {
@@ -13,6 +14,7 @@ func RequestFacebookConversationID(messageData MessageData, pageID string) (stri
 		pageID, messageData.Sender.ID, access_token)
 	discordLog("RequestFacebookConversationID")
 
+	startTime := time.Now()
 	resp, err := http.Get(uri)
 	if err != nil {
 		return "", err
@@ -26,6 +28,7 @@ func RequestFacebookConversationID(messageData MessageData, pageID string) (stri
 	}
 
 	discordLog(fmt.Sprint(body.Data))
+	discordLog(fmt.Sprintf("ConversationID request elapsed : %v", time.Since(startTime)))
 	return body.Data[0].Id, nil
 }
 
