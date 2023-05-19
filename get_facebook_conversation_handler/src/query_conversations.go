@@ -51,7 +51,7 @@ func QueryConversations(pageID string, outputMessage *OutputMessage) error {
 		return err
 	}
 
-	err = cur.All(ctx, outputMessage)
+	err = cur.All(ctx, &outputMessage.Conversations)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error retrieving doc in cur.ALL : %v", err))
 		return err
