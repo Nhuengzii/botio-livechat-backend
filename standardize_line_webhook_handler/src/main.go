@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"context"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+)
+
+func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
+}
 
 func main() {
-	fmt.Println("Hello, Pun!")
+	lambda.Start(Handler)
 }

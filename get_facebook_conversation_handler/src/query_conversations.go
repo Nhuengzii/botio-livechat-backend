@@ -6,9 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,14 +13,8 @@ import (
 
 const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
 
-func main() {
-	lambda.Start(handle)
-}
-
-func handle(ctx context.Context, sqsEvent events.SQSEvent) {
+func QueryConversations(pageID string, outputMessage *OutputMessage) error {
 	start := time.Now()
-	log.Println("facebook database handler")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 
@@ -33,7 +24,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		log.Println("Error connecting to mongo atlas : ", err)
-		return
+		return err
 	}
 
 	defer func() {
@@ -46,17 +37,25 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	// ping
 	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
 		log.Println("Error Pinging DB : ", err)
-		return
+		return err
 	}
 	log.Println("Successfully connect to MongoDB ", time.Since(start))
+	discordLog(fmt.Sprintf("Successfully connect to mongo Elasped : %v", time.Since(start)))
 
-	for _, record := range sqsEvent.Records {
-		err := WriteMessageDb(client, record)
-		if err != nil {
-			discordLog(fmt.Sprintf("Error Inserting doc to DB : %v", err))
-		}
+	// start query
+	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
+	filter := bson.D{{Key: "pageID", Value: pageID}}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error query with filter pageID:%v Error : %v", pageID, err))
+		return err
 	}
 
-	log.Println("Elapsed End: ", time.Since(start))
-	return
+	err = cur.All(ctx, &outputMessage.Conversations)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error retrieving doc in cur.ALL : %v", err))
+		return err
+	}
+
+	return nil
 }

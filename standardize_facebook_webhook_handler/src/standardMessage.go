@@ -2,6 +2,7 @@ package main
 
 type StandardMessage struct {
 	ShopID         string       `json:"shopID"`
+	Platform       string       `json:"platform"`
 	PageID         string       `json:"pageID"`
 	ConversationID string       `json:"conversationID"`
 	MessageID      string       `json:"messageID"`

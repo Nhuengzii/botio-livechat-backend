@@ -20,7 +20,8 @@ func sendSnsMessage(standardMessages *[]StandardMessage) error {
 	sess := session.New(&aws.Config{})
 	svc := sns.New(sess)
 	log.Println("Attempt publishing message from facebook standardizer to SNS")
-	for _, standardMessage := range *standardMessages { //TODO: determine if send as a batch is better?
+	for _, standardMessage := range *standardMessages { // TODO: determine if send as a batch is better?
+		log.Printf("%+v", standardMessage)
 		message, err := json.Marshal(standardMessage)
 		if err != nil {
 			return err
