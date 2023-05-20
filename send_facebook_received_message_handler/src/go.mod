@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go v1.44.266
 	github.com/aws/aws-sdk-go-v2/config v1.18.25
 	github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi v1.11.10
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
