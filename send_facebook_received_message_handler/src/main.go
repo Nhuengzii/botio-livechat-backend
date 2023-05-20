@@ -55,11 +55,6 @@ func sendMessage(svc *apigatewaymanagementapi.Client, connectionID string, messa
 	if err != nil {
 		discordLog(fmt.Sprint("Error sending message: ", err))
 	}
-	_, err = svc.PostToConnection(context.Background(), input)
-	if err != nil {
-		discordLog(fmt.Sprint("Error sending message: ", err))
-	}
-
 }
 
 func discordLog(content string) {
