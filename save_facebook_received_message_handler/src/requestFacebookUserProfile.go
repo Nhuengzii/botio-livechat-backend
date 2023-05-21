@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error) {
@@ -12,7 +11,6 @@ func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error
 	uri := fmt.Sprintf("https://graph.facebook.com/%v?fields=first_name,last_name,profile_pic&access_token=%v", psid, access_token)
 	discordLog("RequestFacebookUserProfile")
 
-	startTime := time.Now()
 	resp, err := http.Get(uri)
 	if err != nil {
 		return ResponseFacebookUserProfile{}, err
@@ -23,7 +21,6 @@ func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error
 	err = json.NewDecoder(resp.Body).Decode(&body)
 
 	discordLog(fmt.Sprintf("%+v", body))
-	discordLog(fmt.Sprintf("UserProfileRequest Elasped : %v", time.Since(startTime)))
 	return body, nil
 }
 

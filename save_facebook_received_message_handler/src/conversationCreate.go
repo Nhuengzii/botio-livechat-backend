@@ -15,6 +15,7 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
 
+	start := time.Now()
 	// connect to DB
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
 	filter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
@@ -67,6 +68,8 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 		}
 		discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
 	}
+
+	discordLog(fmt.Sprintf("ConversationCreate Elasped : %v", time.Since(start)))
 	return nil
 }
 
