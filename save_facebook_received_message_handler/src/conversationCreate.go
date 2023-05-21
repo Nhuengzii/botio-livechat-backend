@@ -38,7 +38,7 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 			Participants: []Participant{
 				{
 					UserID:   recieveMessage.Source.UserID,
-					Username: fmt.Sprintf("%v %v", userProfile.FirstName, userProfile.LastName),
+					Username: userProfile.Name,
 					ProfilePic: Payload{
 						Src: userProfile.ProfilePic,
 					},
