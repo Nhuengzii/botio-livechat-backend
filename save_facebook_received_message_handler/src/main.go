@@ -24,7 +24,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	start := time.Now()
 	log.Println("facebook database handler")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
 
 	opts := options.Client().ApplyURI(uri)
@@ -57,6 +57,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		}
 	}
 
-	log.Println("Elapsed End: ", time.Since(start))
+	discordLog(fmt.Sprintf("Elapsed End : %v", time.Since(start)))
 	return
 }

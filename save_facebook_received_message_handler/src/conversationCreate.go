@@ -12,7 +12,7 @@ import (
 )
 
 func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 2000*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
 
 	// connect to DB
@@ -20,13 +20,13 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 	filter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
 	result := coll.FindOne(ctx, filter)
 
-	// get userProfile
-	userProfile, err := RequestFacebookUserProfile(recieveMessage.Source.UserID)
-	if err != nil {
-		return err
-	}
 	if result.Err() == mongo.ErrNoDocuments {
 		discordLog(fmt.Sprint("No Conversation need to create one"))
+		// get userProfile
+		userProfile, err := RequestFacebookUserProfile(recieveMessage.Source.UserID)
+		if err != nil {
+			return err
+		}
 		doc := Conversation{
 			ShopID:         recieveMessage.ShopID,
 			PageID:         recieveMessage.PageID,
