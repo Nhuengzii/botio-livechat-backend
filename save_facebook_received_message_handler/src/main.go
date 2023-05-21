@@ -32,7 +32,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	// create a new client and connect to the server
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		log.Println("Error connecting to mongo atlas : ", err)
+		log.Println("Error  connecting to mongo atlas : ", err)
 		return
 	}
 
