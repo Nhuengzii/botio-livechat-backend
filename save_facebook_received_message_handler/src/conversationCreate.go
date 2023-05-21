@@ -15,9 +15,16 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 	ctx, cancel := context.WithTimeout(context.Background(), 2000*time.Millisecond)
 	defer cancel()
 
+	// connect to DB
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
 	filter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
 	result := coll.FindOne(ctx, filter)
+
+	// get userProfile
+	userProfile, err := RequestFacebookUserProfile(recieveMessage.Source.UserID)
+	if err != nil {
+		return err
+	}
 	if result.Err() == mongo.ErrNoDocuments {
 		discordLog(fmt.Sprint("No Conversation need to create one"))
 		doc := Conversation{

@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-func RequestFacebookUserProfile(messageData MessageData) (ResponseFacebookUserProfile, error) {
+func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error) {
 	access_token := "EAACgkFuKQwcBAIWWdLrLpOYGJrrI2ZAQWfxolrzTjPFuxjZCOLMxXX8vH6rUhLs6sGB5X7aUBKLiBFzsoeBC13U8GpZAczfBosZBRYlSGigKAbYkzhAt46m8kpQAYoe3yWVSmnAl0xekyZC7Iw09eWM2XjJPKpW6PIhPBBFJh5Oz3tYxxSqe8"
-	uri := fmt.Sprintf("https://graph.facebook.com/%v?fields=first_name,last_name,profile_pic&access_token=%v", messageData.Sender.ID, access_token)
+	uri := fmt.Sprintf("https://graph.facebook.com/%v?fields=first_name,last_name,profile_pic&access_token=%v", psid, access_token)
 	discordLog("RequestFacebookUserProfile")
 
 	startTime := time.Now()
