@@ -12,28 +12,35 @@ import (
 )
 
 func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 2000*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
 
+	// connect to DB
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
 	filter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
 	result := coll.FindOne(ctx, filter)
+
 	if result.Err() == mongo.ErrNoDocuments {
 		discordLog(fmt.Sprint("No Conversation need to create one"))
+		// get userProfile
+		userProfile, err := RequestFacebookUserProfile(recieveMessage.Source.UserID)
+		if err != nil {
+			return err
+		}
 		doc := Conversation{
 			ShopID:         recieveMessage.ShopID,
 			PageID:         recieveMessage.PageID,
 			ConversationID: recieveMessage.ConversationID,
 			ConversationPic: Payload{
-				Src: "PlaceHolder",
+				Src: userProfile.ProfilePic,
 			},
 			UpdatedTime: recieveMessage.Timestamp,
 			Participants: []Participant{
 				{
 					UserID:   recieveMessage.Source.UserID,
-					Username: "PlaceHolder",
+					Username: fmt.Sprintf("%v %v", userProfile.FirstName, userProfile.LastName),
 					ProfilePic: Payload{
-						Src: "PlaceHolder",
+						Src: userProfile.ProfilePic,
 					},
 				},
 			},
@@ -58,8 +65,10 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 		if err != nil {
 			return err
 		}
-		discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
+		log.Printf("Updated a document; changed fields: %v\n", result.ModifiedCount)
+		// discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
 	}
+
 	return nil
 }
 
