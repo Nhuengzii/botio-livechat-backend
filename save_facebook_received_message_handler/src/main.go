@@ -56,7 +56,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 			discordLog(fmt.Sprintf("Error Inserting doc to DB : %v", err))
 		}
 	}
-
 	discordLog(fmt.Sprintf("Elapsed End : %v", time.Since(start)))
 	return
 }
