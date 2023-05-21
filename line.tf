@@ -1,3 +1,12 @@
+variable "DISCORD_WEBHOOK_URL" {
+  type = string
+}
+variable "LINE_CHANNEL_SECRET" {
+  type = string
+}
+
+
+
 resource "aws_api_gateway_resource" "line" {
   rest_api_id = aws_api_gateway_rest_api.botio_rest_api.id
   parent_id   = aws_api_gateway_resource.shop_id.id
@@ -339,9 +348,11 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
   depends_on       = [data.archive_file.validate_line_webhook_handler]
   environment {
     variables = {
-      SQS_QUEUE_URL = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
-      SQS_QUEUE_ARN = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
-      foo           = "bar"
+      SQS_QUEUE_URL       = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
+      SQS_QUEUE_ARN       = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
+      foo                 = "bar"
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+      LINE_CHANNEL_SECRET = var.LINE_CHANNEL_SECRET
     }
   }
 }
@@ -355,8 +366,9 @@ resource "aws_lambda_function" "standardize_line_webhook_handler" {
   source_code_hash = data.archive_file.standardize_line_webhook_handler.output_base64sha256
   environment {
     variables = {
-      SNS_TOPIC_ARN  = aws_sns_topic.line_receive_message.arn
-      SNS_TOPIC_NAME = aws_sns_topic.line_receive_message.name
+      SNS_TOPIC_ARN       = aws_sns_topic.line_receive_message.arn
+      SNS_TOPIC_NAME      = aws_sns_topic.line_receive_message.name
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
     }
   }
   depends_on = [data.archive_file.standardize_line_webhook_handler]
@@ -370,6 +382,11 @@ resource "aws_lambda_function" "post_line_message_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.post_line_message_handler.output_base64sha256
   depends_on       = [data.archive_file.post_line_message_handler]
+  environment {
+    variables = {
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+    }
+  }
 }
 
 resource "aws_lambda_function" "get_line_conversations_handler" {
@@ -380,6 +397,11 @@ resource "aws_lambda_function" "get_line_conversations_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.get_line_conversations_handler.output_base64sha256
   depends_on       = [data.archive_file.get_line_conversations_handler]
+  environment {
+    variables = {
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+    }
+  }
 }
 
 resource "aws_lambda_function" "get_line_messages_handler" {
@@ -390,6 +412,11 @@ resource "aws_lambda_function" "get_line_messages_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.get_line_messages_handler.output_base64sha256
   depends_on       = [data.archive_file.get_line_messages_handler]
+  environment {
+    variables = {
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+    }
+  }
 }
 
 resource "aws_lambda_function" "save_line_received_message_handler" {
@@ -400,6 +427,11 @@ resource "aws_lambda_function" "save_line_received_message_handler" {
   handler          = "main"
   runtime          = "go1.x"
   depends_on       = [data.archive_file.save_line_received_message_handler]
+  environment {
+    variables = {
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+    }
+  }
 }
 
 resource "aws_lambda_function" "send_line_received_message_handler" {
@@ -410,4 +442,9 @@ resource "aws_lambda_function" "send_line_received_message_handler" {
   handler          = "main"
   runtime          = "go1.x"
   depends_on       = [data.archive_file.send_line_received_message_handler]
+  environment {
+    variables = {
+      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+    }
+  }
 }
