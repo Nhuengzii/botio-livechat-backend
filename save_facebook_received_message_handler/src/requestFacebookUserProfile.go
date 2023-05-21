@@ -8,7 +8,7 @@ import (
 )
 
 func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error) {
-	access_token := os.Getenv("facebook_access_token")
+	access_token := os.Getenv("ACCESS_TOKEN")
 	uri := fmt.Sprintf("https://graph.facebook.com/%v?fields=first_name,last_name,profile_pic&access_token=%v", psid, access_token)
 
 	resp, err := http.Get(uri)

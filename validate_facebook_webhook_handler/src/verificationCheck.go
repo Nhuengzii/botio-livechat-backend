@@ -13,5 +13,4 @@ func VerificationCheck(queryStringParameters map[string]string) error {
 	}
 
 	return nil
-
 }
