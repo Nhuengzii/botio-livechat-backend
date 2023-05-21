@@ -20,7 +20,7 @@ func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]
 			Timestamp:      messageData.Timestamp,
 			Source: Source{
 				UserID:   messageData.Sender.ID,
-				UserType: "User",
+				UserType: "user",
 			},
 			Message:     messageData.Message.Text,
 			Attachments: messageData.Message.Attachments,
