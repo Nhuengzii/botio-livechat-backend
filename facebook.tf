@@ -196,6 +196,10 @@ resource "aws_api_gateway_integration" "get_facebook_conversation" {
   uri                     = aws_lambda_function.get_facebook_conversation_handler.invoke_arn
 }
 
+variable "facebook_access_token" {
+  type = string
+}
+
 resource "aws_lambda_function" "get_facebook_conversation_handler" {
   filename         = "get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
   function_name    = "get_facebook_conversation_handler"
@@ -204,6 +208,11 @@ resource "aws_lambda_function" "get_facebook_conversation_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.get_facebook_conversation_handler.output_base64sha256
   depends_on       = [data.archive_file.get_facebook_conversation_handler]
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.facebook_access_token
+    }
+  }
 }
 
 resource "aws_lambda_function" "validate_facebook_webhook_handler" {
@@ -219,6 +228,7 @@ resource "aws_lambda_function" "validate_facebook_webhook_handler" {
       SQS_QUEUE_URL = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.url
       SQS_QUEUE_ARN = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
       foo           = "bar"
+      ACCESS_TOKEN  = var.facebook_access_token
     }
   }
 }
@@ -236,6 +246,7 @@ resource "aws_lambda_function" "standardize_facebook_webhook_handler" {
       SNS_TOPIC_ARN = aws_sns_topic.facebook_receive_message.arn
       SNS_TOPIC_URL = aws_sns_topic.facebook_receive_message.arn
       foo           = "bar"
+      ACCESS_TOKEN  = var.facebook_access_token
     }
   }
 }
@@ -248,6 +259,11 @@ resource "aws_lambda_function" "post_facebook_message_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.post_facebook_message_handler.output_base64sha256
   depends_on       = [data.archive_file.post_facebook_message_handler]
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.facebook_access_token
+    }
+  }
 }
 
 resource "aws_lambda_function" "get_facebook_messages_handler" {
@@ -258,6 +274,11 @@ resource "aws_lambda_function" "get_facebook_messages_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.get_facebook_messages_handler.output_base64sha256
   depends_on       = [data.archive_file.get_facebook_messages_handler]
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.facebook_access_token
+    }
+  }
 }
 
 resource "aws_lambda_function" "save_facebook_received_message_handler" {
@@ -268,6 +289,11 @@ resource "aws_lambda_function" "save_facebook_received_message_handler" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.save_facebook_received_message_handler.output_base64sha256
   depends_on       = [data.archive_file.save_facebook_received_message_handler]
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.facebook_access_token
+    }
+  }
 }
 
 resource "aws_lambda_function" "send_facebook_received_message_handler" {
@@ -281,6 +307,7 @@ resource "aws_lambda_function" "send_facebook_received_message_handler" {
   environment {
     variables = {
       WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
+      ACCESS_TOKEN           = var.facebook_access_token
     }
   }
 }
