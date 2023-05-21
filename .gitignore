@@ -2,7 +2,6 @@
 .vscode
 .idea
 .terraform.lock.hcl
-.terraform.tfstate.lock.info
 terraform.tfstate
 terraform.tfstate.backup
 validate_facebook_webhook_handler/bin/*
