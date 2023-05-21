@@ -32,15 +32,15 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 			PageID:         recieveMessage.PageID,
 			ConversationID: recieveMessage.ConversationID,
 			ConversationPic: Payload{
-				Src: "PlaceHolder",
+				Src: userProfile.ProfilePic,
 			},
 			UpdatedTime: recieveMessage.Timestamp,
 			Participants: []Participant{
 				{
 					UserID:   recieveMessage.Source.UserID,
-					Username: "PlaceHolder",
+					Username: fmt.Sprintf("%v %v", userProfile.FirstName, userProfile.LastName),
 					ProfilePic: Payload{
-						Src: "PlaceHolder",
+						Src: userProfile.ProfilePic,
 					},
 				},
 			},
