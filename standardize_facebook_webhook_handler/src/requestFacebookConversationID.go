@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
 func RequestFacebookConversationID(messageData MessageData, pageID string) (string, error) {
 	// TODO: access_token still hardcode
-	access_token := "EAACgkFuKQwcBAIWWdLrLpOYGJrrI2ZAQWfxolrzTjPFuxjZCOLMxXX8vH6rUhLs6sGB5X7aUBKLiBFzsoeBC13U8GpZAczfBosZBRYlSGigKAbYkzhAt46m8kpQAYoe3yWVSmnAl0xekyZC7Iw09eWM2XjJPKpW6PIhPBBFJh5Oz3tYxxSqe8"
+	access_token := os.Getenv("facebook_access_token")
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=Messenger&user_id=%v&access_token=%v",
 		pageID, messageData.Sender.ID, access_token)
 	discordLog("RequestFacebookConversationID")
