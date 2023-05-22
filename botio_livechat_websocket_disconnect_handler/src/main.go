@@ -33,8 +33,8 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	connectionID := request.RequestContext.ConnectionID
 	discordLog(fmt.Sprint("Got disconnect events from: ", connectionID))
 	my_ctx := context.Background()
-	redis_addr := os.Getenv("REDIS_ADDR")
-	redis_password := os.Getenv("REDIS_PASSWORD")
+	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
+	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redis_addr,
 		Password: redis_password,
