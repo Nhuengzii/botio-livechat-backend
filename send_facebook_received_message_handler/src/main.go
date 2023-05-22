@@ -35,9 +35,11 @@ func discordLog(content string) {
 
 func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
+	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
+	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis-15520.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:15520",
-		Password: "dcesPhFIPwWrItb2yaNe5UT0sbhv9FJk",
+		Addr:     redis_addr,
+		Password: redis_password,
 	})
 	keys, _ := rdb.Keys(ctx, "1:*").Result()
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
