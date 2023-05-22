@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -30,7 +29,7 @@ func discordLog(content string) {
 	json_payload, _ := json.Marshal(payload)
 	_, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(json_payload))
 	if err != nil {
-		log.Println("Error sending discord log: ", err)
+		log.Println("Error  sending discord log: ", err)
 	}
 }
 
