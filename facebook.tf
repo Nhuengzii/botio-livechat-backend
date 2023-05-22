@@ -314,6 +314,8 @@ resource "aws_lambda_function" "send_facebook_received_message_handler" {
     variables = {
       WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
       ACCESS_TOKEN           = var.facebook_access_token
+      REDIS_ACCESS_ADDR = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD = var.redis_access.password
     }
   }
 }
