@@ -20,13 +20,19 @@ func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]
 			Timestamp:      messageData.Timestamp,
 			Source: Source{
 				UserID:   messageData.Sender.ID,
-				UserType: "user",
+				UserType: "User",
 			},
 			Message:     messageData.Message.Text,
-			Attachments: messageData.Message.Attachments,
+			Attachments: []AttachmentOutput{},
 			ReplyTo: ReplyMessage{
 				MessageId: messageData.Message.ReplyTo.MessageId,
 			},
+		}
+		for _, attachment := range messageData.Message.Attachments {
+			newMessage.Attachments = append(newMessage.Attachments, AttachmentOutput{
+				AttachmentType: attachment.AttachmentType,
+				Payload:        PayloadTypeOutput{Src: attachment.Payload.Src},
+			})
 		}
 		*standardMessages = append(*standardMessages, newMessage)
 	}

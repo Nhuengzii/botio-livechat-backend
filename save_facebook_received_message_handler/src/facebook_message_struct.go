@@ -15,7 +15,7 @@ type StandardMessage struct {
 
 type Source struct {
 	UserID   string `bson:"userID"`
-	UserType string `bson:"userType"`
+	UserType string `bson:"type"`
 }
 
 type Attachment struct {
@@ -24,7 +24,7 @@ type Attachment struct {
 }
 
 type PayloadType struct {
-	Src string `bson:"url"`
+	Src string `bson:"src"`
 }
 
 type ReplyMessage struct {

@@ -23,7 +23,7 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil {
-			log.Printf("Error  unmarshal Record.Body: %v\n", err)
+			log.Printf("Error unmarshal Record.Body: %v\n", err)
 			return
 		}
 		log.Printf("%+v", recieveMessage)

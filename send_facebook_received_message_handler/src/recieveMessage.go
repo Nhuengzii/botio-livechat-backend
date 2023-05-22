@@ -35,7 +35,7 @@ type Attachment struct {
 }
 
 type PayloadType struct {
-	Src string `json:"url"`
+	Src string `json:"src"`
 }
 
 type ReplyMessage struct {
@@ -56,5 +56,5 @@ type StandardMessage struct {
 
 type Source struct {
 	UserID   string `json:"userID"`
-	UserType string `json:"userType"`
+	UserType string `json:"type"`
 }
