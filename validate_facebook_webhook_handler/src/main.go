@@ -35,7 +35,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			Body:       request.QueryStringParameters["hub.challenge"],
 		}
 	} else if request.HTTPMethod == "POST" {
-		log.Println("POST method called")
+		log.Println("POST method  called")
 		start := time.Now()
 		// new session
 		sess, err := session.NewSession(&aws.Config{
@@ -47,7 +47,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}
 
 		// verify Signature
-		err = VerifySignature(request.Headers)
+		err = VerifySignature(request.Headers, []byte(request.Body))
 		if err != nil {
 			log.Println(err)
 			return events.APIGatewayProxyResponse{}, err
