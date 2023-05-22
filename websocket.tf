@@ -82,6 +82,8 @@ resource "aws_lambda_function" "botio_livechat_websocket_default_handler" {
   environment {
     variables = {
       WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
+      REDIS_ACCESS_ADDR      = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD  = var.redis_access.password
     }
   }
 }
@@ -93,6 +95,12 @@ resource "aws_lambda_function" "botio_livechat_websocket_connect_handler" {
   filename         = data.archive_file.botio_livechat_websocket_connect_handler.output_path
   source_code_hash = data.archive_file.botio_livechat_websocket_connect_handler.output_base64sha256
   depends_on       = [data.archive_file.botio_livechat_websocket_connect_handler]
+  environment {
+    variables = {
+      REDIS_ACCESS_ADDR     = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD = var.redis_access.password
+    }
+  }
 }
 
 resource "aws_lambda_function" "botio_livechat_websocket_disconnect_handler" {
@@ -103,6 +111,12 @@ resource "aws_lambda_function" "botio_livechat_websocket_disconnect_handler" {
   filename         = data.archive_file.botio_livechat_websocket_disconnect_handler.output_path
   source_code_hash = data.archive_file.botio_livechat_websocket_disconnect_handler.output_base64sha256
   depends_on       = [data.archive_file.botio_livechat_websocket_disconnect_handler]
+  environment {
+    variables = {
+      REDIS_ACCESS_ADDR     = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD = var.redis_access.password
+    }
+  }
 }
 
 resource "aws_lambda_permission" "botio_livechat_websocket_default_handler_allow_execution_form_api_gateway" {
