@@ -200,6 +200,10 @@ variable "facebook_access_token" {
   type = string
 }
 
+variable "facebook_app_secret" {
+  type = string
+}
+
 resource "aws_lambda_function" "get_facebook_conversation_handler" {
   filename         = "get_facebook_conversation_handler/get_facebook_conversation_handler.zip"
   function_name    = "get_facebook_conversation_handler"
@@ -229,6 +233,7 @@ resource "aws_lambda_function" "validate_facebook_webhook_handler" {
       SQS_QUEUE_ARN = aws_sqs_queue.facebook_webhook_to_standardize_facebook_webhook_handler.arn
       foo           = "bar"
       ACCESS_TOKEN  = var.facebook_access_token
+      APP_SECRET    = var.facebook_app_secret
     }
   }
 }
@@ -262,6 +267,7 @@ resource "aws_lambda_function" "post_facebook_message_handler" {
   environment {
     variables = {
       ACCESS_TOKEN = var.facebook_access_token
+      APP_SECRET   = var.facebook_app_secret
     }
   }
 }
