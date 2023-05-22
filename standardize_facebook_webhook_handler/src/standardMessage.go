@@ -15,7 +15,7 @@ type StandardMessage struct {
 
 type Source struct {
 	UserID   string `json:"userID"`
-	UserType string `json:"userType"`
+	UserType string `json:"type"`
 }
 
 type AttachmentOutput struct {
