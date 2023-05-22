@@ -16,7 +16,7 @@ func main() {
 }
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	discordLog("facebook get messages handler!!!")
+	discordLog("facebook get messages handler!!!!")
 	start := time.Now()
 
 	pathParams := request.PathParameters
