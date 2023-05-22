@@ -24,7 +24,7 @@ type Attachment struct {
 }
 
 type PayloadType struct {
-	Src string `bson:"url"`
+	Src string `bson:"src"`
 }
 
 type ReplyMessage struct {
