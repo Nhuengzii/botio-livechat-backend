@@ -12,7 +12,21 @@ func SendFacebookMessage(requestMessage RequestMessage, psid string, response *F
 	token := os.Getenv("ACCESS_TOKEN")
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/me/messages?access_token=%v", token)
 
-	facebookRequest := FacebookRequest{}
+	facebookRequest := FacebookRequest{
+		Recipient: Recipient{
+			Id: psid,
+		},
+		Message: Message{
+			Text: requestMessage.Message,
+			Attachment: AttachmentFacebookRequest{
+				AttachmentType: requestMessage.Attachment.AttachmentType,
+				Payload: AttachmentFacebookPayload{
+					Src:        requestMessage.Attachment.Payload.Src,
+					IsReusable: true,
+				},
+			},
+		},
+	}
 
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(facebookRequest)
@@ -43,6 +57,7 @@ type FacebookRequest struct {
 }
 
 type Message struct {
+	Text       string                    `json:"text"`
 	Attachment AttachmentFacebookRequest `json:"attachment"`
 }
 type AttachmentFacebookRequest struct {

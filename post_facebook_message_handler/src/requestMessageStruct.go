@@ -1,8 +1,8 @@
 package main
 
 type RequestMessage struct {
-	Message     string       `json:"message"`
-	Attachments []Attachment `json:"attachments"`
+	Message    string     `json:"message"`
+	Attachment Attachment `json:"attachment"`
 }
 
 type Attachment struct {
