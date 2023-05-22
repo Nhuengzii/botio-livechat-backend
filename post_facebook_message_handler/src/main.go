@@ -23,7 +23,6 @@ var (
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	start := time.Now()
-	discordLog(fmt.Sprint("--------Post-FacebookMessage-handler!!!--------"))
 
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
@@ -44,7 +43,6 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	}
 
 	// no message or attachment can exists at the same time
-
 	var facebookResponse FacebookResponse
 	err = SendFacebookMessage(requestMessage, psid, pageID, &facebookResponse)
 	if err != nil {
