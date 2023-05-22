@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID string, response *FacebookResponse) error {
 	token := os.Getenv("ACCESS_TOKEN")
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, token)
 
-	discordLog(fmt.Sprint(uri))
+	start := time.Now()
 	var facebookRequest FacebookRequest
 	if requestMessage.Message != "" {
 		facebookRequest = FacebookRequest{
@@ -41,7 +42,6 @@ func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID stri
 			},
 		}
 	}
-	discordLog(fmt.Sprintf("%+v", facebookRequest))
 	facebookReqBody, err := json.Marshal(facebookRequest)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error marshal body : %v", err))
@@ -57,6 +57,7 @@ func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID stri
 	if err != nil {
 		return err
 	}
+	discordLog(fmt.Sprintf("facebook send elapsed : %v", time.Since(start)))
 	return nil
 }
 

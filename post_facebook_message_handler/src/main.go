@@ -23,7 +23,7 @@ var (
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	start := time.Now()
-	discordLog(fmt.Sprint("-------Post-FacebookMessage-handler!!!--------"))
+	discordLog(fmt.Sprint("--------Post-FacebookMessage-handler!!!--------"))
 
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
@@ -43,15 +43,29 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 		return events.APIGatewayProxyResponse{}, err
 	}
 
+	// no message or attachment can exists at the same time
+
 	var facebookResponse FacebookResponse
 	err = SendFacebookMessage(requestMessage, psid, pageID, &facebookResponse)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error sending facebook message : %v", err))
 		return events.APIGatewayProxyResponse{}, err
 	}
-	discordLog(fmt.Sprintf("%+v", facebookResponse))
-	discordLog(fmt.Sprintf("Elasped : %v", time.Since(start)))
+	jsonBodyByte, err := json.Marshal(facebookResponse)
+	jsonString := string(jsonBodyByte)
+	if err != nil {
+		discordLog(fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadGateway,
+		}, err
+	}
+	discordLog(fmt.Sprintf("Elasped  : %v", time.Since(start)))
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
+		Body:       jsonString,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
 	}, nil
 }
