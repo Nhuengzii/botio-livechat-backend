@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
