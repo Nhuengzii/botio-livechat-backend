@@ -57,7 +57,7 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 			StatusCode: http.StatusBadGateway,
 		}, err
 	}
-	discordLog(fmt.Sprintf("Elasped  : %v", time.Since(start)))
+	discordLog(fmt.Sprintf("Elasped : %v", time.Since(start)))
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
