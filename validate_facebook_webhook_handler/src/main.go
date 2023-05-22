@@ -46,6 +46,13 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			return events.APIGatewayProxyResponse{}, err
 		}
 
+		// verify Signature
+		err = VerifySignature(request.Headers)
+		if err != nil {
+			log.Println(err)
+			return events.APIGatewayProxyResponse{}, err
+		}
+
 		sqsClient := sqs.New(sess)
 		queueUrl := os.Getenv("SQS_QUEUE_URL")
 		msg := request.Body

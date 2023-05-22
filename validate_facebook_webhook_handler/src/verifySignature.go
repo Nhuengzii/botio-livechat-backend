@@ -18,7 +18,7 @@ var (
 	errInvalidXSignHeader = errors.New("Invalid x-sign header")
 )
 
-func VertifySignature(header map[string]string) error {
+func VerifySignature(header map[string]string) error {
 	log.Println("Header : ", header)
 	recieveSignature := header["x-hub-signature-256"]
 	if !strings.HasPrefix(recieveSignature, signaturePrefix) {
