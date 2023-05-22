@@ -14,5 +14,6 @@ func main() {
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	discordLog(fmt.Sprint("-------Post-FacebookMessage-handler!!!!"))
+
 	return events.APIGatewayProxyResponse{}, nil
 }
