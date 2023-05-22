@@ -44,7 +44,7 @@ func QueryMessages(pageID string, conversationID string, outputMessage *OutputMe
 
 	// start query
 	coll := client.Database("BotioLivechat").Collection("facebook_messages")
-	filter := bson.D{{"pageID", pageID}, {"conversationID", conversationID}}
+	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error query with filter pageID:%v conversationID:%v Error : %v", pageID, conversationID, err))
