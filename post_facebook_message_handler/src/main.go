@@ -16,16 +16,24 @@ func main() {
 	lambda.Start(handler)
 }
 
-var errNoPsidParam = errors.New("QueryStringParameters psid not given")
+var (
+	errNoPsidParam   = errors.New("QueryStringParameters psid not given")
+	errNoPageIDParam = errors.New("PathParameter page_id not given")
+)
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	start := time.Now()
-	discordLog(fmt.Sprint("-------Post-FacebookMessage-handler!!!!---------"))
+	discordLog(fmt.Sprint("-------Post-FacebookMessage-handler!!!--------"))
 
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
 		discordLog(fmt.Sprintf("Error reading psid queryStringParam"))
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoPsidParam
+	}
+	pageID, ok := request.PathParameters["page_id"]
+	if !ok {
+		discordLog(fmt.Sprintf("Error reading pageID path param"))
+		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoPageIDParam
 	}
 
 	var requestMessage RequestMessage
@@ -36,7 +44,12 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	}
 
 	var facebookResponse FacebookResponse
-	err = SendFacebookMessage(requestMessage, psid, &facebookResponse)
+	err = SendFacebookMessage(requestMessage, psid, pageID, &facebookResponse)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error sending facebook message : %v", err))
+		return events.APIGatewayProxyResponse{}, err
+	}
+	discordLog(fmt.Sprintf("%+v", facebookResponse))
 	discordLog(fmt.Sprintf("Elasped : %v", time.Since(start)))
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,

@@ -8,32 +8,46 @@ import (
 	"os"
 )
 
-func SendFacebookMessage(requestMessage RequestMessage, psid string, response *FacebookResponse) error {
+func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID string, response *FacebookResponse) error {
 	token := os.Getenv("ACCESS_TOKEN")
-	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/me/messages?access_token=%v", token)
+	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, token)
 
-	facebookRequest := FacebookRequest{
-		Recipient: Recipient{
-			Id: psid,
-		},
-		Message: Message{
-			Text: requestMessage.Message,
-			Attachment: AttachmentFacebookRequest{
-				AttachmentType: requestMessage.Attachment.AttachmentType,
-				Payload: AttachmentFacebookPayload{
-					Src:        requestMessage.Attachment.Payload.Src,
-					IsReusable: true,
+	discordLog(fmt.Sprint(uri))
+	var facebookRequest FacebookRequest
+	if requestMessage.Message != "" {
+		facebookRequest = FacebookRequest{
+			Recipient: Recipient{
+				Id: psid,
+			},
+			MessagingType: "RESPONSE",
+			Message: MessageText{
+				Text: requestMessage.Message,
+			},
+		}
+	} else {
+		facebookRequest = FacebookRequest{
+			Recipient: Recipient{
+				Id: psid,
+			},
+			MessagingType: "RESPONSE",
+			Message: MessageAttachment{
+				Attachment: AttachmentFacebookRequest{
+					AttachmentType: requestMessage.Attachment.AttachmentType,
+					Payload: AttachmentFacebookPayload{
+						Src:        requestMessage.Attachment.Payload.Src,
+						IsReusable: true,
+					},
 				},
 			},
-		},
+		}
+	}
+	discordLog(fmt.Sprintf("%+v", facebookRequest))
+	facebookReqBody, err := json.Marshal(facebookRequest)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error marshal body : %v", err))
 	}
 
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(facebookRequest)
-	if err != nil {
-		discordLog(fmt.Sprintf("Error encoding body : %v", err))
-	}
-	resp, err := http.Post(uri, "application/json", &buf)
+	resp, err := http.Post(uri, "application/json", bytes.NewReader(facebookReqBody))
 	if err != nil {
 		return err
 	}
@@ -52,12 +66,16 @@ type FacebookResponse struct {
 }
 
 type FacebookRequest struct {
-	Recipient Recipient `json:"recipient"`
-	Message   Message   `json:"message"`
+	Recipient     Recipient `json:"recipient"`
+	Message       any       `json:"message"`
+	MessagingType string    `json:"messaging_type"`
 }
 
-type Message struct {
-	Text       string                    `json:"text"`
+type MessageText struct {
+	Text string `json:"text"`
+}
+
+type MessageAttachment struct {
 	Attachment AttachmentFacebookRequest `json:"attachment"`
 }
 type AttachmentFacebookRequest struct {
