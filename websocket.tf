@@ -64,6 +64,13 @@ resource "aws_apigatewayv2_integration" "botio_livechat_websocket_disconnect" {
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
+variable "redis_access" {
+  type = object({
+    addr     = string
+    password = string
+  })
+}
+
 resource "aws_lambda_function" "botio_livechat_websocket_default_handler" {
   function_name    = "botio_livechat_websocket_default_handler"
   role             = aws_iam_role.assume_role_lambda.arn
