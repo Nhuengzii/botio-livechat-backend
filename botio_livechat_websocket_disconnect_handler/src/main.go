@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -32,9 +33,11 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	connectionID := request.RequestContext.ConnectionID
 	discordLog(fmt.Sprint("Got disconnect events from: ", connectionID))
 	my_ctx := context.Background()
+	redis_addr := os.Getenv("REDIS_ADDR")
+	redis_password := os.Getenv("REDIS_PASSWORD")
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis-15520.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:15520",
-		Password: "dcesPhFIPwWrItb2yaNe5UT0sbhv9FJk",
+		Addr:     redis_addr,
+		Password: redis_password,
 	})
 
 	keys, err := rdb.Keys(my_ctx, "*:"+connectionID).Result()
