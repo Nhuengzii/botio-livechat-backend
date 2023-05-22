@@ -1,21 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 )
 
-func SendFacebookMessage(response *FacebookResponse) error {
+func SendFacebookMessage(requestMessage RequestMessage, psid string, response *FacebookResponse) error {
 	token := os.Getenv("ACCESS_TOKEN")
-	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/PAGE-ID/messages" +
-		"?recipient={'id':'PSID'}" +
-		"&messaging_type=RESPONSE" +
-		"&message={'text':'hello,world'}" +
-		"&access_token=PAGE-ACCESS-TOKEN")
+	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/me/messages?access_token=%v", token)
 
-	resp, err := http.Get(uri)
+	facebookRequest := FacebookRequest{}
+
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(facebookRequest)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error encoding body : %v", err))
+	}
+	resp, err := http.Post(uri, "application/json", &buf)
 	if err != nil {
 		return err
 	}
@@ -29,6 +33,26 @@ func SendFacebookMessage(response *FacebookResponse) error {
 }
 
 type FacebookResponse struct {
-	RecipientID string `json:"recipient_id`
+	RecipientID string `json:"recipient_id"`
 	MessageID   string `json:"message_id"`
+}
+
+type FacebookRequest struct {
+	Recipient Recipient `json:"recipient"`
+	Message   Message   `json:"message"`
+}
+
+type Message struct {
+	Attachment AttachmentFacebookRequest `json:"attachment"`
+}
+type AttachmentFacebookRequest struct {
+	AttachmentType string                    `json:"type"`
+	Payload        AttachmentFacebookPayload `json:"payload"`
+}
+type AttachmentFacebookPayload struct {
+	Src        string `json:"url"`
+	IsReusable bool   `json:"is_reusable"`
+}
+type Recipient struct {
+	Id string `json:"id"`
 }
