@@ -24,7 +24,7 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 
 	coll := client.Database("BotioLivechat").Collection("facebook_messages")
 
-	insertDocMessage := StandardMessage{
+	doc := StandardMessage{
 		ShopID:         "1",
 		Platform:       "Facebook",
 		PageID:         pageID,
@@ -43,6 +43,12 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 			MessageId: "",
 		},
 	}
+
+	result, err := coll.InsertOne(ctx, doc)
+	if err != nil {
+		return err
+	}
+	log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
 	return nil
 }
 

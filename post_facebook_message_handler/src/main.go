@@ -65,7 +65,13 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	}
 
 	// update db
-	AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message)
+	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message, requestMessage.Attachment)
+	if err != nil {
+		discordLog(fmt.Sprintf("error add admin message to DB : %v", err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadGateway,
+		}, err
+	}
 	discordLog(fmt.Sprintf("Elasped : %v", time.Since(start)))
 
 	return events.APIGatewayProxyResponse{
