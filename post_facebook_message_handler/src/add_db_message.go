@@ -12,7 +12,7 @@ import (
 
 const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
 
-func AddDBMessage() error {
+func AddDBMessage(pageID string, conversationID string, messageID string, message string, attachment Attachment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 
@@ -22,6 +22,27 @@ func AddDBMessage() error {
 		return err
 	}
 
+	coll := client.Database("BotioLivechat").Collection("facebook_messages")
+
+	insertDocMessage := StandardMessage{
+		ShopID:         "1",
+		Platform:       "Facebook",
+		PageID:         pageID,
+		ConversationID: conversationID,
+		MessageID:      messageID,
+		// Timestamp: ,
+		Source: Source{
+			UserID:   pageID, // botio user id?
+			UserType: "Admin",
+		},
+		Message: message,
+		Attachments: []Attachment{
+			attachment,
+		},
+		ReplyTo: ReplyMessage{
+			MessageId: "",
+		},
+	}
 	return nil
 }
 

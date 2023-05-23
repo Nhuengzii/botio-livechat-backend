@@ -65,6 +65,7 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	}
 
 	// update db
+	AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message)
 	discordLog(fmt.Sprintf("Elasped : %v", time.Since(start)))
 
 	return events.APIGatewayProxyResponse{
