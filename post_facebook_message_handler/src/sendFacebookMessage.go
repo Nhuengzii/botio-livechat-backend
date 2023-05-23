@@ -64,6 +64,7 @@ func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID stri
 type FacebookResponse struct {
 	RecipientID string `json:"recipient_id"`
 	MessageID   string `json:"message_id"`
+	Timestamp   int64  `json:"timestamp"`
 }
 
 type FacebookRequest struct {

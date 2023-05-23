@@ -55,19 +55,20 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 		discordLog(fmt.Sprintf("Error sending facebook message : %v", err))
 		return events.APIGatewayProxyResponse{}, err
 	}
-	jsonBodyByte, err := json.Marshal(facebookResponse)
-	jsonString := string(jsonBodyByte)
+
+	// update db
+	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message, requestMessage.Attachment, &facebookResponse)
 	if err != nil {
-		discordLog(fmt.Sprint(err))
+		discordLog(fmt.Sprintf("error add admin message to DB : %v", err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadGateway,
 		}, err
 	}
 
-	// update db
-	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message, requestMessage.Attachment)
+	jsonBodyByte, err := json.Marshal(facebookResponse)
+	jsonString := string(jsonBodyByte)
 	if err != nil {
-		discordLog(fmt.Sprintf("error add admin message to DB : %v", err))
+		discordLog(fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadGateway,
 		}, err

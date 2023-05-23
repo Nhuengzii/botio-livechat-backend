@@ -16,11 +16,12 @@ import (
 
 const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
 
-func AddDBMessage(pageID string, conversationID string, messageID string, message string, attachment Attachment) error {
+func AddDBMessage(pageID string, conversationID string, messageID string, message string, attachment Attachment, response *FacebookResponse) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 
 	timestamp, err := getMessageCreatedTime(messageID)
+	response.Timestamp = timestamp
 	if err != nil {
 		return err
 	}
