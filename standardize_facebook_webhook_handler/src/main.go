@@ -45,7 +45,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 
 func handleWebhookEntry(message Notification) error {
 	if len(message.MessageDatas) <= 0 {
-		log.Printf("Error No message entry")
 		return errNoMessageEntry
 	}
 
@@ -63,7 +62,7 @@ func handleWebhookEntry(message Notification) error {
 				return err
 			}
 		} else {
-			log.Printf("Unknown webhook type!!")
+			return errUnknownWebhookType
 		}
 	}
 	return nil

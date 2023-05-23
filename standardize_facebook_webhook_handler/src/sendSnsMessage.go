@@ -40,8 +40,7 @@ func sendSnsMessage(standardMessage *StandardMessage) error {
 		TopicArn:         &topicArn,
 	})
 	if err != nil {
-		log.Println("Unable to publish to SNS topic", err.Error())
-		log.Fatal(err.Error())
+		return err
 	}
 	log.Println("sns publish result: ", result)
 	return nil
