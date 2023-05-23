@@ -57,7 +57,7 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	}
 
 	// update db
-	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message, requestMessage.Attachment, &facebookResponse)
+	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, facebookResponse.Timestamp, requestMessage.Message, requestMessage.Attachment, &facebookResponse)
 	if err != nil {
 		discordLog(fmt.Sprintf("error add admin message to DB : %v", err))
 		return events.APIGatewayProxyResponse{
@@ -79,7 +79,8 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 		StatusCode: http.StatusOK,
 		Body:       jsonString,
 		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Methods": "*",
 		},
 	}, nil
 }
