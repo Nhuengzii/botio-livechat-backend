@@ -17,8 +17,9 @@ func main() {
 }
 
 var (
-	errNoPsidParam   = errors.New("QueryStringParameters psid not given")
-	errNoPageIDParam = errors.New("PathParameter page_id not given")
+	errNoPsidParam           = errors.New("QueryStringParameters psid not given")
+	errNoPageIDParam         = errors.New("PathParameter page_id not given")
+	errNoConversationIDParam = errors.New("PathParameter conversation_id not given")
 )
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -33,6 +34,11 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	if !ok {
 		discordLog(fmt.Sprintf("Error reading pageID path param"))
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoPageIDParam
+	}
+	conversationID, ok := request.PathParameters["conversation_id"]
+	if !ok {
+		discordLog(fmt.Sprintf("Error reading pageID path param"))
+		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoConversationIDParam
 	}
 
 	var requestMessage RequestMessage
