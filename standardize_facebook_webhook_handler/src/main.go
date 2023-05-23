@@ -28,27 +28,35 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		}
 		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
-			if messaging := message.MessageDatas; len(messaging) != 0 {
-				log.Println("messaging field found in recievedMessage")
+			handleWebhookEntry(message, &standardMessages)
+		}
+	}
+	discordLog(fmt.Sprintf("Elapsed: %v", time.Since(start)))
+	return
+}
+
+func handleWebhookEntry(message Notification, standardMessages *[]StandardMessage) {
+	if messaging := message.MessageDatas; len(messaging) != 0 {
+		for _, messageData := range message.MessageDatas {
+			if messageData.Message.MessageID != "" {
 				// standardize messaging hooks
-				err = Standardize(messaging, message.PageID, &standardMessages)
+				err := Standardize(messageData, message.PageID, standardMessages)
 				if err != nil {
 					log.Printf("Error standarizing message : %v", err)
 					return
 				}
+				err = sendSnsMessage(standardMessages)
+				log.Printf("%+v", standardMessages)
+				if err != nil {
+					log.Println("Error sending SNS message :", err)
+					return
+				}
 			} else {
-				log.Printf("Error no message entry : %v", err)
-				return
+				log.Printf("other webhook type!!")
 			}
 		}
-	}
-
-	err := sendSnsMessage(&standardMessages)
-	log.Printf("%+v", standardMessages)
-	if err != nil {
-		log.Println("Error sending SNS message :", err)
+	} else {
+		log.Printf("Error no message entry")
 		return
 	}
-	discordLog(fmt.Sprintf("Elapsed: %v", time.Since(start)))
-	return
 }
