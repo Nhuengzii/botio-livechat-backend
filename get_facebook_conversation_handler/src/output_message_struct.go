@@ -10,6 +10,7 @@ type Conversation struct {
 	UpdatedTime     int64         `json:"updatedTime"`
 	Participants    []Participant `json:"participants"`
 	LastActivity    string        `json:"lastActivity"`
+	IsRead          bool          `json:"isRead"`
 }
 
 type Participant struct {
