@@ -144,8 +144,9 @@ resource "aws_lambda_function" "botio_livechat_websocket_broadcast_handler" {
   depends_on       = [data.archive_file.botio_livechat_websocket_broadcast_handler]
   environment {
     variables = {
-      REDIS_ACCESS_ADDR     = var.redis_access.addr
-      REDIS_ACCESS_PASSWORD = var.redis_access.password
+      REDIS_ACCESS_ADDR      = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD  = var.redis_access.password
+      WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
     }
   }
 }
