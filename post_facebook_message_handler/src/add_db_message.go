@@ -2,7 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,6 +20,10 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
 
+	timestamp, err := getMessageCreatedTime(messageID)
+	if err != nil {
+		return err
+	}
 	// connect mongo
 	client, err := ConnectMongo(ctx)
 	if err != nil {
@@ -36,7 +44,7 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 		PageID:         pageID,
 		ConversationID: conversationID,
 		MessageID:      messageID,
-		// Timestamp: ,
+		Timestamp:      timestamp,
 		Source: Source{
 			UserID:   pageID, // botio user id?
 			UserType: "Admin",
@@ -56,6 +64,32 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 	}
 	log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
 	return nil
+}
+
+func getMessageCreatedTime(messageID string) (int64, error) {
+	access_token := os.Getenv("ACCESS_TOKEN")
+	getMessageURI := fmt.Sprintf("https://graph.facebook.com/v16.0/%v?access_token=%v",
+		messageID, access_token)
+
+	response, err := http.Get(getMessageURI)
+	if err != nil {
+		return 0, err
+	}
+	defer response.Body.Close()
+
+	var messageDataResponse MessageDataResponse
+	err = json.NewDecoder(response.Body).Decode(&messageDataResponse)
+
+	timestampDatetime, err := time.Parse("2023-05-23 09:30:55 +0007", messageDataResponse.Timestamp)
+	if err != nil {
+		return 0, err
+	}
+	return timestampDatetime.Unix(), nil
+}
+
+type MessageDataResponse struct {
+	ID        string `json:"id"`
+	Timestamp string `json:"created_time"`
 }
 
 func ConnectMongo(ctx context.Context) (*mongo.Client, error) {
