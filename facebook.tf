@@ -370,8 +370,8 @@ resource "null_resource" "build_standardize_facebook_webhook_handler" {
   triggers = {
     source_code_hash  = "${filebase64sha256("standardize_facebook_webhook_handler/src/main.go")}"
     source_code_hash1 = "${filebase64sha256("standardize_facebook_webhook_handler/src/recieveMessage.go")}"
-    source_code_hash2 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardMessage.go")}"
-    source_code_hash3 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardize.go")}"
+    source_code_hash2 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardMessageStruct.go")}"
+    source_code_hash3 = "${filebase64sha256("standardize_facebook_webhook_handler/src/standardizeMessage.go")}"
     source_code_hash4 = "${filebase64sha256("standardize_facebook_webhook_handler/src/sendSnsMessage.go")}"
   }
   provisioner "local-exec" {
