@@ -15,8 +15,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
+
 func main() {
 	lambda.Start(handler)
+}
+
+type DB struct {
+	client *mongo.Client
 }
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -34,8 +40,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	conversationID := pathParams["conversation_id"]
 
 	// connect to mongo
-	var client *mongo.Client
-	err := ConnectMongo(client, ctx)
+	client, err := ConnectMongo(ctx)
 	if err != nil {
 		discordLog(fmt.Sprintf("error connect mongo : %v", err))
 		return events.APIGatewayProxyResponse{
@@ -70,6 +75,9 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	err = UpdateConversationIsRead(client, conversationID)
 	if err != nil {
 		discordLog(fmt.Sprintf("Error updating conversationDB isRead field : %v", err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadGateway,
+		}, err
 	}
 	discordLog(fmt.Sprintf("Total Elasped time: %v", time.Since(start)))
 
@@ -82,7 +90,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}, nil
 }
 
-func ConnectMongo(client *mongo.Client, ctx context.Context) error {
+func ConnectMongo(ctx context.Context) (*mongo.Client, error) {
 	start := time.Now()
 
 	opts := options.Client().ApplyURI(uri)
@@ -91,16 +99,16 @@ func ConnectMongo(client *mongo.Client, ctx context.Context) error {
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		discordLog(fmt.Sprintln("Error connecting to mongo atlas : ", err))
-		return err
+		return nil, err
 	}
 
 	// ping
 	if err := client.Database("admin").RunCommand(ctx, bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
 		discordLog(fmt.Sprintln("Error Pinging DB : ", err))
-		return err
+		return nil, err
 	}
 	log.Println("Successfully connect to MongoDB ", time.Since(start))
 	discordLog(fmt.Sprintf("Successfully connect to mongo Elasped : %v", time.Since(start)))
 
-	return nil
+	return client, nil
 }

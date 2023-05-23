@@ -15,7 +15,7 @@ func UpdateConversationIsRead(client *mongo.Client, conversationID string) error
 
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
 
-	update := bson.M{"isRead": true}
+	update := bson.M{"$set": bson.M{"isRead": true}}
 	updateFilter := bson.D{{Key: "conversationID", Value: conversationID}}
 	result, err := coll.UpdateOne(ctx, updateFilter, update)
 	if err != nil {
