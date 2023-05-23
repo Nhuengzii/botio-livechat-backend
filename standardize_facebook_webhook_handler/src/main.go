@@ -60,6 +60,9 @@ func handleWebhookEntry(message Notification) error {
 			if err != nil {
 				return err
 			}
+		} else if messageData.Delivery.Watermark != 0 {
+			// standardize delivery hooks
+			discordLog(fmt.Sprintf("Delivery Webhook"))
 		} else {
 			return errUnknownWebhookType
 		}

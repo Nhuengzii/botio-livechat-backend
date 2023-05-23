@@ -12,10 +12,16 @@ type Notification struct {
 }
 
 type MessageData struct {
-	Sender    User    `json:"sender"`
-	Recipient User    `json:"recipient"`
-	Timestamp int64   `json:"timestamp"`
-	Message   Message `json:"message"`
+	Sender    User     `json:"sender"`
+	Recipient User     `json:"recipient"`
+	Timestamp int64    `json:"timestamp"`
+	Message   Message  `json:"message"`
+	Delivery  Delivery `json:"delivery"`
+}
+
+type Delivery struct {
+	MessageIDs []string `json:"mids"`
+	Watermark  int64    `json:"watermark"` // all messages before watermark timestamp was sent
 }
 
 type Message struct {
