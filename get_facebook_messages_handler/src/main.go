@@ -67,7 +67,10 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, err
 	}
 
-	err = UpdateConversationIsRead()
+	err = UpdateConversationIsRead(client, conversationID)
+	if err != nil {
+		discordLog(fmt.Sprintf("Error updating conversationDB isRead field : %v", err))
+	}
 	discordLog(fmt.Sprintf("Total Elasped time: %v", time.Since(start)))
 
 	return events.APIGatewayProxyResponse{
@@ -81,8 +84,6 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 func ConnectMongo(client *mongo.Client, ctx context.Context) error {
 	start := time.Now()
-	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
-	defer cancel()
 
 	opts := options.Client().ApplyURI(uri)
 
