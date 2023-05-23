@@ -2,9 +2,9 @@ package main
 
 import "fmt"
 
-// TODO: change value that got hardcoded : ShopID, ConversationID
+// TODO: change value that got hardcoded : ShopID
 // TODO: attachments currently support image video audio files only
-func Standardize(messageData MessageData, pageID string, standardMessages *[]StandardMessage) error {
+func StandardizeMessage(messageData MessageData, pageID string, standardMessage *StandardMessage) error {
 	conversationID, err := RequestFacebookConversationID(messageData, pageID)
 	if err != nil {
 		discordLog(fmt.Sprintf("RequestFacebookConversationID : %v", err))
@@ -33,7 +33,7 @@ func Standardize(messageData MessageData, pageID string, standardMessages *[]Sta
 			Payload:        PayloadTypeOutput{Src: attachment.Payload.Src},
 		})
 	}
-	*standardMessages = append(*standardMessages, newMessage)
+	*standardMessage = newMessage
 
 	return nil
 }

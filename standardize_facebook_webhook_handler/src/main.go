@@ -3,12 +3,18 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+)
+
+var (
+	errNoMessageEntry     = errors.New("Error! no message entry")
+	errUnknownWebhookType = errors.New("Error! unknown webhook type found!")
 )
 
 func main() {
@@ -19,7 +25,6 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	log.Println("Facebook Message Standardizer handler")
 	start := time.Now()
 	var recieveMessage RecieveMessage
-	var standardMessages []StandardMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
@@ -28,35 +33,38 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 		}
 		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
-			handleWebhookEntry(message, &standardMessages)
+			err = handleWebhookEntry(message)
+			if err != nil {
+				log.Printf("Error handling webhook entry : %v", err)
+			}
 		}
 	}
 	discordLog(fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return
 }
 
-func handleWebhookEntry(message Notification, standardMessages *[]StandardMessage) {
-	if messaging := message.MessageDatas; len(messaging) != 0 {
-		for _, messageData := range message.MessageDatas {
-			if messageData.Message.MessageID != "" {
-				// standardize messaging hooks
-				err := Standardize(messageData, message.PageID, standardMessages)
-				if err != nil {
-					log.Printf("Error standarizing message : %v", err)
-					return
-				}
-				err = sendSnsMessage(standardMessages)
-				log.Printf("%+v", standardMessages)
-				if err != nil {
-					log.Println("Error sending SNS message :", err)
-					return
-				}
-			} else {
-				log.Printf("other webhook type!!")
-			}
-		}
-	} else {
-		log.Printf("Error no message entry")
-		return
+func handleWebhookEntry(message Notification) error {
+	if len(message.MessageDatas) <= 0 {
+		log.Printf("Error No message entry")
+		return errNoMessageEntry
 	}
+
+	for _, messageData := range message.MessageDatas {
+		if messageData.Message.MessageID != "" {
+			// standardize messaging hooks
+			var standardMessage StandardMessage
+			err := StandardizeMessage(messageData, message.PageID, &standardMessage)
+			if err != nil {
+				return err
+			}
+			err = sendSnsMessage(&standardMessage)
+			log.Printf("%+v", standardMessage)
+			if err != nil {
+				return err
+			}
+		} else {
+			log.Printf("Unknown webhook type!!")
+		}
+	}
+	return nil
 }
