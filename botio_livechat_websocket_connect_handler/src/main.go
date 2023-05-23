@@ -32,7 +32,7 @@ func discordLog(content string) {
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
 	connectionID := request.RequestContext.ConnectionID
 	shopId := request.QueryStringParameters["shopId"]
-	discordLog(fmt.Sprint("Got connect: ", connectionID))
+	// discordLog(fmt.Sprint("Got connect: ", connectionID))
 	my_ctx := context.Background()
 	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
 	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
