@@ -13,7 +13,6 @@ func RequestFacebookConversationID(messageData MessageData, pageID string) (stri
 	access_token := os.Getenv("ACCESS_TOKEN")
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=Messenger&user_id=%v&access_token=%v",
 		pageID, messageData.Sender.ID, access_token)
-	discordLog("RequestFacebookConversationID")
 
 	startTime := time.Now()
 	resp, err := http.Get(uri)

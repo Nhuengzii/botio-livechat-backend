@@ -22,20 +22,20 @@ func main() {
 }
 
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
-	log.Println("Facebook Message Standardizer handler")
+	discordLog(fmt.Sprintln("Facebook Message Standardizer handler"))
 	start := time.Now()
 	var recieveMessage RecieveMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
-			log.Printf("Error unknown webhook object: %v\n", err)
+			discordLog(fmt.Sprintf("Error unknown webhook object: %v\n", err))
 			return
 		}
 		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
 			err = handleWebhookEntry(message)
 			if err != nil {
-				log.Printf("Error handling webhook entry : %v", err)
+				discordLog(fmt.Sprintf("Error handling webhook entry : %v", err))
 			}
 		}
 	}
@@ -57,7 +57,6 @@ func handleWebhookEntry(message Notification) error {
 				return err
 			}
 			err = sendSnsMessage(&standardMessage)
-			log.Printf("%+v", standardMessage)
 			if err != nil {
 				return err
 			}
