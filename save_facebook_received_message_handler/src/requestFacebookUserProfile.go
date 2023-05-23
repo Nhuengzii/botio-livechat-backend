@@ -19,6 +19,9 @@ func RequestFacebookUserProfile(psid string) (ResponseFacebookUserProfile, error
 
 	var body ResponseFacebookUserProfile
 	err = json.NewDecoder(resp.Body).Decode(&body)
+	if err != nil {
+		return ResponseFacebookUserProfile{}, err
+	}
 
 	return body, nil
 }

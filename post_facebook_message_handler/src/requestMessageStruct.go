@@ -6,10 +6,10 @@ type RequestMessage struct {
 }
 
 type Attachment struct {
-	AttachmentType string      `json:"type"`
-	Payload        PayloadType `json:"payload"`
+	AttachmentType string      `json:"type" bson:"type"`
+	Payload        PayloadType `json:"payload" bson:"payload"`
 }
 
 type PayloadType struct {
-	Src string `json:"src"`
+	Src string `json:"src" bson:"src"`
 }

@@ -17,8 +17,9 @@ func main() {
 }
 
 var (
-	errNoPsidParam   = errors.New("QueryStringParameters psid not given")
-	errNoPageIDParam = errors.New("PathParameter page_id not given")
+	errNoPsidParam           = errors.New("QueryStringParameters psid not given")
+	errNoPageIDParam         = errors.New("PathParameter page_id not given")
+	errNoConversationIDParam = errors.New("PathParameter conversation_id not given")
 )
 
 func handler(context context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -33,6 +34,11 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 	if !ok {
 		discordLog(fmt.Sprintf("Error reading pageID path param"))
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoPageIDParam
+	}
+	conversationID, ok := request.PathParameters["conversation_id"]
+	if !ok {
+		discordLog(fmt.Sprintf("Error reading pageID path param"))
+		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, errNoConversationIDParam
 	}
 
 	var requestMessage RequestMessage
@@ -49,6 +55,16 @@ func handler(context context.Context, request events.APIGatewayProxyRequest) (ev
 		discordLog(fmt.Sprintf("Error sending facebook message : %v", err))
 		return events.APIGatewayProxyResponse{}, err
 	}
+
+	// update db
+	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, requestMessage.Message, requestMessage.Attachment, &facebookResponse)
+	if err != nil {
+		discordLog(fmt.Sprintf("error add admin message to DB : %v", err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadGateway,
+		}, err
+	}
+
 	jsonBodyByte, err := json.Marshal(facebookResponse)
 	jsonString := string(jsonBodyByte)
 	if err != nil {
