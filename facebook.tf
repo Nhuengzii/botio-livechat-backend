@@ -34,6 +34,13 @@ resource "aws_api_gateway_resource" "facebook_message" {
   path_part   = "messages"
 }
 
+module "aws_api_gateway_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = aws_api_gateway_rest_api.botio_rest_api.id
+  api_resource_id = aws_api_gateway_resource.facebook_message.id
+}
+
 resource "aws_api_gateway_method" "post_facebook_message" {
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.facebook_message.id
