@@ -21,6 +21,12 @@ func AddDBMessage(pageID string, conversationID string, messageID string, messag
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Println("Error disconnecting from mongo atlas : ", err)
+			return
+		}
+	}()
 
 	coll := client.Database("BotioLivechat").Collection("facebook_messages")
 
@@ -62,13 +68,6 @@ func ConnectMongo(ctx context.Context) (*mongo.Client, error) {
 		log.Println("Error connecting to mongo atlas : ", err)
 		return nil, err
 	}
-
-	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
-			log.Println("Error disconnecting from mongo atlas : ", err)
-			return
-		}
-	}()
 
 	// ping
 	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
