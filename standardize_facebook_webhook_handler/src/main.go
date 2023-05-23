@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -11,37 +12,60 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+var (
+	errNoMessageEntry     = errors.New("Error! no message entry")
+	errUnknownWebhookType = errors.New("Error! unknown webhook type found!")
+)
+
 func main() {
 	lambda.Start(handle)
 }
 
 func handle(ctx context.Context, sqsEvent events.SQSEvent) {
-	log.Println("Facebook Message Standardizer handler")
+	discordLog(fmt.Sprintln("Facebook Message Standardizer handler"))
 	start := time.Now()
 	var recieveMessage RecieveMessage
-	var standardMessages []StandardMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
-		if err != nil {
-			log.Printf("Error unmarshal Record.Body: %v\n", err)
+		if err != nil || recieveMessage.Object != "page" {
+			discordLog(fmt.Sprintf("Error unknown webhook object: %v\n", err))
 			return
 		}
 		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
-			if messaging := message.MessageDatas; messaging != nil {
-				log.Println("messaging field found in recievedMessage")
-				// standardize messaging hooks
-				Standardize(messaging, message.PageID, &standardMessages)
+			err = handleWebhookEntry(message)
+			if err != nil {
+				discordLog(fmt.Sprintf("Error handling webhook entry : %v", err))
 			}
 		}
 	}
-
-	err := sendSnsMessage(&standardMessages)
-	log.Printf("%+v", standardMessages)
-	if err != nil {
-		log.Println("Error sending SNS message :", err)
-		return
-	}
 	discordLog(fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return
+}
+
+func handleWebhookEntry(message Notification) error {
+	if len(message.MessageDatas) <= 0 {
+		return errNoMessageEntry
+	}
+
+	for _, messageData := range message.MessageDatas {
+		if messageData.Message.MessageID != "" {
+			// standardize messaging hooks
+			var standardMessage StandardMessage
+			err := StandardizeMessage(messageData, message.PageID, &standardMessage)
+			if err != nil {
+				return err
+			}
+			err = sendSnsMessage(&standardMessage)
+			if err != nil {
+				return err
+			}
+		} else if messageData.Delivery.Watermark != 0 {
+			// standardize delivery hooks
+			discordLog(fmt.Sprintf("Delivery Webhook"))
+		} else {
+			return errUnknownWebhookType
+		}
+	}
+	return nil
 }
