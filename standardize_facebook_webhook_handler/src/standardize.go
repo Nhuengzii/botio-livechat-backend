@@ -4,12 +4,12 @@ import "fmt"
 
 // TODO: change value that got hardcoded : ShopID, ConversationID
 // TODO: attachments currently support image video audio files only
-func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]StandardMessage) {
+func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]StandardMessage) error {
 	for _, messageData := range messageDatas {
 		conversationID, err := RequestFacebookConversationID(messageData, pageID)
 		if err != nil {
 			discordLog(fmt.Sprintf("RequestFacebookConversationID : %v", err))
-			return
+			return err
 		}
 		newMessage := StandardMessage{
 			ShopID:         "1", // TODO:botio API
@@ -36,4 +36,6 @@ func Standardize(messageDatas []MessageData, pageID string, standardMessages *[]
 		}
 		*standardMessages = append(*standardMessages, newMessage)
 	}
+
+	return nil
 }

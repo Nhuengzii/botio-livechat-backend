@@ -22,16 +22,23 @@ func handle(ctx context.Context, sqsEvent events.SQSEvent) {
 	var standardMessages []StandardMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
-		if err != nil {
-			log.Printf("Error unmarshal Record.Body: %v\n", err)
+		if err != nil || recieveMessage.Object != "page" {
+			log.Printf("Error unknown webhook object: %v\n", err)
 			return
 		}
 		log.Printf("%+v", recieveMessage)
 		for _, message := range recieveMessage.Entry {
-			if messaging := message.MessageDatas; messaging != nil {
+			if messaging := message.MessageDatas; len(messaging) != 0 {
 				log.Println("messaging field found in recievedMessage")
 				// standardize messaging hooks
-				Standardize(messaging, message.PageID, &standardMessages)
+				err = Standardize(messaging, message.PageID, &standardMessages)
+				if err != nil {
+					log.Printf("Error standarizing message : %v", err)
+					return
+				}
+			} else {
+				log.Printf("Error no message entry : %v", err)
+				return
 			}
 		}
 	}
