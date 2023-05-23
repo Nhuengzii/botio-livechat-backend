@@ -53,7 +53,10 @@ func SendFacebookMessage(requestMessage RequestMessage, psid string, pageID stri
 	}
 	defer resp.Body.Close()
 
+	now := time.Now().UnixMilli()
 	err = json.NewDecoder(resp.Body).Decode(response)
+
+	response.Timestamp = now
 	if err != nil {
 		return err
 	}
