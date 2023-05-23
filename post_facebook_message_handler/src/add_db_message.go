@@ -80,7 +80,7 @@ func getMessageCreatedTime(messageID string) (int64, error) {
 	var messageDataResponse MessageDataResponse
 	err = json.NewDecoder(response.Body).Decode(&messageDataResponse)
 
-	timestampDatetime, err := time.Parse("2023-05-23 09:30:55 +0007", messageDataResponse.Timestamp)
+	timestampDatetime, err := time.Parse("2006-01-02T15:04:05-0700", messageDataResponse.Timestamp)
 	if err != nil {
 		return 0, err
 	}
