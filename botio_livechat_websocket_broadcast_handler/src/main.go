@@ -7,9 +7,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
+	"github.com/go-redis/redis/v8"
 )
 
 func discordLog(content string) {
@@ -48,11 +54,8 @@ type Message struct {
 }
 
 type BroadcastMessage struct {
-	ShopId         string `json:"shopId"`
-	Message        string `json:"message"`
-	MessageID      string `json:"messageId"`
-	ConversationID string `json:"conversationId"`
-	Timestamp      int64  `json:"timestamp"`
+	Action  string  `json:"action"`
+	Message Message `json:"message"`
 }
 
 type IncommingMessage struct {
@@ -61,9 +64,10 @@ type IncommingMessage struct {
 }
 
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
-	// connectionID := request.RequestContext.ConnectionID
+	connectionID := request.RequestContext.ConnectionID
 	discordLog("Got broadcast")
 	// Unmarshal the message
+	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
 	var message IncommingMessage
 	discordLog("Raw message: " + request.Body)
 	err := json.Unmarshal([]byte(request.Body), &message)
@@ -71,6 +75,45 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		discordLog(fmt.Sprint("Error unmarshalling message: ", err))
 	}
 	discordLog(fmt.Sprintf("Message: %+v", message))
+	shopId := "1"
+	my_ctx := context.Background()
+	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
+	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     redis_addr,
+		Password: redis_password,
+	})
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
+	if err != nil {
+		discordLog(fmt.Sprint("Error loading config: ", err))
+	}
+	svc := apigatewaymanagementapi.NewFromConfig(cfg, func(o *apigatewaymanagementapi.Options) {
+		o.EndpointResolver = apigatewaymanagementapi.EndpointResolverFunc(func(region string, options apigatewaymanagementapi.EndpointResolverOptions) (aws.Endpoint, error) {
+			return aws.Endpoint{
+				URL:           endpoint,
+				SigningRegion: region,
+			}, nil
+		})
+	})
+	keys, err := rdb.Keys(my_ctx, shopId+":*").Result()
+	discordLog(fmt.Sprintf("Keys: %+v", keys))
+	if err != nil {
+		discordLog(fmt.Sprint("Error getting keys: ", err))
+	}
+	var broadcastMessage BroadcastMessage
+	broadcastMessage.Action = "broadcast"
+	broadcastMessage.Message = message.Message
+	for _, key := range keys {
+		if key == shopId+":"+connectionID {
+			continue
+		}
+
+		json_message, err := json.Marshal(broadcastMessage)
+		if err != nil {
+			discordLog(fmt.Sprint("Error marshalling message: ", err))
+		}
+		sendMessage(svc, strings.Split(key, ":")[1], string(json_message))
+	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
