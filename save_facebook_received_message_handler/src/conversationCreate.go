@@ -45,6 +45,7 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 				},
 			},
 			LastActivity: recieveMessage.Message,
+			IsRead:       false,
 		}
 		log.Printf("Doc : %+v", doc)
 		result, err := coll.InsertOne(ctx, doc)
@@ -52,13 +53,13 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 			return err
 		}
 		log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
-	} else {
+	} else { // update conversation
 		var update primitive.M
 		if recieveMessage.Message != "" {
-			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": recieveMessage.Message}}
+			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": recieveMessage.Message, "isRead": false}}
 		} else {
 			attachType := recieveMessage.Attachments[0].AttachmentType
-			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": fmt.Sprintf("send a %v", attachType)}}
+			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": fmt.Sprintf("send a %v", attachType), "isRead": false}}
 		}
 		updateFilter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
 		result, err := coll.UpdateOne(ctx, updateFilter, update)
@@ -80,6 +81,7 @@ type Conversation struct {
 	UpdatedTime     int64         `bson:"updatedTime"`
 	Participants    []Participant `bson:"participants"`
 	LastActivity    string        `bson:"lastActivity"`
+	IsRead          bool          `bson:"isRead"`
 }
 
 type Participant struct {
