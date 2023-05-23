@@ -56,10 +56,19 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 	})
 
 	for _, message := range sqsEvent.Records {
+		discordLog(fmt.Sprint("Received message: ", message.Body))
 		var standardMessage StandardMessage
+
 		json.Unmarshal([]byte(message.Body), &standardMessage)
+		discordLog(fmt.Sprint("Unmarshalled message: ", standardMessage.Message))
+		websocketMessage := WebsocketMessage{
+			Action:  "userMessage",
+			Message: standardMessage.Message,
+		}
+		json_websocketMessage, _ := json.Marshal(websocketMessage)
+		discordLog(fmt.Sprint("Sending message: ", string(json_websocketMessage)))
 		for _, key := range keys {
-			sendMessage(svc, strings.Split(key, ":")[1], standardMessage.Message)
+			sendMessage(svc, strings.Split(key, ":")[1], string(json_websocketMessage))
 		}
 	}
 }

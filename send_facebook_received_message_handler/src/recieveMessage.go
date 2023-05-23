@@ -41,6 +41,12 @@ type PayloadType struct {
 type ReplyMessage struct {
 	MessageId string `json:"messageID"`
 }
+
+type WebsocketMessage struct {
+	Action  string `json:"action"`
+	Message string `json:"message"`
+}
+
 type StandardMessage struct {
 	ShopID         string       `json:"shopID"`
 	Platform       string       `json:"platform"`
