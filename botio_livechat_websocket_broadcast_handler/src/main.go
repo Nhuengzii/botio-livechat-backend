@@ -65,16 +65,16 @@ type IncommingMessage struct {
 
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
 	connectionID := request.RequestContext.ConnectionID
-	discordLog("Got broadcast")
+	// discordLog("Got broadcast")
 	// Unmarshal the message
 	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
 	var message IncommingMessage
-	discordLog("Raw message: " + request.Body)
+	// discordLog("Raw message: " + request.Body)
 	err := json.Unmarshal([]byte(request.Body), &message)
 	if err != nil {
 		discordLog(fmt.Sprint("Error unmarshalling message: ", err))
 	}
-	discordLog(fmt.Sprintf("Message: %+v", message))
+	// discordLog(fmt.Sprintf("Message: %+v", message))
 	shopId := "1"
 	my_ctx := context.Background()
 	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
@@ -96,7 +96,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		})
 	})
 	keys, err := rdb.Keys(my_ctx, shopId+":*").Result()
-	discordLog(fmt.Sprintf("Keys: %+v", keys))
+	// discordLog(fmt.Sprintf("Keys: %+v", keys))
 	if err != nil {
 		discordLog(fmt.Sprint("Error getting keys: ", err))
 	}
