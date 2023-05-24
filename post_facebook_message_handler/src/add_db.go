@@ -32,7 +32,10 @@ func UpdateDB(pageID string, conversationID string, facebookResponse FacebookRes
 		}
 	}()
 
-	err = AddDBMessage(ctx, client, pageID, conversationID, facebookResponse.MessageID, facebookResponse.Timestamp, requestMessage.Message, requestMessage.Attachment)
+	err = AddDBMessage(ctx, client, pageID, conversationID, facebookResponse, requestMessage)
+	if err != nil {
+		return err
+	}
 	err = AddDbConversation(ctx, client, conversationID, facebookResponse, requestMessage)
 	if err != nil {
 		return err
@@ -75,7 +78,7 @@ func adminLastActivityFormat(requestMessage RequestMessage) (string, error) {
 	return "", errAttachmentTypeNotSupport
 }
 
-func AddDBMessage(ctx context.Context, client *mongo.Client, pageID string, conversationID string, messageID string, timestamp int64, message string, attachment Attachment) error {
+func AddDBMessage(ctx context.Context, client *mongo.Client, pageID string, conversationID string, facebookResponse FacebookResponse, requestMessage RequestMessage) error {
 	coll := client.Database("BotioLivechat").Collection("facebook_messages")
 
 	doc := StandardMessage{
@@ -83,15 +86,15 @@ func AddDBMessage(ctx context.Context, client *mongo.Client, pageID string, conv
 		Platform:       "Facebook",
 		PageID:         pageID,
 		ConversationID: conversationID,
-		MessageID:      messageID,
-		Timestamp:      timestamp,
+		MessageID:      facebookResponse.MessageID,
+		Timestamp:      facebookResponse.Timestamp,
 		Source: Source{
 			UserID:   pageID, // botio user id?
 			UserType: "Admin",
 		},
-		Message: message,
+		Message: requestMessage.Message,
 		Attachments: []Attachment{
-			attachment,
+			requestMessage.Attachment,
 		},
 		ReplyTo: ReplyMessage{
 			MessageId: "",
