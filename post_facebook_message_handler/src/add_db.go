@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -12,6 +13,8 @@ import (
 )
 
 const uri = "mongodb+srv://paff:thisispassword@botiolivechat.qsb7kv4.mongodb.net/?retryWrites=true&w=majority"
+
+var errAttachmentTypeNotSupport = errors.New("Attachment type not support")
 
 func UpdateDB(pageID string, conversationID string, facebookResponse FacebookResponse, requestMessage RequestMessage) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
@@ -30,6 +33,7 @@ func UpdateDB(pageID string, conversationID string, facebookResponse FacebookRes
 	}()
 
 	err = AddDBMessage(ctx, client, pageID, conversationID, facebookResponse.MessageID, facebookResponse.Timestamp, requestMessage.Message, requestMessage.Attachment)
+	err = AddDbConversation(ctx, client, conversationID, facebookResponse, requestMessage)
 	if err != nil {
 		return err
 	}
@@ -40,7 +44,11 @@ func UpdateDB(pageID string, conversationID string, facebookResponse FacebookRes
 func AddDbConversation(ctx context.Context, client *mongo.Client, conversationID string, facebookResponse FacebookResponse, requestMessage RequestMessage) error {
 	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
 
-	update := bson.M{"$set": bson.M{"updatedTime": facebookResponse.Timestamp, "lastActivity": "placeholder"}}
+	lastActivity, err := adminLastActivityFormat(requestMessage)
+	if err != nil {
+		return err
+	}
+	update := bson.M{"$set": bson.M{"updatedTime": facebookResponse.Timestamp, "lastActivity": lastActivity}}
 	updateFilter := bson.D{{Key: "conversationID", Value: conversationID}}
 	result, err := coll.UpdateOne(ctx, updateFilter, update)
 	if err != nil {
@@ -48,6 +56,23 @@ func AddDbConversation(ctx context.Context, client *mongo.Client, conversationID
 	}
 	discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
 	return nil
+}
+
+func adminLastActivityFormat(requestMessage RequestMessage) (string, error) {
+	if requestMessage.Message != "" {
+		return fmt.Sprintf("คุณ: %v", requestMessage.Message), nil
+	} else if requestMessage.Attachment.AttachmentType == "image" {
+		return "คุณส่งรูปภาพ", nil
+	} else if requestMessage.Attachment.AttachmentType == "audio" {
+		return "คุณส่งข้อความเสียง", nil
+	} else if requestMessage.Attachment.AttachmentType == "video" {
+		return "คุณส่งวิดีโอ", nil
+	} else if requestMessage.Attachment.AttachmentType == "file" {
+		return "คุณส่งไฟล์", nil
+	} else if requestMessage.Attachment.AttachmentType == "template" {
+		return "คุณส่งเทมเพลท", nil
+	}
+	return "", errAttachmentTypeNotSupport
 }
 
 func AddDBMessage(ctx context.Context, client *mongo.Client, pageID string, conversationID string, messageID string, timestamp int64, message string, attachment Attachment) error {
