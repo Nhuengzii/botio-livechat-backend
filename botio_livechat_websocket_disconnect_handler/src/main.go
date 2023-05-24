@@ -31,7 +31,7 @@ func discordLog(content string) {
 
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
 	connectionID := request.RequestContext.ConnectionID
-	discordLog(fmt.Sprint("Got disconnect events from: ", connectionID))
+	// discordLog(fmt.Sprint("Got disconnect events from: ", connectionID))
 	my_ctx := context.Background()
 	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
 	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
@@ -44,7 +44,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	if err != nil {
 		discordLog(fmt.Sprint("Error getting keys: ", err))
 	}
-	discordLog(fmt.Sprint("Keys: ", keys))
+	// discordLog(fmt.Sprint("Keys: ", keys))
 
 	if len(keys) > 0 {
 		_, err := rdb.Del(my_ctx, keys[0]).Result()

@@ -66,3 +66,5 @@ botio_livechat_websocket_disconnect_handler/botio_livechat_websocket_disconnect_
 facebook.auto.tfvars
 line.auto.tfvars
 websocket.auto.tfvars
+botio_livechat_websocket_broadcast_handler/bin/*
+botio_livechat_websocket_broadcast_handler/botio_livechat_websocket_broadcast_handler.zip
