@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+var errAttachmentTypeNotSupport = errors.New("Attachment type not support")
 
 func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
@@ -55,12 +58,11 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 		log.Printf("Inserted a document with _id: %v\n", result.InsertedID)
 	} else { // update conversation
 		var update primitive.M
-		if recieveMessage.Message != "" {
-			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": recieveMessage.Message, "isRead": false}}
-		} else {
-			attachType := recieveMessage.Attachments[0].AttachmentType
-			update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": fmt.Sprintf("send a %v", attachType), "isRead": false}}
+		lastActivity, err := LastActivityFormat(recieveMessage)
+		if err != nil {
+			return err
 		}
+		update = bson.M{"$set": bson.M{"updatedTime": recieveMessage.Timestamp, "lastActivity": lastActivity, "isRead": false}}
 		updateFilter := bson.D{{Key: "conversationID", Value: recieveMessage.ConversationID}}
 		result, err := coll.UpdateOne(ctx, updateFilter, update)
 		if err != nil {
@@ -71,6 +73,26 @@ func ConversationCreate(client *mongo.Client, recieveMessage StandardMessage) er
 	}
 
 	return nil
+}
+
+func LastActivityFormat(recieveMessage StandardMessage) (string, error) {
+	if recieveMessage.Message != "" {
+		return fmt.Sprintf("%v", recieveMessage.Message), nil
+	}
+	attachment := recieveMessage.Attachments[0]
+	if attachment.AttachmentType == "image" {
+		return "ส่งรูปภาพ", nil
+	} else if attachment.AttachmentType == "audio" {
+		return "ส่งข้อความเสียง", nil
+	} else if attachment.AttachmentType == "video" {
+		return "ส่งวิดีโอ", nil
+	} else if attachment.AttachmentType == "file" {
+		return "ส่งไฟล์", nil
+	} else if attachment.AttachmentType == "template" {
+		return "ส่งเทมเพลท", nil
+	}
+
+	return "", errAttachmentTypeNotSupport
 }
 
 type Conversation struct {
