@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -28,7 +29,7 @@ func UpdateDB(pageID string, conversationID string, facebookResponse FacebookRes
 		}
 	}()
 
-	err = AddDBMessage(pageID, conversationID, facebookResponse.MessageID, facebookResponse.Timestamp, requestMessage.Message, requestMessage.Attachment)
+	err = AddDBMessage(ctx, client, pageID, conversationID, facebookResponse.MessageID, facebookResponse.Timestamp, requestMessage.Message, requestMessage.Attachment)
 	if err != nil {
 		return err
 	}
@@ -36,7 +37,20 @@ func UpdateDB(pageID string, conversationID string, facebookResponse FacebookRes
 	return nil
 }
 
-func AddDBMessage(client mongo.Client, pageID string, conversationID string, messageID string, timestamp int64, message string, attachment Attachment) error {
+func AddDbConversation(ctx context.Context, client *mongo.Client, conversationID string, facebookResponse FacebookResponse, requestMessage RequestMessage) error {
+	coll := client.Database("BotioLivechat").Collection("facebook_conversations")
+
+	update := bson.M{"$set": bson.M{"updatedTime": facebookResponse.Timestamp, "lastActivity": "placeholder"}}
+	updateFilter := bson.D{{Key: "conversationID", Value: conversationID}}
+	result, err := coll.UpdateOne(ctx, updateFilter, update)
+	if err != nil {
+		return err
+	}
+	discordLog(fmt.Sprintf("Updated a document; changed fields: %v\n", result.ModifiedCount))
+	return nil
+}
+
+func AddDBMessage(ctx context.Context, client *mongo.Client, pageID string, conversationID string, messageID string, timestamp int64, message string, attachment Attachment) error {
 	coll := client.Database("BotioLivechat").Collection("facebook_messages")
 
 	doc := StandardMessage{
