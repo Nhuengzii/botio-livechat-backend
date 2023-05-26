@@ -13,36 +13,43 @@ func main() {
 	lambda.Start(Handler)
 }
 
-func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
-	discordLog("Received event")
-	// todo: implement deduplication logic
+func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+	log.Println("from standardizer: received sqs event")
+	if logToDiscordEnabled {
+		logToDiscord("from standardizer: received sqs event")
+	}
 	for _, sqsMessage := range sqsEvent.Records {
-		webhookBody := sqsMessage.Body
-		discordLog(webhookBody)
-		wb, err := parseRequest([]byte(webhookBody))
+		wBody := sqsMessage.Body
+		wb, err := parseWebhookBody(wBody)
 		if err != nil {
-			discordLog("Error parsing webhook body")
-			log.Fatal(err)
-		}
-		discordLog("Parsed webhook body")
-		standardMessages := wb.toStandardMessages()
-		for _, standardMessage := range standardMessages {
-			stdMsg, _ := json.Marshal(standardMessage)
-			discordLog(string(stdMsg))
-			err := publishToSNS(string(stdMsg))
-			if err != nil {
-				discordLog("Error publishing to SNS")
-				log.Fatal(err)
+			log.Println("from standardizer: couldn't parse webhook body")
+			if logToDiscordEnabled {
+				logToDiscord("from standardizer: couldn't parse webhook body")
 			}
-			discordLog("Published to SNS")
+			return err
+		}
+		botioMessages := wb.toBotioMessages()
+		for _, message := range botioMessages {
+			messageJSON, err := json.Marshal(message)
+			if err != nil {
+				log.Println("from standardizer: couldn't marshal botio message")
+				if logToDiscordEnabled {
+					logToDiscord("from standardizer: couldn't marshal botio message")
+				}
+				return err
+			}
+			if err := publishSNSMessage(string(messageJSON)); err != nil {
+				log.Println("from standardizer: couldn't publish botio message")
+				if logToDiscordEnabled {
+					logToDiscord("from standardizer: couldn't publish botio message")
+				}
+				return err
+			}
 		}
 	}
-}
-
-func parseRequest(webhookBody []byte) (WebhookBody, error) {
-	wb := WebhookBody{}
-	if err := json.Unmarshal(webhookBody, &wb); err != nil {
-		return wb, err
+	log.Println("from standardizer: published all botio messages to sns")
+	if logToDiscordEnabled {
+		logToDiscord("from standardizer: published all botio messages to sns")
 	}
-	return wb, nil
+	return nil
 }
