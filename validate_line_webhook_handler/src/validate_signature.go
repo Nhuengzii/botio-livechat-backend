@@ -4,20 +4,22 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"os"
+	"errors"
 )
 
-var channelSecret = os.Getenv("LINE_CHANNEL_SECRET")
-
-func validateSignature(channelSecret string, signature string, body []byte) bool {
+func validateSignature(channelSecret string, signature string, body string) error {
 	decoded, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		return false
+		return err
 	}
 	hash := hmac.New(sha256.New, []byte(channelSecret))
-	_, err = hash.Write(body)
+	_, err = hash.Write([]byte(body))
 	if err != nil {
-		return false
+		return err
 	}
-	return hmac.Equal(decoded, hash.Sum(nil))
+	valid := hmac.Equal(decoded, hash.Sum(nil))
+	if !valid {
+		return errors.New("signature invalid")
+	}
+	return nil
 }

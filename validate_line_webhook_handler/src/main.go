@@ -2,47 +2,47 @@ package main
 
 import (
 	"context"
-	"os"
+	"log"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
 )
-
-var qURL = os.Getenv("SQS_QUEUE_URL")
 
 func main() {
 	lambda.Start(Handler)
 }
 
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	body := []byte(req.Body)
-	signature := req.Headers["x-line-signature"]
-	if !validateSignature(channelSecret, signature, body) {
-		discordLog("Unauthorized request to webhook")
+	log.Println("from webhook handler: new webhook received")
+	if logToDiscordEnabled {
+		logToDiscord("from webhook handler: new webhook received")
+	}
+	webhookBody := req.Body
+	lineSignature := req.Headers["x-line-signature"]
+	if err := validateSignature(lineChannelSecret, lineSignature, webhookBody); err != nil {
+		log.Println("from webhook handler: invalid signature")
+		if logToDiscordEnabled {
+			logToDiscord("from webhook handler: invalid signature")
+		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 401,
 			Body:       "Unauthorized",
-		}, nil
+		}, err
 	}
-	sess := session.Must(session.NewSession())
-	svc := sqs.New(sess, aws.NewConfig().WithRegion("ap-southeast-1"))
-	params := &sqs.SendMessageInput{
-		MessageBody: aws.String(string(body)),
-		QueueUrl:    aws.String(qURL),
-	}
-	_, err := svc.SendMessage(params)
-	if err != nil {
-		discordLog("Cannot send message to SQS")
-		discordLog(err.Error())
+	if err := sendSQSMessage(webhookBody); err != nil {
+		log.Println("from webhook handler: couldn't send webhook body to sqs")
+		if logToDiscordEnabled {
+			logToDiscord("from webhook handler: couldn't send webhook body to sqs")
+		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
-		}, nil
+		}, err
 	}
-	discordLog("Webhhok body sent to SQS")
+	log.Println("from webhook handler: webhook body sent to sqs")
+	if logToDiscordEnabled {
+		logToDiscord("from webhook handler: webhook body sent to sqs")
+	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       "OK",
