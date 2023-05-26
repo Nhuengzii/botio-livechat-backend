@@ -16,5 +16,20 @@ func sendSQSMessage(message string) error {
 		QueueUrl:    aws.String(sqsQueueURL),
 	}
 	_, err := svc.SendMessage(input)
-	return err
+	if err != nil {
+		return &sendSQSMessageError{
+			message: "couldn't send message to sqs",
+			err:     err,
+		}
+	}
+	return nil
+}
+
+type sendSQSMessageError struct {
+	message string
+	err     error
+}
+
+func (e *sendSQSMessageError) Error() string {
+	return e.message + ": " + e.err.Error()
 }
