@@ -32,7 +32,7 @@ func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) error {
 			}
 			return nil
 		} else {
-			// some other error
+			// some other checkConversationExists error
 			return &messageHandlerError{
 				message: "couldn't handle botio message",
 				err:     err,
