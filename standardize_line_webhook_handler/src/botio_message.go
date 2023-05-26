@@ -34,7 +34,7 @@ const (
 	userTypeRoom  userType = "room"
 )
 
-// the currne attachment structure doesn't allow
+// the current attachment structure doesn't support
 // more than one line-emojis on their own or
 // line-emojis embedding in text messages
 type attachment struct {

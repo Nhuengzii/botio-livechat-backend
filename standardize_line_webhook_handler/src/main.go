@@ -14,42 +14,32 @@ func main() {
 }
 
 func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	log.Println("from standardizer: received sqs event")
-	if logToDiscordEnabled {
-		logToDiscord("from standardizer: received sqs event")
-	}
+	log.Println("message standardizer handler: received sqs event")
+	logToDiscord("message standardizer handler: received sqs event")
 	for _, sqsMessage := range sqsEvent.Records {
-		wBody := sqsMessage.Body
-		wb, err := parseWebhookBody(wBody)
+		webhookBodyString := sqsMessage.Body
+		wb, err := parseWebhookBody(webhookBodyString)
 		if err != nil {
-			log.Println("from standardizer: couldn't parse webhook body")
-			if logToDiscordEnabled {
-				logToDiscord("from standardizer: couldn't parse webhook body")
-			}
+			log.Println("message standardizer handler: " + err.Error())
+			logToDiscord("message standardizer handler: " + err.Error())
 			return err
 		}
 		botioMessages := wb.toBotioMessages()
 		for _, message := range botioMessages {
 			messageJSON, err := json.Marshal(message)
 			if err != nil {
-				log.Println("from standardizer: couldn't marshal botio message")
-				if logToDiscordEnabled {
-					logToDiscord("from standardizer: couldn't marshal botio message")
-				}
+				log.Println("message standardizer handler: couldn't marshal botio message: " + err.Error())
+				logToDiscord("message standardizer handler: couldn't marshal botio message: " + err.Error())
 				return err
 			}
 			if err := publishSNSMessage(string(messageJSON)); err != nil {
-				log.Println("from standardizer: couldn't publish botio message")
-				if logToDiscordEnabled {
-					logToDiscord("from standardizer: couldn't publish botio message")
-				}
+				log.Println("message standardizer handler: " + err.Error())
+				logToDiscord("message standardizer handler: " + err.Error())
 				return err
 			}
 		}
 	}
-	log.Println("from standardizer: published all botio messages to sns")
-	if logToDiscordEnabled {
-		logToDiscord("from standardizer: published all botio messages to sns")
-	}
+	log.Println("message standardizer handler: published all botio messages to sns")
+	logToDiscord("message standardizer handler: published all botio messages to sns")
 	return nil
 }

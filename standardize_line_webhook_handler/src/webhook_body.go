@@ -14,14 +14,17 @@ type webhookBody struct {
 func parseWebhookBody(body string) (*webhookBody, error) {
 	wb := &webhookBody{}
 	if err := json.Unmarshal([]byte(body), wb); err != nil {
-		return nil, err
+		return nil, &parseWebhookBodyError{
+			message: "couldn't parse webhook body",
+			err:     err,
+		}
 	}
 	return wb, nil
 }
 
-func (wb *webhookBody) toBotioMessages() []botioMessage {
+func (wb *webhookBody) toBotioMessages() []*botioMessage {
 	botUserID := wb.Destination
-	var botioMessages = []botioMessage{}
+	var botioMessages = []*botioMessage{}
 	for _, event := range wb.Events {
 		if event.Type != linebot.EventTypeMessage {
 			continue
@@ -60,7 +63,7 @@ func (wb *webhookBody) toBotioMessages() []botioMessage {
 		}
 
 		botioMessages = append(botioMessages,
-			botioMessage{
+			&botioMessage{
 				ShopID:         shopID,
 				Platform:       platform,
 				PageID:         pageID,
@@ -75,4 +78,13 @@ func (wb *webhookBody) toBotioMessages() []botioMessage {
 	}
 
 	return botioMessages
+}
+
+type parseWebhookBodyError struct {
+	message string
+	err     error
+}
+
+func (e *parseWebhookBodyError) Error() string {
+	return e.message + ": " + e.err.Error()
 }

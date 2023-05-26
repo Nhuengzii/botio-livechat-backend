@@ -16,7 +16,7 @@ func getStickerPNGurl(sm *linebot.StickerMessage) string {
 }
 
 func getLocationString(lm *linebot.LocationMessage) string {
-	return fmt.Sprintf("Title: %s\nAddress: %sfnLatitude: %f\nLongitude: %f", lm.Title, lm.Address, lm.Latitude, lm.Longitude)
+	return fmt.Sprintf("Title: %s\nAddress: %s\nLatitude: %f\nLongitude: %f", lm.Title, lm.Address, lm.Latitude, lm.Longitude)
 }
 
 // once the botio attachment structure supports line emojis embedding,
