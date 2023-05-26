@@ -16,5 +16,20 @@ func publishSNSMessage(message string) error {
 		TopicArn: aws.String(snsTopicARN),
 	}
 	_, err := svc.Publish(input)
-	return err
+	if err != nil {
+		return &publishSNSMessageError{
+			message: "couldn't publish sns message",
+			err:     err,
+		}
+	}
+	return nil
+}
+
+type publishSNSMessageError struct {
+	message string
+	err     error
+}
+
+func (e *publishSNSMessageError) Error() string {
+	return e.message + ": " + e.err.Error()
 }
