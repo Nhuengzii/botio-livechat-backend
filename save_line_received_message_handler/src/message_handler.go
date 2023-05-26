@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -10,7 +11,7 @@ func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) error {
 	conversationID, err := dbc.checkConversationExists(ctx, m)
 	if err != nil {
 		// conversation does not exist, create it and insert message
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			c, err := newBotioConversation(m)
 			if err != nil {
 				return &messageHandlerError{
@@ -62,4 +63,8 @@ type messageHandlerError struct {
 
 func (e *messageHandlerError) Error() string {
 	return e.message + ": " + e.err.Error()
+}
+
+func (e *messageHandlerError) Unwrap() error {
+	return e.err
 }

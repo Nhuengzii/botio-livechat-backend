@@ -49,3 +49,7 @@ type newBotioConversationError struct {
 func (e *newBotioConversationError) Error() string {
 	return e.message + ": " + e.err.Error()
 }
+
+func (e *newBotioConversationError) Unwrap() error {
+	return e.err
+}

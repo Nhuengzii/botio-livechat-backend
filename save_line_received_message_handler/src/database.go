@@ -55,9 +55,16 @@ func (dbc *dbClient) checkConversationExists(ctx context.Context, m *botioMessag
 	c := &botioConversation{}
 	err := coll.FindOne(ctx, filter).Decode(c)
 	if err != nil {
-		return "", &checkConversationExistsError{
-			message: "couldn't check if conversation exists in mongodb",
-			err:     err,
+		if err == mongo.ErrNoDocuments {
+			return "", &checkConversationExistsError{
+				message: "conversation does not exist in mongodb",
+				err:     err,
+			}
+		} else {
+			return "", &checkConversationExistsError{
+				message: "couldn't check if conversation exists in mongodb",
+				err:     err,
+			}
 		}
 	}
 	return c.ConversationID, nil
@@ -140,4 +147,23 @@ func (e *updateConversationError) Error() string {
 }
 func (e *insertMessageError) Error() string {
 	return e.message + ": " + e.err.Error()
+}
+
+func (e *newDBclientError) Unwrap() error {
+	return e.err
+}
+func (e *closeDBclientError) Unwrap() error {
+	return e.err
+}
+func (e *insertConversationError) Unwrap() error {
+	return e.err
+}
+func (e *checkConversationExistsError) Unwrap() error {
+	return e.err
+}
+func (e *updateConversationError) Unwrap() error {
+	return e.err
+}
+func (e *insertMessageError) Unwrap() error {
+	return e.err
 }
