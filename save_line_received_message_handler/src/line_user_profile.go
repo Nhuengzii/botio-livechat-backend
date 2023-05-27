@@ -57,3 +57,7 @@ type getLineUserProfileError struct {
 func (e *getLineUserProfileError) Error() string {
 	return e.message + ": " + e.err.Error()
 }
+
+func (e *getLineUserProfileError) Unwrap() error {
+	return e.err
+}
