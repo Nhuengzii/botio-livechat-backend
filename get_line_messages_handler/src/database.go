@@ -38,6 +38,7 @@ func (dbc *dbClient) getMessagesInConversation(ctx context.Context, conversation
 	if err != nil {
 		return nil, fmt.Errorf("dbClient.getMessagesInConversation: %w", err)
 	}
+	defer cur.Close(ctx)
 	messages := []botioMessage{}
 	if err := cur.All(ctx, &messages); err != nil {
 		return nil, fmt.Errorf("dbClient.getMessagesInConversation: %w", err)
