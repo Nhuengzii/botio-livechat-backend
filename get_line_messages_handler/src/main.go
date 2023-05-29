@@ -20,12 +20,11 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.A
 			logToDiscord("get line message handler: " + err.Error())
 		}
 	}()
-	log.Println("get line message handler: new get-message-in-conversation request reeived")
-	logToDiscord("get line message handler: new get-message-in-conversation request reeived")
 	pathParams := req.PathParameters
 	// conversationID is designed to be unique (conversationID=botUserID:userID)
 	// so other path parameters are not needed
-	conversationID := pathParams["conversationID"]
+	conversationID := pathParams["conversation_id"]
+	logToDiscord("get line message handler: conversationID=" + conversationID)
 	dbc, err := newDBClient(ctx)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
