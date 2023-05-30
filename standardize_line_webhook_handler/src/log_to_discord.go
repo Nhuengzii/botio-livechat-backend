@@ -13,7 +13,7 @@ func logToDiscord(message string) {
 		payloadJSON, _ := json.Marshal(payload)
 		_, err := http.Post(discordWebhookURL, "application/json", bytes.NewBuffer(payloadJSON))
 		if err != nil {
-			log.Println("from logToDiscord: ", err)
+			log.Println("logToDiscord: ", err)
 		}
 	}
 }

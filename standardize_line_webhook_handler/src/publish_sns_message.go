@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -15,21 +16,8 @@ func publishSNSMessage(message string) error {
 		Message:  aws.String(message),
 		TopicArn: aws.String(snsTopicARN),
 	}
-	_, err := svc.Publish(input)
-	if err != nil {
-		return &publishSNSMessageError{
-			message: "couldn't publish sns message",
-			err:     err,
-		}
+	if _, err := svc.Publish(input); err != nil {
+		return fmt.Errorf("publishSNSMessage: %w", err)
 	}
 	return nil
-}
-
-type publishSNSMessageError struct {
-	message string
-	err     error
-}
-
-func (e *publishSNSMessageError) Error() string {
-	return e.message + ": " + e.err.Error()
 }
