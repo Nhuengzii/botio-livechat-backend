@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,37 +40,29 @@ func (dbc *dbClient) insertConversation(ctx context.Context, c *botioConversatio
 	return nil
 }
 
-func (dbc *dbClient) checkConversationExists(ctx context.Context, m *botioMessage) (bool, string, error) {
+func (dbc *dbClient) checkConversationExists(ctx context.Context, m *botioMessage) (bool, error) {
 	coll := dbc.client.Database(mongodbDatabase).Collection(mongodbCollectionLineConversations)
 	filter := bson.D{{Key: "conversationID", Value: m.ConversationID}}
 	c := &botioConversation{}
 	if err := coll.FindOne(ctx, filter).Decode(c); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return false, "", nil
+			return false, nil
 		} else {
-			return false, "", fmt.Errorf("dbClient.checkConversationExists: %w", err)
+			return false, fmt.Errorf("dbClient.checkConversationExists: %w", err)
 		}
 	}
-	return true, c.ConversationID, nil
+	return true, nil
 }
 
-func (dbc *dbClient) updateConversation(ctx context.Context, conversationID string, m *botioMessage) (err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("dbClient.updateConversation: %w", err)
-		}
-	}()
-	if conversationID != m.ConversationID {
-		return errors.New("conversationID mismatch")
-	}
+func (dbc *dbClient) updateConversationOfMessage(ctx context.Context, m *botioMessage) (err error) {
 	coll := dbc.client.Database(mongodbDatabase).Collection(mongodbCollectionLineConversations)
-	filter := bson.D{{Key: "conversationID", Value: conversationID}}
+	filter := bson.D{{Key: "conversationID", Value: m.ConversationID}}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "lastActivity", Value: m.Message},
 		{Key: "updatedTime", Value: m.Timestamp},
 	}}}
 	if _, err := coll.UpdateOne(ctx, filter, update); err != nil {
-		return err
+		return fmt.Errorf("dbClient.updateConversation: %w", err)
 	}
 	return nil
 }

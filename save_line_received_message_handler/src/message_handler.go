@@ -11,7 +11,7 @@ func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) (err er
 			err = fmt.Errorf("messageHandler: %w", err)
 		}
 	}()
-	exists, conversationID, err := dbc.checkConversationExists(ctx, m)
+	exists, err := dbc.checkConversationExists(ctx, m)
 	// some unexpected error
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) (err er
 		}
 	} else {
 		// conversation exists; update the conversation and insert the message
-		if err := dbc.updateConversation(ctx, conversationID, m); err != nil {
+		if err := dbc.updateConversationOfMessage(ctx, m); err != nil {
 			return err
 		}
 		if err := dbc.insertMessage(ctx, m); err != nil {
