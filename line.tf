@@ -5,6 +5,25 @@ variable "LINE_CHANNEL_SECRET" {
   type = string
 }
 
+variable "LINE_CHANNEL_ACCESS_TOKEN" {
+  type = string
+}
+
+variable "MONGODB_URI" {
+  type = string
+}
+
+variable "MONGODB_DATABASE" {
+  type = string
+}
+
+variable "MONGODB_COLLECTION_LINE_CONVERSATIONS" {
+  type = string
+}
+
+variable "MONGODB_COLLECTION_LINE_MESSAGES" {
+  type = string
+}
 
 
 resource "aws_api_gateway_resource" "line" {
@@ -350,7 +369,6 @@ resource "aws_lambda_function" "validate_line_webhook_handler" {
     variables = {
       SQS_QUEUE_URL       = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.id
       SQS_QUEUE_ARN       = aws_sqs_queue.line_webhook_to_standardize_line_webhook_handler.arn
-      foo                 = "bar"
       DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
       LINE_CHANNEL_SECRET = var.LINE_CHANNEL_SECRET
     }
@@ -400,6 +418,9 @@ resource "aws_lambda_function" "get_line_conversations_handler" {
   environment {
     variables = {
       DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+      MONGODB_URI        = var.MONGODB_URI
+      MONGODB_DATABASE = var.MONGODB_DATABASE
+      MONGODB_COLLECTION_LINE_CONVERSATIONS = var.MONGODB_COLLECTION_LINE_CONVERSATIONS
     }
   }
 }
@@ -415,6 +436,9 @@ resource "aws_lambda_function" "get_line_messages_handler" {
   environment {
     variables = {
       DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+      MONGODB_URI        = var.MONGODB_URI
+      MONGODB_DATABASE = var.MONGODB_DATABASE
+      MONGODB_COLLECTION_LINE_MESSAGES = var.MONGODB_COLLECTION_LINE_MESSAGES
     }
   }
 }
@@ -430,6 +454,11 @@ resource "aws_lambda_function" "save_line_received_message_handler" {
   environment {
     variables = {
       DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+      LINE_CHANNEL_ACCESS_TOKEN = var.LINE_CHANNEL_ACCESS_TOKEN
+      MONGODB_URI        = var.MONGODB_URI
+      MONGODB_DATABASE = var.MONGODB_DATABASE
+      MONGODB_COLLECTION_LINE_CONVERSATIONS = var.MONGODB_COLLECTION_LINE_CONVERSATIONS
+      MONGODB_COLLECTION_LINE_MESSAGES = var.MONGODB_COLLECTION_LINE_MESSAGES
     }
   }
 }
