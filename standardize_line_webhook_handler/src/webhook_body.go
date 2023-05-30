@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
@@ -14,17 +15,14 @@ type webhookBody struct {
 func parseWebhookBody(body string) (*webhookBody, error) {
 	wb := &webhookBody{}
 	if err := json.Unmarshal([]byte(body), wb); err != nil {
-		return nil, &parseWebhookBodyError{
-			message: "couldn't parse webhook body",
-			err:     err,
-		}
+		return nil, fmt.Errorf("parseWebhookBody: %w", err)
 	}
 	return wb, nil
 }
 
-func (wb *webhookBody) toBotioMessages() []*botioMessage {
+func (wb *webhookBody) toBotioMessages() []botioMessage {
 	botUserID := wb.Destination
-	var botioMessages = []*botioMessage{}
+	botioMessages := []botioMessage{}
 	for _, event := range wb.Events {
 		if event.Type != linebot.EventTypeMessage {
 			continue
@@ -36,9 +34,11 @@ func (wb *webhookBody) toBotioMessages() []*botioMessage {
 		conversationID := botUserID + ":" + string(source.UserType) + ":" + source.UserID
 		timestamp := event.Timestamp.UnixMilli()
 
-		var messageID string
-		var message string
-		var attachments = []attachment{}
+		// message-type-specific fields from here down
+		messageID := ""
+		message := ""
+		attachments := []attachment{}
+		// replyTo defaults to nil
 		var replyTo *replyMessage
 
 		switch m := event.Message.(type) {
@@ -50,20 +50,24 @@ func (wb *webhookBody) toBotioMessages() []*botioMessage {
 			}
 		case *linebot.ImageMessage:
 			messageID = m.ID
+			message = "new image message"
 		case *linebot.VideoMessage:
 			messageID = m.ID
+			message = "new video message"
 		case *linebot.AudioMessage:
 			messageID = m.ID
+			message = "new audio message"
 		case *linebot.LocationMessage:
 			messageID = m.ID
 			message = getLocationString(m)
 		case *linebot.StickerMessage:
 			messageID = m.ID
+			message = "new sticker message"
 			attachments = toStickerBotioAttachments(m)
 		}
 
 		botioMessages = append(botioMessages,
-			&botioMessage{
+			botioMessage{
 				ShopID:         shopID,
 				Platform:       platform,
 				PageID:         pageID,
@@ -78,13 +82,4 @@ func (wb *webhookBody) toBotioMessages() []*botioMessage {
 	}
 
 	return botioMessages
-}
-
-type parseWebhookBodyError struct {
-	message string
-	err     error
-}
-
-func (e *parseWebhookBodyError) Error() string {
-	return e.message + ": " + e.err.Error()
 }
