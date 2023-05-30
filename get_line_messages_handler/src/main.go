@@ -28,7 +28,10 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.A
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
-			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
 		}, err
 	}
 	defer dbc.Close(ctx)
@@ -36,13 +39,19 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.A
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
-			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
 		}, err
 	}
 	if len(messages) == 0 {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
-			Body:       "Not Found",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Not Found",
 		}, nil
 	}
 	returnMessages := returnMessages{messages}
@@ -50,11 +59,17 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.A
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
-			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
 		}, err
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       string(returnBody),
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
+		Body: string(returnBody),
 	}, nil
 }
