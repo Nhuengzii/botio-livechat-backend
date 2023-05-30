@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -15,21 +16,8 @@ func sendSQSMessage(message string) error {
 		MessageBody: aws.String(message),
 		QueueUrl:    aws.String(sqsQueueURL),
 	}
-	_, err := svc.SendMessage(input)
-	if err != nil {
-		return &sendSQSMessageError{
-			message: "couldn't send message to sqs",
-			err:     err,
-		}
+	if _, err := svc.SendMessage(input); err != nil {
+		return fmt.Errorf("sendSQSMessage: %w", err)
 	}
 	return nil
-}
-
-type sendSQSMessageError struct {
-	message string
-	err     error
-}
-
-func (e *sendSQSMessageError) Error() string {
-	return e.message + ": " + e.err.Error()
 }
