@@ -2,69 +2,40 @@ package main
 
 import (
 	"context"
-	"errors"
-
-	"go.mongodb.org/mongo-driver/mongo"
+	"fmt"
 )
 
-func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) error {
-	conversationID, err := dbc.checkConversationExists(ctx, m)
+func messageHandler(ctx context.Context, dbc *dbClient, m *botioMessage) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("messageHandler: %w", err)
+		}
+	}()
+	exists, conversationID, err := dbc.checkConversationExists(ctx, m)
+	// some unexpected error
 	if err != nil {
-		// conversation does not exist, create it and insert message
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			c, err := newBotioConversation(m)
-			if err != nil {
-				return &messageHandlerError{
-					message: "couldn't handle botio message",
-					err:     err,
-				}
-			}
-			if err := dbc.insertConversation(ctx, c); err != nil {
-				return &messageHandlerError{
-					message: "couldn't handle botio message",
-					err:     err,
-				}
-			}
-			if err := dbc.insertMessage(ctx, m); err != nil {
-				return &messageHandlerError{
-					message: "couldn't handle botio message",
-					err:     err,
-				}
-			}
-			return nil
-		} else {
-			// some other checkConversationExists error
-			return &messageHandlerError{
-				message: "couldn't handle botio message",
-				err:     err,
-			}
-		}
+		return err
 	}
-	// conversation exists, update it and insert message
-	if err := dbc.updateConversation(ctx, conversationID, m); err != nil {
-		return &messageHandlerError{
-			message: "couldn't handle botio message",
-			err:     err,
+	// no conversation exists; create a new one and insert the message
+	if !exists {
+		conversation, err := newBotioConversation(m)
+		if err != nil {
+			return err
 		}
-	}
-	if err := dbc.insertMessage(ctx, m); err != nil {
-		return &messageHandlerError{
-			message: "couldn't handle botio message",
-			err:     err,
+		if err := dbc.insertConversation(ctx, conversation); err != nil {
+			return err
+		}
+		if err := dbc.insertMessage(ctx, m); err != nil {
+			return err
+		}
+	} else {
+		// conversation exists; update the conversation and insert the message
+		if err := dbc.updateConversation(ctx, conversationID, m); err != nil {
+			return err
+		}
+		if err := dbc.insertMessage(ctx, m); err != nil {
+			return err
 		}
 	}
 	return nil
-}
-
-type messageHandlerError struct {
-	message string
-	err     error
-}
-
-func (e *messageHandlerError) Error() string {
-	return e.message + ": " + e.err.Error()
-}
-
-func (e *messageHandlerError) Unwrap() error {
-	return e.err
 }
