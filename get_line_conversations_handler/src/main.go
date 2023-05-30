@@ -16,8 +16,8 @@ func main() {
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			log.Println(err.Error())
-			logToDiscord(err.Error())
+			log.Println("get line conversations handler: " + err.Error())
+			logToDiscord("get line conversations handler: " + err.Error())
 		}
 	}()
 	pathParams := req.PathParameters
