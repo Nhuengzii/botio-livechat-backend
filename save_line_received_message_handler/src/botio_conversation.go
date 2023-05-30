@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type botioConversation struct {
 	ShopID          string        `bson:"shopID"`
 	PageID          string        `bson:"pageID"`
@@ -20,10 +22,7 @@ type participant struct {
 func newBotioConversation(m *botioMessage) (*botioConversation, error) {
 	userProfile, err := getLineUserProfile(m.Source.UserID)
 	if err != nil {
-		return nil, &newBotioConversationError{
-			message: "couldn't create new botio conversation",
-			err:     err,
-		}
+		return nil, fmt.Errorf("newBotioConversation: %w", err)
 	}
 	return &botioConversation{
 		ShopID:          m.ShopID,
@@ -39,17 +38,4 @@ func newBotioConversation(m *botioMessage) (*botioConversation, error) {
 		LastActivity: m.Message,
 		IsRead:       false,
 	}, nil
-}
-
-type newBotioConversationError struct {
-	message string
-	err     error
-}
-
-func (e *newBotioConversationError) Error() string {
-	return e.message + ": " + e.err.Error()
-}
-
-func (e *newBotioConversationError) Unwrap() error {
-	return e.err
 }

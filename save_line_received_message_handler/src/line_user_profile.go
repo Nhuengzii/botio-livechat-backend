@@ -14,50 +14,30 @@ type lineUserProfile struct {
 	Message       string `json:"message"` // in case of error
 }
 
-func getLineUserProfile(userID string) (*lineUserProfile, error) {
+func getLineUserProfile(userID string) (_ *lineUserProfile, err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New("getLineUserProfile: " + err.Error())
+		}
+	}()
 	url := "https://api.line.me/v2/bot/profile/" + userID
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, &getLineUserProfileError{
-			message: "couldn't get line user profile",
-			err:     err,
-		}
+		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+lineChannelAccessToken)
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, &getLineUserProfileError{
-			message: "couldn't get line user profile",
-			err:     err,
-		}
+		return nil, err
 	}
 	defer resp.Body.Close()
 	usr := &lineUserProfile{}
 	if err := json.NewDecoder(resp.Body).Decode(usr); err != nil {
-		return nil, &getLineUserProfileError{
-			message: "couldn't get line user profile",
-			err:     err,
-		}
+		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, &getLineUserProfileError{
-			message: "couldn't get line user profile",
-			err:     errors.New(usr.Message),
-		}
+		return nil, err
 	}
 	return usr, nil
-}
-
-type getLineUserProfileError struct {
-	message string
-	err     error
-}
-
-func (e *getLineUserProfileError) Error() string {
-	return e.message + ": " + e.err.Error()
-}
-
-func (e *getLineUserProfileError) Unwrap() error {
-	return e.err
 }
