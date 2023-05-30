@@ -21,11 +21,16 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.A
 	}()
 	webhookBody := req.Body
 	lineSignature := req.Headers["x-line-signature"]
-	if err := validateSignature(lineChannelSecret, lineSignature, webhookBody); err != nil {
+	if valid, err := validateSignature(lineChannelSecret, lineSignature, webhookBody); err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+		}, err
+	} else if !valid {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 401,
 			Body:       "Unauthorized",
-		}, err
+		}, nil
 	}
 	if err := sendSQSMessage(webhookBody); err != nil {
 		return events.APIGatewayProxyResponse{
