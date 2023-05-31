@@ -70,7 +70,6 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		var standardMessage StandardMessage
 
 		json.Unmarshal([]byte(message.Body), &standardMessage)
-		discordLog(fmt.Sprintf("Unmarshalled message: %+v", standardMessage))
 		// discordLog(fmt.Sprint("Unmarshalled message: ", standardMessage.Message))
 		websocketMessage := WebsocketMessage{
 			Action:  "userMessage",
