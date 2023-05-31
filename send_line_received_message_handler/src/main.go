@@ -81,8 +81,9 @@ type EventRecordBody struct {
 	Message string `json:"Message"`
 }
 type WebsocketMessage struct {
-	Action  string `json:"action"`
-	Message string `json:"message"`
+	Action   string `json:"action"`
+	Message  string `json:"message"`
+	Platform string `json:"platform"`
 }
 
 func discordLog(content string) {
@@ -116,6 +117,7 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		var wsMessage WebsocketMessage
 		wsMessage.Action = "userMessage"
 		wsMessage.Message = eventRec.Message
+		wsMessage.Platform = lineRM.Platform
 		wsMessageJSON, _ := json.Marshal(wsMessage)
 		for _, key := range keys {
 			sendMessage(svc, strings.Split(key, ":")[1], string(wsMessageJSON))
