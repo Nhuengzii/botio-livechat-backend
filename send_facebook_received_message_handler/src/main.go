@@ -33,15 +33,18 @@ func discordLog(content string) {
 	}
 }
 
-func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
-	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
+func getRedisClient() *redis.Client {
 	redis_addr := os.Getenv("REDIS_ACCESS_ADDR")
 	redis_password := os.Getenv("REDIS_ACCESS_PASSWORD")
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redis_addr,
 		Password: redis_password,
 	})
-	keys, _ := rdb.Keys(ctx, "1:*").Result()
+	return rdb
+}
+
+func getSVCClient() *apigatewaymanagementapi.Client {
+	endpoint := os.Getenv("WEBSOCKET_API_ENDPOINT")
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
 	if err != nil {
 		discordLog(fmt.Sprint("Error loading config: ", err))
@@ -54,12 +57,20 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 			}, nil
 		})
 	})
+	return svc
+}
+
+func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
+	rdb := getRedisClient()
+	svc := getSVCClient()
+	keys, _ := rdb.Keys(ctx, "1:*").Result()
 
 	for _, message := range sqsEvent.Records {
 		// discordLog(fmt.Sprint("Received message: ", message.Body))
 		var standardMessage StandardMessage
 
 		json.Unmarshal([]byte(message.Body), &standardMessage)
+		discordLog(fmt.Sprintf("Unmarshalled message: %+v", standardMessage))
 		// discordLog(fmt.Sprint("Unmarshalled message: ", standardMessage.Message))
 		websocketMessage := WebsocketMessage{
 			Action:  "userMessage",
