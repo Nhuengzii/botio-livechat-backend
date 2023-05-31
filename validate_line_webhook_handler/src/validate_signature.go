@@ -4,40 +4,25 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
+	"fmt"
 )
 
-func validateSignature(channelSecret string, signature string, body string) error {
+func validateSignature(channelSecret string, signature string, body string) (_ bool, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validateSignature: %w", err)
+		}
+	}()
 	decoded, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		return &validateSignatureError{
-			message: "couldn't validate signature",
-			err:     err,
-		}
+		return false, err
 	}
 	hash := hmac.New(sha256.New, []byte(channelSecret))
-	_, err = hash.Write([]byte(body))
-	if err != nil {
-		return &validateSignatureError{
-			message: "couldn't validate signature",
-			err:     err,
-		}
+	if _, err = hash.Write([]byte(body)); err != nil {
+		return false, err
 	}
-	valid := hmac.Equal(decoded, hash.Sum(nil))
-	if !valid {
-		return &validateSignatureError{
-			message: "couldn't validate signature",
-			err:     errors.New("invalid signature"),
-		}
+	if !hmac.Equal(decoded, hash.Sum(nil)) {
+		return false, nil
 	}
-	return nil
-}
-
-type validateSignatureError struct {
-	message string
-	err     error
-}
-
-func (e *validateSignatureError) Error() string {
-	return e.message + ": " + e.err.Error()
+	return true, nil
 }
