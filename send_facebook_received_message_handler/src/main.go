@@ -73,8 +73,9 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		json.Unmarshal([]byte(message.Body), &standardMessage)
 		// discordLog(fmt.Sprint("Unmarshalled message: ", standardMessage.Message))
 		websocketMessage := WebsocketMessage{
-			Action:  "userMessage",
-			Message: standardMessage.Message,
+			Action:   "userMessage",
+			Message:  standardMessage.Message,
+			Platform: "facebook",
 		}
 		json_websocketMessage, _ := json.Marshal(websocketMessage)
 		// discordLog(fmt.Sprint("Sending message: ", string(json_websocketMessage)))
