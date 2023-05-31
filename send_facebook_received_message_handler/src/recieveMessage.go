@@ -43,8 +43,9 @@ type ReplyMessage struct {
 }
 
 type WebsocketMessage struct {
-	Action  string `json:"action"`
-	Message string `json:"message"`
+	Action   string `json:"action"`
+	Message  string `json:"message"`
+	Platform string `json:"platform"`
 }
 
 type StandardMessage struct {

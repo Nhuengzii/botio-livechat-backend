@@ -40,6 +40,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		Addr:     redis_addr,
 		Password: redis_password,
 	})
+	defer rdb.Close()
 
 	err := rdb.Set(my_ctx, shopId+":"+connectionID, 1, 0).Err()
 	if err != nil {

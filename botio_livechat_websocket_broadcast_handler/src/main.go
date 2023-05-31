@@ -54,13 +54,15 @@ type Message struct {
 }
 
 type BroadcastMessage struct {
-	Action  string  `json:"action"`
-	Message Message `json:"message"`
+	Action   string  `json:"action"`
+	Message  Message `json:"message"`
+	Platform string  `json:"platform"`
 }
 
 type IncommingMessage struct {
-	Action  string  `json:"action"`
-	Message Message `json:"message"`
+	Action   string  `json:"action"`
+	Message  Message `json:"message"`
+	Platform string  `json:"platform"`
 }
 
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -95,6 +97,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 			}, nil
 		})
 	})
+	defer rdb.Close()
 	keys, err := rdb.Keys(my_ctx, shopId+":*").Result()
 	// discordLog(fmt.Sprintf("Keys: %+v", keys))
 	if err != nil {
@@ -103,6 +106,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	var broadcastMessage BroadcastMessage
 	broadcastMessage.Action = "broadcast"
 	broadcastMessage.Message = message.Message
+	broadcastMessage.Platform = message.Platform
 	for _, key := range keys {
 		if key == shopId+":"+connectionID {
 			continue
