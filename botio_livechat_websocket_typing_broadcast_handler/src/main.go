@@ -67,6 +67,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		Addr:     redis_addr,
 		Password: redis_password,
 	})
+	defer rdb.Close()
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
 	if err != nil {
 		discordLog(fmt.Sprint("Error loading config: ", err))

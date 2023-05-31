@@ -39,7 +39,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		Addr:     redis_addr,
 		Password: redis_password,
 	})
-
+	defer rdb.Close()
 	keys, err := rdb.Keys(my_ctx, "*:"+connectionID).Result()
 	if err != nil {
 		discordLog(fmt.Sprint("Error getting keys: ", err))

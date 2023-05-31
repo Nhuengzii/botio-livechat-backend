@@ -63,6 +63,7 @@ func getSVCClient() *apigatewaymanagementapi.Client {
 func Handler(ctx context.Context, sqsEvent events.SQSEvent) {
 	rdb := getRedisClient()
 	svc := getSVCClient()
+	defer rdb.Close()
 	keys, _ := rdb.Keys(ctx, "1:*").Result()
 
 	for _, message := range sqsEvent.Records {

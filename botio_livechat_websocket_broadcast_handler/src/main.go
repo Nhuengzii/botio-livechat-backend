@@ -97,6 +97,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 			}, nil
 		})
 	})
+	defer rdb.Close()
 	keys, err := rdb.Keys(my_ctx, shopId+":*").Result()
 	// discordLog(fmt.Sprintf("Keys: %+v", keys))
 	if err != nil {
