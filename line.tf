@@ -417,9 +417,9 @@ resource "aws_lambda_function" "get_line_conversations_handler" {
   depends_on       = [data.archive_file.get_line_conversations_handler]
   environment {
     variables = {
-      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
-      MONGODB_URI        = var.MONGODB_URI
-      MONGODB_DATABASE = var.MONGODB_DATABASE
+      DISCORD_WEBHOOK_URL                   = var.DISCORD_WEBHOOK_URL
+      MONGODB_URI                           = var.MONGODB_URI
+      MONGODB_DATABASE                      = var.MONGODB_DATABASE
       MONGODB_COLLECTION_LINE_CONVERSATIONS = var.MONGODB_COLLECTION_LINE_CONVERSATIONS
     }
   }
@@ -435,9 +435,9 @@ resource "aws_lambda_function" "get_line_messages_handler" {
   depends_on       = [data.archive_file.get_line_messages_handler]
   environment {
     variables = {
-      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
-      MONGODB_URI        = var.MONGODB_URI
-      MONGODB_DATABASE = var.MONGODB_DATABASE
+      DISCORD_WEBHOOK_URL              = var.DISCORD_WEBHOOK_URL
+      MONGODB_URI                      = var.MONGODB_URI
+      MONGODB_DATABASE                 = var.MONGODB_DATABASE
       MONGODB_COLLECTION_LINE_MESSAGES = var.MONGODB_COLLECTION_LINE_MESSAGES
     }
   }
@@ -453,12 +453,12 @@ resource "aws_lambda_function" "save_line_received_message_handler" {
   depends_on       = [data.archive_file.save_line_received_message_handler]
   environment {
     variables = {
-      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
-      LINE_CHANNEL_ACCESS_TOKEN = var.LINE_CHANNEL_ACCESS_TOKEN
-      MONGODB_URI        = var.MONGODB_URI
-      MONGODB_DATABASE = var.MONGODB_DATABASE
+      DISCORD_WEBHOOK_URL                   = var.DISCORD_WEBHOOK_URL
+      LINE_CHANNEL_ACCESS_TOKEN             = var.LINE_CHANNEL_ACCESS_TOKEN
+      MONGODB_URI                           = var.MONGODB_URI
+      MONGODB_DATABASE                      = var.MONGODB_DATABASE
       MONGODB_COLLECTION_LINE_CONVERSATIONS = var.MONGODB_COLLECTION_LINE_CONVERSATIONS
-      MONGODB_COLLECTION_LINE_MESSAGES = var.MONGODB_COLLECTION_LINE_MESSAGES
+      MONGODB_COLLECTION_LINE_MESSAGES      = var.MONGODB_COLLECTION_LINE_MESSAGES
     }
   }
 }
@@ -473,7 +473,10 @@ resource "aws_lambda_function" "send_line_received_message_handler" {
   depends_on       = [data.archive_file.send_line_received_message_handler]
   environment {
     variables = {
-      DISCORD_WEBHOOK_URL = var.DISCORD_WEBHOOK_URL
+      DISCORD_WEBHOOK_URL    = var.DISCORD_WEBHOOK_URL
+      WEBSOCKET_API_ENDPOINT = "https://${aws_apigatewayv2_api.botio_livechat_websocket.id}.execute-api.ap-southeast-1.amazonaws.com/test"
+      REDIS_ACCESS_ADDR      = var.redis_access.addr
+      REDIS_ACCESS_PASSWORD  = var.redis_access.password
     }
   }
 }
