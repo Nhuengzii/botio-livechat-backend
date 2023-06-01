@@ -50,19 +50,15 @@ func (wb *webhookBody) toBotioMessages() []botioMessage {
 			}
 		case *linebot.ImageMessage:
 			messageID = m.ID
-			message = "new image message"
 		case *linebot.VideoMessage:
 			messageID = m.ID
-			message = "new video message"
 		case *linebot.AudioMessage:
 			messageID = m.ID
-			message = "new audio message"
 		case *linebot.LocationMessage:
 			messageID = m.ID
 			message = getLocationString(m)
 		case *linebot.StickerMessage:
 			messageID = m.ID
-			message = "new sticker message"
 			attachments = toStickerBotioAttachments(m)
 		}
 
