@@ -1,21 +1,22 @@
 package standardize
 
 import (
+	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/request"
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 )
 
 func (messageData MessageData) StandardizeMessage(pageID string, standardMessage *stdmessage.StdMessage) error {
-	// conversationID, err := RequestFacebookConversationID(messageData, pageID)
-	// if err != nil {
-	// 	return err
-	// }
+	conversationID, err := request.RequestFacebookConversationID(messageData.Sender.ID, pageID)
+	if err != nil {
+		return err
+	}
 	newMessage := stdmessage.StdMessage{
-		ShopID:   "1", // TODO:botio API
-		Platform: "Facebook",
-		PageID:   pageID,
-		// ConversationID: conversationID,
-		MessageID: messageData.Message.MessageID,
-		Timestamp: messageData.Timestamp,
+		ShopID:         "1", // TODO:botio API
+		Platform:       "Facebook",
+		PageID:         pageID,
+		ConversationID: conversationID,
+		MessageID:      messageData.Message.MessageID,
+		Timestamp:      messageData.Timestamp,
 		Source: stdmessage.Source{
 			UserID:   messageData.Sender.ID,
 			UserType: "User",
