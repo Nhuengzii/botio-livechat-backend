@@ -37,7 +37,7 @@ func main() {
 	lambda.Start(l.handler)
 }
 
-func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
+func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
 	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
 	var recieveMessage standardize.RecieveMessage
@@ -48,7 +48,7 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
 			return
 		}
 		for _, message := range recieveMessage.Entry {
-			err = handleWebhookEntry(message)
+			err = l.handleWebhookEntry(message)
 			if err != nil {
 				discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Error handling webhook entry : %v", err))
 			}
@@ -57,7 +57,7 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
 	discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
 }
 
-func handleWebhookEntry(message standardize.Notification) error {
+func (l *Lambda) handleWebhookEntry(message standardize.Notification) error {
 	if len(message.MessageDatas) <= 0 {
 		return errNoMessageEntry
 	}
@@ -70,6 +70,7 @@ func handleWebhookEntry(message standardize.Notification) error {
 			if err != nil {
 				return err
 			}
+
 		} else {
 			return errUnknownWebhookType
 		}

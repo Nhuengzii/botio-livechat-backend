@@ -1,6 +1,7 @@
 package snswrapper
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -19,12 +20,24 @@ func NewClient() *Client {
 	return &Client{client}
 }
 
-func (c *Client) PublishMessage(topicARN string, message string) error {
+func (c *Client) PublishMessage(topicARN string, v any) error {
+	message, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	snsMessage := SNSMessage{
+		Message: string(message),
+	}
+	snsByte, err := json.Marshal(snsMessage)
+	if err != nil {
+		return err
+	}
+
 	input := &sns.PublishInput{
-		Message:  aws.String(message),
+		Message:  aws.String(string(snsByte)),
 		TopicArn: aws.String(topicARN),
 	}
-	_, err := c.client.Publish(input)
+	_, err = c.client.Publish(input)
 	if err != nil {
 		return fmt.Errorf("sns.PublishMessage: %w", err)
 	}
