@@ -70,3 +70,5 @@ botio_livechat_websocket_broadcast_handler/bin/*
 botio_livechat_websocket_broadcast_handler/botio_livechat_websocket_broadcast_handler.zip
 botio_livechat_websocket_typing_broadcast_handler/bin/*
 botio_livechat_websocket_typing_broadcast_handler/botio_livechat_websocket_typing_broadcast_handler.zip
+**/main
+**/handler.zip
