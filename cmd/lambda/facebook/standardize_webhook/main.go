@@ -10,7 +10,7 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/standardize"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/internal/snswrapper"
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -30,8 +30,8 @@ func main() {
 	l := Lambda{
 		config: config{
 			DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-			SqsQueueURL:       os.Getenv("SQS_QUEUE_URL"),
-			SqsClient:         *sqswrapper.NewClient(),
+			SnsQueueURL:       os.Getenv("SNS_QUEUE_URL"),
+			SnsClient:         *snswrapper.NewClient(),
 		},
 	}
 	lambda.Start(l.handler)
@@ -71,6 +71,10 @@ func (l *Lambda) handleWebhookEntry(message standardize.Notification) error {
 				return err
 			}
 
+			err = l.SnsClient.PublishMessage(l.SnsQueueURL, standardMessage)
+			if err != nil {
+				return err
+			}
 		} else {
 			return errUnknownWebhookType
 		}
