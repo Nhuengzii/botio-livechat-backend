@@ -42,7 +42,7 @@ func main() {
 func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
-	var recieveMessage webhook.RecieveMessage
+	var recieveMessage webhook.RecieveWebhook
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
