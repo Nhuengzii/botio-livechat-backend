@@ -9,6 +9,7 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
+	transport "github.com/Nhuengzii/botio-livechat-backend/internal/transport/lambda"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,7 +19,13 @@ type Lambda struct {
 	config
 }
 
-func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+// aliasing the types to keep lines short
+type (
+	Request  = events.APIGatewayProxyRequest
+	Response = events.APIGatewayProxyResponse
+)
+
+func (l Lambda) handler(ctx context.Context, request Request) (Response, error) {
 	log.Println("Facebook websocket verify lambda handler")
 
 	if request.HTTPMethod == "GET" {
@@ -26,15 +33,9 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 		err := webhook.VerifyConnection(request.QueryStringParameters, l.FacebookWebhookVerificationString)
 		if err != nil {
 			log.Println(err)
-			return events.APIGatewayProxyResponse{
-				StatusCode: 401,
-				Body:       "Unauthorized",
-			}, err
+			return transport.SendError(401, "Unauthorized"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Body:       request.QueryStringParameters["hub.challenge"],
-		}, nil
+		return transport.SendResponse(200, request.QueryStringParameters["hub.challenge"]), nil
 	} else if request.HTTPMethod == "POST" {
 		log.Println("POST method  called")
 		start := time.Now()
@@ -44,10 +45,7 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 		err := webhook.VerifyMessageSignature(request.Headers, []byte(request.Body), l.FacebookAppSecret)
 		if err != nil {
 			log.Println(err)
-			return events.APIGatewayProxyResponse{
-				StatusCode: 401,
-				Body:       "Unauthorized",
-			}, err
+			return transport.SendError(401, "Unauthorized"), err
 		}
 
 		msg := request.Body
@@ -55,25 +53,16 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 		err = l.SqsClient.SendMessage(l.SqsQueueURL, msg)
 		if err != nil {
 			log.Println(err)
-			return events.APIGatewayProxyResponse{
-				StatusCode: 502,
-				Body:       "Bad Gateway",
-			}, err
+			return transport.SendError(502, "Bad Gateway"), err
 		}
 		elasped := time.Since(start)
 		log.Println("Elapsed : ", elasped)
 
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Body:       "OK",
-		}, nil
+		return transport.SendResponse(200, "OK"), nil
 
 	} else {
 		log.Printf("%v : method does not exist", request.HTTPMethod)
-		return events.APIGatewayProxyResponse{
-			StatusCode: 405,
-			Body:       "Method Not Allowed",
-		}, errors.New("Method Not Allowed")
+		return transport.SendError(405, "Method Not Allowed"), errors.New("Method Not Allowed")
 	}
 }
 
