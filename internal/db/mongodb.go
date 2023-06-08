@@ -12,6 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var ErrNoConversations = errors.New("mongodb: no conversations")
+
 type Client struct {
 	client *mongo.Client
 	Target
@@ -59,8 +61,6 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 	}
 	return nil
 }
-
-var ErrNoConversations = errors.New("mongodb: no conversations")
 
 func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
