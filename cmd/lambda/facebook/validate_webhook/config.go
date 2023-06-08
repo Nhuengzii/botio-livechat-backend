@@ -1,11 +1,12 @@
 package main
 
 import (
-	"os"
+	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
 )
 
-var (
-	discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
-	sqsQueueURL       = os.Getenv("SQS_QUEUE_URL")
-	facebookAppSecret = os.Getenv("FACEBOOK_APP_SECRET") // TODO to be removed and get from some db instead
-)
+type config struct {
+	DiscordWebhookURL string
+	SqsQueueURL       string
+	FacebookAppSecret string
+	SqsClient         sqswrapper.Client
+}
