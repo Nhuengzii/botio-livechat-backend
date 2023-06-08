@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-lambda-go v1.41.0
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.7
 )

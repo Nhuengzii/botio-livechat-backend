@@ -1,4 +1,4 @@
-package sns
+package snswrapper
 
 import (
 	"fmt"

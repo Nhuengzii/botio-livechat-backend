@@ -1,4 +1,4 @@
-package sqs
+package sqswrapper
 
 import (
 	"fmt"
