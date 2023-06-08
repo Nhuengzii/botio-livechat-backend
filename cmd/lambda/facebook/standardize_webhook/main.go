@@ -11,6 +11,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/standardize"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -64,11 +65,11 @@ func handleWebhookEntry(message standardize.Notification) error {
 	for _, messageData := range message.MessageDatas {
 		if messageData.Message.MessageID != "" {
 			// standardize messaging hooks
-			// var standardMessage stdmessage.StdMessage
-			// err := StandardizeMessage(messageData, message.PageID, &standardMessage)
-			// if err != nil {
-			// 	return err
-			// }
+			var standardMessage stdmessage.StdMessage
+			err := messageData.StandardizeMessage(message.PageID, &standardMessage)
+			if err != nil {
+				return err
+			}
 		} else {
 			return errUnknownWebhookType
 		}
