@@ -5,68 +5,28 @@
 .terraform.tfstate.lock.info
 terraform.tfstate
 terraform.tfstate.backup
-validate_facebook_webhook_handler/bin/*
-validate_facebook_webhook_handler/validate_facebook_webhook_handler.zip
-standardize_facebook_webhook_handler/bin/*
-standardize_facebook_webhook_handler/standardize_facebook_webhook_handler.zip
-validate_line_webhook_handler/bin/*
-validate_line_webhook_handler/validate_line_webhook_handler.zip
-standardize_line_webhook_handler/bin/*
-standardize_line_webhook_handler/standardize_line_webhook_handler.zip
-post_facebook_message_handler/bin/*
-post_facebook_message_handler/post_facebook_message_handler.zip
-post_line_message_handler/bin/*
-post_line_message_handler/post_line_message_handler.zip
-get_facebook_messages_handler/bin/*
-get_facebook_messages_handler/get_facebook_messages_handler.zip
-get_facebook_conversation_handler/bin/*
-get_facebook_conversation_handler/get_facebook_conversation_handler.zip
-get_line_conversations_handler/bin/*
-get_line_conversations_handler/get_line_conversations_handler.zip
-get_line_messages_handler/bin/*
-get_line_messages_handler/get_line_messages_handler.zip
-save_facebook_received_message_handler/bin/*
-save_facebook_received_message_handler/save_facebook_recieved_message_handler.zip
-send_facebook_received_message_handler/bin/*
-send_facebook_received_message_handler/send_facebook_recieved_message_handler.zip
-send_line_received_message_handler/bin/*
-send_line_received_message_handler/send_line_received_message_handler.zip
-save_line_received_message_handler/bin/*
-save_line_received_message_handler/save_line_received_message_handler.zip
-post_facebook_message_handler/bin/*
-post_facebook_message_handler/post_facebook_message_handler.zip
-post_line_message_handler/bin/*
-post_line_message_handler/post_line_message_handler.zip
-get_facebook_messages_handler/bin/*
-get_facebook_messages_handler/get_facebook_messages_handler.zip
-get_facebook_conversation_handler/bin/*
-get_facebook_conversation_handler/get_facebook_conversation_handler.zip
-get_line_conversations_handler/bin/*
-get_line_conversations_handler/get_line_conversations_handler.zip
-get_line_messages_handler/bin/*
-get_line_messages_handler/get_line_messages_handler.zip
-post_facebook_message_handler/bin/*
-post_facebook_message_handler/post_facebook_message_handler.zip
-post_line_message_handler/bin/*
-post_line_message_handler/post_line_message_handler.zip
-get_facebook_messages_handler/bin/*
-get_facebook_messages_handler/get_facebook_messages_handler.zip
-get_facebook_conversation_handler/bin/*
-get_facebook_conversation_handler/get_facebook_conversation_handler.zip
-get_line_conversations_handler/bin/*
-get_line_conversations_handler/get_line_conversations_handler.zip
-get_line_messages_handler/bin/*
-get_line_messages_handler/get_line_messages_handler.zip
-botio_livechat_websocket_default_handler/bin/*
-botio_livechat_websocket_default_handler/botio_livechat_websocket_default_handler.zip
-botio_livechat_websocket_connect_handler/bin/*
-botio_livechat_websocket_connect_handler/botio_livechat_websocket_connect_handler.zip
-botio_livechat_websocket_disconnect_handler/bin/*
-botio_livechat_websocket_disconnect_handler/botio_livechat_websocket_disconnect_handler.zip
 facebook.auto.tfvars
 line.auto.tfvars
 websocket.auto.tfvars
-botio_livechat_websocket_broadcast_handler/bin/*
-botio_livechat_websocket_broadcast_handler/botio_livechat_websocket_broadcast_handler.zip
-botio_livechat_websocket_typing_broadcast_handler/bin/*
-botio_livechat_websocket_typing_broadcast_handler/botio_livechat_websocket_typing_broadcast_handler.zip
+
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
