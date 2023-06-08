@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/standardize"
+	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/snswrapper"
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 
@@ -42,7 +42,7 @@ func main() {
 func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
-	var recieveMessage standardize.RecieveMessage
+	var recieveMessage webhook.RecieveMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
@@ -61,7 +61,7 @@ func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	return nil
 }
 
-func (l *Lambda) handleWebhookEntry(message standardize.Notification) error {
+func (l *Lambda) handleWebhookEntry(message webhook.Notification) error {
 	if len(message.MessageDatas) <= 0 {
 		return errNoMessageEntry
 	}

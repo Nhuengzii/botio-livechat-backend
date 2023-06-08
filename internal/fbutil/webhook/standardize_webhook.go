@@ -1,4 +1,4 @@
-package standardize
+package webhook
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/request"

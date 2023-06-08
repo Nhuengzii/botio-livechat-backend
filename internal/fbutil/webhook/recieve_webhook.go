@@ -1,4 +1,4 @@
-package standardize
+package webhook
 
 type RecieveMessage struct {
 	Object string         `json:"object"`
