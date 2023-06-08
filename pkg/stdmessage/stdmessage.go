@@ -38,6 +38,7 @@ const (
 	AttachmentTypeFile      AttachmentType = "file"
 	AttachmentTypeSticker   AttachmentType = "sticker"
 	AttachmentTypeLineEmoji AttachmentType = "line emoji"
+	AttachmentTypeTemplate  AttachmentType = "template"
 )
 
 type Platform string
@@ -74,16 +75,20 @@ func (message StdMessage) ToLastActivityString() (string, error) {
 	switch message.Attachments[0].AttachmentType {
 	case AttachmentTypeImage:
 		// return fmt.Sprintf("%s sent an image", displayName)
-		return "new image message", nil
+		return "ส่งรูปภาพ", nil
 	case AttachmentTypeVideo:
 		// return fmt.Sprintf("%s sent a video", displayName)
-		return "new video message", nil
+		return "ส่งวิดีโอ", nil
 	case AttachmentTypeAudio:
 		// return fmt.Sprintf("%s sent an audio", displayName)
-		return "new audio message", nil
+		return "ส่งข้อความเสียง", nil
+	case AttachmentTypeFile:
+		return "ส่งไฟล์", nil
 	case AttachmentTypeSticker:
 		// return fmt.Sprintf("%s sent a sticker", displayName)
-		return "new sticker message", nil
+		return "ส่งสติกเกอร์", nil
+	case AttachmentTypeTemplate:
+		return "ส่งเทมเพลท", nil
 	default:
 		return "", ErrUnknownAttachmentType
 	}
