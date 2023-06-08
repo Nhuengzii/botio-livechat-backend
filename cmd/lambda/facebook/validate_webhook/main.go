@@ -63,16 +63,15 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 		elasped := time.Since(start)
 		log.Println("Elapsed : ", elasped)
 
-		response = events.APIGatewayProxyResponse{
+		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",
-		}
+		}, nil
 
 	} else {
 		log.Printf("%v : method does not exist", request.HTTPMethod)
 		return events.APIGatewayProxyResponse{}, errors.New("method does not exist")
 	}
-	return response, nil
 }
 
 func main() {
