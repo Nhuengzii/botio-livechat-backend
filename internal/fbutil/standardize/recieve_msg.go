@@ -1,4 +1,4 @@
-package standardize
+package recievemsg
 
 type RecieveMessage struct {
 	Object string         `json:"object"`
