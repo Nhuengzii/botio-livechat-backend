@@ -22,8 +22,9 @@ type Lambda struct {
 }
 
 var (
-	errNoMessageEntry     = errors.New("Error! no message entry")
-	errUnknownWebhookType = errors.New("Error! unknown webhook type found!")
+	errNoMessageEntry       = errors.New("Error! no message entry")
+	errUnknownWebhookType   = errors.New("Error! unknown webhook type found!")
+	errUnknownWebhookObject = errors.New("Error! unknown webhook Object found!")
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	lambda.Start(l.handler)
 }
 
-func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
+func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
 	var recieveMessage standardize.RecieveMessage
@@ -45,16 +46,18 @@ func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
 			discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Error unknown webhook object: %v\n", err))
-			return
+			return errUnknownWebhookObject
 		}
 		for _, message := range recieveMessage.Entry {
 			err = l.handleWebhookEntry(message)
 			if err != nil {
 				discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Error handling webhook entry : %v", err))
+				return err
 			}
 		}
 	}
 	discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
+	return nil
 }
 
 func (l *Lambda) handleWebhookEntry(message standardize.Notification) error {
