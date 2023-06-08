@@ -56,8 +56,8 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 		if err != nil {
 			log.Println(err)
 			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Body:       "Internal Server Error",
+				StatusCode: 502,
+				Body:       "Bad Gateway",
 			}, err
 		}
 		elasped := time.Since(start)
@@ -70,7 +70,10 @@ func (l Lambda) handler(ctx context.Context, request events.APIGatewayProxyReque
 
 	} else {
 		log.Printf("%v : method does not exist", request.HTTPMethod)
-		return events.APIGatewayProxyResponse{}, errors.New("method does not exist")
+		return events.APIGatewayProxyResponse{
+			StatusCode: 405,
+			Body:       "Method Not Allowed",
+		}, errors.New("Method Not Allowed")
 	}
 }
 
