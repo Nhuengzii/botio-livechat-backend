@@ -5,8 +5,8 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 )
 
-func (messageData MessageData) StandardizeMessage(pageID string, standardMessage *stdmessage.StdMessage) error {
-	conversationID, err := request.RequestFacebookConversationID(messageData.Sender.ID, pageID)
+func (messageData MessageData) StandardizeMessage(facebookAccessToken string, pageID string, standardMessage *stdmessage.StdMessage) error {
+	conversationID, err := request.RequestFacebookConversationID(facebookAccessToken, messageData.Sender.ID, pageID)
 	if err != nil {
 		return err
 	}

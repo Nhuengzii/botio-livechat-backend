@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 )
 
-func RequestFacebookConversationID(senderID string, pageID string) (string, error) {
-	access_token := os.Getenv("ACCESS_TOKEN")
+func RequestFacebookConversationID(access_token string, senderID string, pageID string) (string, error) {
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=Messenger&user_id=%v&access_token=%v",
 		pageID, senderID, access_token)
 

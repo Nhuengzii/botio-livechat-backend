@@ -30,9 +30,10 @@ var (
 func main() {
 	l := Lambda{
 		config: config{
-			DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-			SnsQueueURL:       os.Getenv("SNS_QUEUE_URL"),
-			SnsClient:         *snswrapper.NewClient(),
+			DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
+			SnsQueueURL:             os.Getenv("SNS_QUEUE_URL"),
+			SnsClient:               *snswrapper.NewClient(),
+			FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
 		},
 	}
 	lambda.Start(l.handler)
@@ -69,7 +70,7 @@ func (l *Lambda) handleWebhookEntry(message standardize.Notification) error {
 		if messageData.Message.MessageID != "" {
 			// standardize messaging hooks
 			var standardMessage stdmessage.StdMessage
-			err := messageData.StandardizeMessage(message.PageID, &standardMessage)
+			err := messageData.StandardizeMessage(l.FacebookPageAccessToken, message.PageID, &standardMessage)
 			if err != nil {
 				return err
 			}
