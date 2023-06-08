@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"os"
 	"strings"
 )
 
@@ -19,10 +18,10 @@ var (
 	errNoXSignHeaders     = errors.New("There is no x-sign-header")
 	errInvalidXSignHeader = errors.New("Invalid x-sign header")
 	errHexDecodeString    = errors.New("Error decoding recieveSignature")
-	appSecret             = os.Getenv("APP_SECRET")
 )
 
-func VerifySignature(header map[string]string, bodyByte []byte) error {
+func VerifyMessageSignature(header map[string]string, bodyByte []byte, appSecret string) error {
+	// use for facebook post request
 	recieveSignature := header["X-Hub-Signature-256"]
 	if !strings.HasPrefix(recieveSignature, signaturePrefix) {
 		return errNoXSignHeaders
@@ -50,5 +49,19 @@ func compareSignature(recieveSignature string, expectedSignatureByte []byte) err
 	if !hmac.Equal(actualSignature, expectedSignatureByte) {
 		return errInvalidXSignHeader
 	}
+	return nil
+}
+
+func VerifyConnection(queryStringParameters map[string]string, verificationString string) error {
+	// use for facebook get request
+	mode := queryStringParameters["hub.mode"]
+	token := queryStringParameters["hub.verify_token"]
+
+	if verificationString != token {
+		return errors.New("verify_token : token does not match")
+	} else if mode != "subscribe" {
+		return errors.New("mode : mode is not subscibe")
+	}
+
 	return nil
 }
