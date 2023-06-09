@@ -16,7 +16,7 @@ type StdMessage struct {
 }
 
 var (
-	ErrNoAttachment          = errors.New("stdmessage.ToLastActivityString no attachment in message")
+	ErrNoAttachments         = errors.New("stdmessage.ToLastActivityString no attachment in message")
 	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString unknown attachment type")
 )
 
@@ -70,7 +70,7 @@ func (message StdMessage) ToLastActivityString() (string, error) {
 		return message.Message, nil
 	}
 	if len(message.Attachments) == 0 { // this really shouldn't be the case but just in case
-		return "", ErrNoAttachment
+		return "", ErrNoAttachments
 	}
 	switch message.Attachments[0].AttachmentType {
 	case AttachmentTypeImage:
