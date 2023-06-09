@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 )
 
 type config struct {
@@ -9,5 +9,5 @@ type config struct {
 	SqsQueueURL                       string
 	FacebookAppSecret                 string
 	FacebookWebhookVerificationString string
-	SqsClient                         sqswrapper.Client
+	SqsClient                         livechat.SQSClient
 }

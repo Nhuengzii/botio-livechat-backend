@@ -73,7 +73,7 @@ func main() {
 			SqsQueueURL:                       os.Getenv("SQS_QUEUE_URL"),
 			FacebookAppSecret:                 os.Getenv("FACEBOOK_APP_SECRET"), // TODO to be removed and get from some db instead
 			FacebookWebhookVerificationString: os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING"),
-			SqsClient:                         *sqswrapper.NewClient(),
+			SqsClient:                         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
 		},
 	}
 	lambda.Start(l.handler)
