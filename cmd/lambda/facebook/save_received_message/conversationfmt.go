@@ -1,12 +1,12 @@
-package conversationfmt
+package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/request"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 )
 
 func NewStdConversation(facebookAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
-	userProfile, err := request.RequestFacebookUserProfile(facebookAccessToken, message.Source.UserID)
+	userProfile, err := fbrequest.RequestFacebookUserProfile(facebookAccessToken, message.Source.UserID)
 	if err != nil {
 		return &livechat.StdConversation{}, err
 	}
