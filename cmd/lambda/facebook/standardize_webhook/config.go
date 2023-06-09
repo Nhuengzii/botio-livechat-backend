@@ -1,10 +1,12 @@
 package main
 
-import "github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+import (
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+)
 
 type config struct {
 	DiscordWebhookURL       string
 	SnsQueueURL             string
-	SnsClient               snswrapper.Client
+	SnsClient               livechat.SNSClient
 	FacebookPageAccessToken string
 }

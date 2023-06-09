@@ -1,4 +1,4 @@
-package webhook
+package main
 
 type ReceiveWebhook struct {
 	Object string         `json:"object"`

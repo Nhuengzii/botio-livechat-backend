@@ -14,13 +14,10 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/msgfmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
-
-type Lambda struct {
-	config
-}
 
 var (
 	errNoMessageEntry       = errors.New("Error! no message entry")
@@ -29,40 +26,38 @@ var (
 )
 
 func main() {
-	l := Lambda{
-		config: config{
-			DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
-			SnsQueueURL:             os.Getenv("SNS_QUEUE_URL"),
-			SnsClient:               *snswrapper.NewClient(os.Getenv("AWS_REGION")),
-			FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
-		},
+	c := config{
+		DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
+		SnsQueueURL:             os.Getenv("SNS_QUEUE_URL"),
+		SnsClient:               snswrapper.NewClient(os.Getenv("AWS_REGION")),
+		FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
 	}
-	lambda.Start(l.handler)
+	lambda.Start(c.handler)
 }
 
-func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
+func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+	discord.Log(c.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
 	var recieveMessage webhook.ReceiveWebhook
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
-			discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Error unknown webhook object: %v\n", err))
+			discord.Log(c.DiscordWebhookURL, fmt.Sprintf("Error unknown webhook object: %v\n", err))
 			return errUnknownWebhookObject
 		}
 		for _, message := range recieveMessage.Entry {
-			err = l.handleWebhookEntry(message)
+			err = c.handleWebhookEntry(message)
 			if err != nil {
-				discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Error handling webhook entry : %v", err))
+				discord.Log(c.DiscordWebhookURL, fmt.Sprintf("Error handling webhook entry : %v", err))
 				return err
 			}
 		}
 	}
-	discord.Log(l.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
+	discord.Log(c.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return nil
 }
 
-func (l *Lambda) handleWebhookEntry(message webhook.Notification) error {
+func (c *config) handleWebhookEntry(message webhook.Notification) error {
 	if len(message.MessageDatas) <= 0 {
 		return errNoMessageEntry
 	}
@@ -71,12 +66,12 @@ func (l *Lambda) handleWebhookEntry(message webhook.Notification) error {
 		if messageData.Message.MessageID != "" {
 			// standardize messaging hooks
 			var standardMessage *livechat.StdMessage
-			standardMessage, err := msgfmt.NewStdMessage(l.FacebookPageAccessToken, messageData, message.PageID)
+			standardMessage, err := msgfmt.NewStdMessage(c.FacebookPageAccessToken, messageData, message.PageID)
 			if err != nil {
 				return err
 			}
 
-			err = l.SnsClient.PublishMessage(l.SnsQueueURL, *standardMessage)
+			err = c.SnsClient.PublishMessage(c.SnsQueueURL, *standardMessage)
 			if err != nil {
 				return err
 			}
