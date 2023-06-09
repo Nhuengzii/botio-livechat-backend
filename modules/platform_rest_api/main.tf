@@ -107,3 +107,67 @@ resource "aws_api_gateway_integration" "get_post_webhook" {
   type                    = "AWS_PROXY"
   uri                     = module.get_post_webhook_handler.lambda.invoke_arn
 }
+
+locals {
+  endpoint_with_handlers = {
+    get_message = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_get_messages_handler", var.platform)
+      handler_path  = format("%s/get_facebook_messages_handler", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+    }
+    post_message = {
+      method        = "POST"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_post_message_handler", var.platform)
+      handler_path  = format("%s/post_facebook_message_handler", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+    }
+    get_conversations = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.conversations.id
+      resource_path = aws_api_gateway_resource.conversations.path
+      handler_name  = format("%s_get_conversations_handler", var.platform)
+      handler_path  = format("%s/get_facebook_conversation_handler", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+    }
+  }
+}
+
+resource "aws_api_gateway_method" "endpoint_method" {
+  for_each      = local.endpoint_with_handlers
+  http_method   = each.value.method
+  rest_api_id   = var.rest_api_id
+  resource_id   = each.value.resource_id
+  authorization = "NONE"
+}
+
+module "endpoint_handlers" {
+  for_each     = local.endpoint_with_handlers
+  source       = "../lambda_handler/"
+  handler_name = each.value.handler_name
+  handler_path = each.value.handler_path
+  role_arn     = each.value.role_arn
+}
+
+resource "aws_api_gateway_integration" "endpoint_handler_integrations" {
+  for_each                = local.endpoint_with_handlers
+  http_method             = aws_api_gateway_method.endpoint_method[each.key].http_method
+  integration_http_method = "POST"
+  resource_id             = each.value.resource_id
+  rest_api_id             = var.rest_api_id
+  type                    = "AWS_PROXY"
+  uri                     = module.endpoint_handlers[each.key].lambda.invoke_arn
+}
+
+resource "aws_lambda_permission" "endpoint_handler_permissions" {
+  for_each      = local.endpoint_with_handlers
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.endpoint_handlers[each.key].lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, each.value.method, each.value.resource_path)
+}
