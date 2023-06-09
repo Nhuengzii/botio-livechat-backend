@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/msgfmt"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/snswrapper"
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
@@ -69,13 +70,13 @@ func (l *Lambda) handleWebhookEntry(message webhook.Notification) error {
 	for _, messageData := range message.MessageDatas {
 		if messageData.Message.MessageID != "" {
 			// standardize messaging hooks
-			var standardMessage stdmessage.StdMessage
-			err := messageData.StandardizeMessage(l.FacebookPageAccessToken, message.PageID, &standardMessage)
+			var standardMessage *stdmessage.StdMessage
+			standardMessage, err := msgfmt.NewStdMessage(l.FacebookPageAccessToken, messageData, message.PageID)
 			if err != nil {
 				return err
 			}
 
-			err = l.SnsClient.PublishMessage(l.SnsQueueURL, standardMessage)
+			err = l.SnsClient.PublishMessage(l.SnsQueueURL, *standardMessage)
 			if err != nil {
 				return err
 			}
