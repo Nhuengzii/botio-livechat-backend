@@ -53,6 +53,8 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			// err = l.DbClient.InsertConversation(context.TODO(), )
 		}
 		// implement add message
 		l.DbClient.InsertMessage(context.TODO(), &recieveMessage)
@@ -79,6 +81,10 @@ func main() {
 			DbClient:          dbClient,
 		},
 	}
+	defer func() {
+		discord.Log(l.DiscordWebhookURL, "defer dbclient close")
+		l.DbClient.Close(context.TODO())
+	}()
+
 	lambda.Start(l.handler)
-	l.DbClient.Close(context.TODO())
 }
