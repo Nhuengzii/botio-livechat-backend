@@ -9,7 +9,6 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
-	transport "github.com/Nhuengzii/botio-livechat-backend/livechat/transport/lambda"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -33,9 +32,15 @@ func (l Lambda) handler(ctx context.Context, request Request) (Response, error) 
 		err := webhook.VerifyConnection(request.QueryStringParameters, l.FacebookWebhookVerificationString)
 		if err != nil {
 			log.Println(err)
-			return transport.SendError(401, "Unauthorized"), err
+			return events.APIGatewayProxyResponse{
+				StatusCode: 401,
+				Body:       "Unauthorized",
+			}, err
 		}
-		return transport.SendResponse(200, request.QueryStringParameters["hub.challenge"]), nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: 200,
+			Body:       request.QueryStringParameters["hub.challenge"],
+		}, err
 	} else if request.HTTPMethod == "POST" {
 		log.Println("POST method  called")
 		start := time.Now()
@@ -45,7 +50,10 @@ func (l Lambda) handler(ctx context.Context, request Request) (Response, error) 
 		err := webhook.VerifyMessageSignature(request.Headers, []byte(request.Body), l.FacebookAppSecret)
 		if err != nil {
 			log.Println(err)
-			return transport.SendError(401, "Unauthorized"), err
+			return events.APIGatewayProxyResponse{
+				StatusCode: 401,
+				Body:       "Unauthorized",
+			}, err
 		}
 
 		msg := request.Body
@@ -53,16 +61,25 @@ func (l Lambda) handler(ctx context.Context, request Request) (Response, error) 
 		err = l.SqsClient.SendMessage(l.SqsQueueURL, msg)
 		if err != nil {
 			log.Println(err)
-			return transport.SendError(502, "Bad Gateway"), err
+			return events.APIGatewayProxyResponse{
+				StatusCode: 502,
+				Body:       "Bad Gateway",
+			}, err
 		}
 		elasped := time.Since(start)
 		log.Println("Elapsed : ", elasped)
 
-		return transport.SendResponse(200, "OK"), nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: 200,
+			Body:       "OK",
+		}, err
 
 	} else {
 		log.Printf("%v : method does not exist", request.HTTPMethod)
-		return transport.SendError(405, "Method Not Allowed"), errors.New("Method Not Allowed")
+		return events.APIGatewayProxyResponse{
+			StatusCode: 405,
+			Body:       "Method",
+		}, errors.New("Method Not Allowed")
 	}
 }
 
