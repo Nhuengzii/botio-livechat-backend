@@ -19,56 +19,49 @@ type Lambda struct {
 	config
 }
 
-type recievedSqsMessage struct {
+type receivedMessage struct {
 	Message string `json:"Message"`
 }
 
 var (
-	errUnmarshalRecievedBody    = errors.New("Error json unmarshal recieve body")
-	errUnmarshalRecievedMessage = errors.New("Error json unmarshal recieve message")
+	errUnmarshalReceivedBody    = errors.New("Error json unmarshal recieve body")
+	errUnmarshalReceivedMessage = errors.New("Error json unmarshal recieve message")
 )
 
 func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	var recieveBody recievedSqsMessage
-	var recieveMessage livechat.StdMessage
+	var receiveBody receivedMessage
+	var receiveMessage livechat.StdMessage
 	for _, record := range sqsEvent.Records {
-		err := json.Unmarshal([]byte(record.Body), &recieveBody)
+		err := json.Unmarshal([]byte(record.Body), &receiveBody)
 		if err != nil {
-			discord.Log(l.DiscordWebhookURL, "Error unmarshal recieveBody")
-			return errUnmarshalRecievedBody
+			discord.Log(l.DiscordWebhookURL, "Error unmarshal receiveBody")
+			return errUnmarshalReceivedBody
 		}
-		err = bson.UnmarshalExtJSON([]byte(recieveBody.Message), true, &recieveMessage)
+		err = bson.UnmarshalExtJSON([]byte(receiveBody.Message), true, &receiveMessage)
 		if err != nil {
-			discord.Log(l.DiscordWebhookURL, "Error unmarshal recieveMessage")
-			return errUnmarshalRecievedMessage
+			discord.Log(l.DiscordWebhookURL, "Error unmarshal receiveMessage")
+			return errUnmarshalReceivedMessage
 		}
-
-		// implement update conversation
-		convIsExist, err := l.DbClient.CheckConversationExists(context.TODO(), recieveMessage.ConversationID)
+		err = l.config.DbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
 		if err != nil {
-			discord.Log(l.DiscordWebhookURL, "Error checking if conversation already exist")
-			return err
-		}
-		if convIsExist {
-			err = l.DbClient.UpdateConversationOnNewMessage(context.TODO(), &recieveMessage)
-			if err != nil {
-				return err
-			}
-		} else {
-			newConversation, err := NewStdConversation(l.FacebookAccessToken, &recieveMessage)
-			if err != nil {
-				return err
-			}
-			err = l.DbClient.InsertConversation(context.TODO(), newConversation)
-			if err != nil {
+			if errors.Is(err, mongodb.ErrNoConversations) {
+				conversation, err := newStdConversation(l.config.FacebookAccessToken, &receiveMessage)
+				if err != nil {
+					return err
+				}
+				err = l.config.DbClient.InsertConversation(ctx, conversation)
+				if err != nil {
+					return err
+				}
+			} else {
 				return err
 			}
 		}
-		// implement add message
-		l.DbClient.InsertMessage(context.TODO(), &recieveMessage)
+		err = l.config.DbClient.InsertMessage(ctx, &receiveMessage)
 		if err != nil {
 			return err
 		}
+		return nil
 	}
 	return nil
 }

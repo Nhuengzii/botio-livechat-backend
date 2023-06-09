@@ -22,7 +22,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	//pathParameters := req.PathParameters
 	//shopID := pathParameters["shop_id"]
 	//pageID := pathParameters["page_id"]
-	//lineChannelSecret := "" // TODO get from some db with shopID and pageID
+	//lineChannelSecret := "" // TODO get from some db with shopID and pageID here
 	lineSignature := req.Headers["x-line-signature"]
 	webhookBodyString := req.Body
 	err = validateSignature(c.lineChannelSecret, lineSignature, webhookBodyString)
@@ -55,7 +55,7 @@ func main() {
 	c := &config{
 		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
 		sqsQueueURL:       os.Getenv("SQS_QUEUE_URL"),
-		lineChannelSecret: os.Getenv("LINE_CHANNEL_SECRET"),
+		lineChannelSecret: os.Getenv("LINE_CHANNEL_SECRET"), // TODO remove and get from some db with shopID and pageID
 		sqsClient:         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
 	}
 	lambda.Start(c.handler)

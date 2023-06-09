@@ -5,7 +5,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 )
 
-func NewStdConversation(facebookAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
+func newStdConversation(facebookAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
 	userProfile, err := fbrequest.RequestFacebookUserProfile(facebookAccessToken, message.Source.UserID)
 	if err != nil {
 		return &livechat.StdConversation{}, err

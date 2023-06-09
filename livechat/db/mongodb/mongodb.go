@@ -55,7 +55,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *livechat.StdMessage
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	_, err := coll.InsertOne(ctx, message)
 	if err != nil {
-		return fmt.Errorf("db.Client.InsertMessage: %w", err)
+		return fmt.Errorf("mongodb.Client.InsertMessage: %w", err)
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *livechat.StdMessage
 func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *livechat.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("db.Client.UpdateConversationOnNewMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.UpdateConversationOnNewMessage: %w", err)
 		}
 	}()
 	lastActivity, err := message.ToLastActivityString()
@@ -76,8 +76,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *li
 		{Key: "lastActivity", Value: lastActivity},
 		{Key: "updatedTime", Value: message.Timestamp},
 	}}}
-	var updatedConversation bson.D
-	err = coll.FindOneAndUpdate(ctx, filter, update).Decode(updatedConversation)
+	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return ErrNoConversations
@@ -87,40 +86,33 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *li
 	return nil
 }
 
-func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID string) (err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("db.Client.UpdateConversationIsRead %w", err)
-		}
-	}()
+func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{{Key: "conversationID", Value: conversationID}}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "isRead", Value: true},
 	}}}
-	var updatedConversation bson.D
-	err = coll.FindOneAndUpdate(ctx, filter, update).Decode(updatedConversation)
+	err := coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrNoConversations
+			return fmt.Errorf("mongodb.Client.UpdateConversationIsRead %w", ErrNoConversations)
 		}
 		return err
 	}
 	return nil
 }
 
-func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) (bool, error) {
+func (c *Client) EnsureConversationExists(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{{Key: "conversationID", Value: conversationID}}
-	result := coll.FindOne(ctx, filter)
-
-	if result.Err() != nil {
-		if result.Err() == mongo.ErrNoDocuments {
-			return false, nil
-		} else {
-			return false, result.Err()
+	err := coll.FindOne(ctx, filter).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return fmt.Errorf("mongodb.Client.EnsureConversationExists %w", ErrNoConversations)
 		}
+		return err
 	}
-
-	return true, nil
+	return nil
 }
+
+// TODO add other methods required for getting conversation and messages to livechat.DBClient interface first then implement them here

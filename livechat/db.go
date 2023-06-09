@@ -10,5 +10,5 @@ type DBClient interface {
 	InsertMessage(ctx context.Context, message *StdMessage) error
 	UpdateConversationOnNewMessage(ctx context.Context, message *StdMessage) error
 	UpdateConversationIsRead(ctx context.Context, conversationID string) error
-	CheckConversationExists(ctx context.Context, conversationID string) (bool, error)
+	EnsureConversationExists(ctx context.Context, conversationID string) error
 }
