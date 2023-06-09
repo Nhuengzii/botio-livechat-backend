@@ -205,7 +205,7 @@ resource "aws_iam_role_policy_attachment" "sqs_full_access" {
 
 resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
   event_source_arn = aws_sqs_queue.webhook_standardizer.arn
-  function_name    = module.get_post_webhook_handler.lambda.function_name
+  function_name    = module.standardizer.lambda.function_name
   batch_size       = 10
 }
 
