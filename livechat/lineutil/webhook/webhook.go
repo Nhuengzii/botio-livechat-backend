@@ -1,35 +1,10 @@
 package webhook
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
-	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/lineutil/messagefmt"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
-
-func ValidateSignature(channelSecret string, signature string, body string) (_ bool, err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("lineutil.ValidateSignature: %w", err)
-		}
-	}()
-	decoded, err := base64.StdEncoding.DecodeString(signature)
-	if err != nil {
-		return false, err
-	}
-	hash := hmac.New(sha256.New, []byte(channelSecret))
-	_, err = hash.Write([]byte(body))
-	if err != nil {
-		return false, err
-	}
-	if !hmac.Equal(decoded, hash.Sum(nil)) {
-		return false, nil
-	}
-	return true, nil
-}
 
 type Body struct {
 	Destination string           `json:"destination"` // bot user id that should receive the webhook

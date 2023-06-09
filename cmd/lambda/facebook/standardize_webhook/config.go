@@ -7,6 +7,6 @@ import (
 type config struct {
 	DiscordWebhookURL       string
 	SnsQueueURL             string
-	SnsClient               livechat.SNSClient
+	SnsClient               livechat.PushNotificationClient
 	FacebookPageAccessToken string
 }

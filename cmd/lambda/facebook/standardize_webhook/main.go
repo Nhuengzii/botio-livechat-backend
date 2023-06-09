@@ -71,7 +71,11 @@ func (c *config) handleWebhookEntry(message webhook.Notification) error {
 				return err
 			}
 
-			err = c.SnsClient.PublishMessage(c.SnsQueueURL, *standardMessage)
+			standardMessageJSON, err := json.Marshal(standardMessage)
+			if err != nil {
+				return err
+			}
+			err = c.SnsClient.PublishMessage(c.SnsQueueURL, string(standardMessageJSON))
 			if err != nil {
 				return err
 			}

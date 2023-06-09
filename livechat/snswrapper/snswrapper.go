@@ -1,7 +1,6 @@
 package snswrapper
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,32 +18,16 @@ func NewClient(awsRegion string) *Client {
 	return &Client{client}
 }
 
-func (c *Client) PublishMessage(topicARN string, v any) error {
-	message, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-	snsPublishMessage := SNSPublishMessage{
-		Default: string(message),
-	}
-	snsByte, err := json.Marshal(snsPublishMessage)
-	if err != nil {
-		return err
-	}
-
+func (c *Client) PublishMessage(topicARN string, message string) error {
 	input := &sns.PublishInput{
-		Message:  aws.String(string(snsByte)),
+		Message:  aws.String(message),
 		TopicArn: aws.String(topicARN),
 	}
-	_, err = c.client.Publish(input)
+	_, err := c.client.Publish(input)
 	if err != nil {
-		return fmt.Errorf("sns.PublishMessage: %w", err)
+		return fmt.Errorf("snswrapper.PublishMessage: %w", err)
 	}
 	return nil
-}
-
-type SNSPublishMessage struct {
-	Default string `json:"default"`
 }
 
 type SNSMessage struct {

@@ -25,7 +25,7 @@ func (c *Client) SendMessage(queueURL string, message string) error {
 	}
 	_, err := c.client.SendMessage(input)
 	if err != nil {
-		return fmt.Errorf("sqs.SendMessage: %w", err)
+		return fmt.Errorf("sqswrapper.SendMessage: %w", err)
 	}
 	return nil
 }

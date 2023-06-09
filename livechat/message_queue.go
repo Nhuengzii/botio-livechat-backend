@@ -1,5 +1,5 @@
 package livechat
 
-type SQSClient interface {
+type MessageQueueClient interface {
 	SendMessage(queueURL string, message string) error
 }

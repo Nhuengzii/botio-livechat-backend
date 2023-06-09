@@ -9,5 +9,5 @@ type config struct {
 	SqsQueueURL                       string
 	FacebookAppSecret                 string
 	FacebookWebhookVerificationString string
-	SqsClient                         livechat.SQSClient
+	SqsClient                         livechat.MessageQueueClient
 }
