@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/webhook"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -19,7 +18,7 @@ func (c config) handler(ctx context.Context, request events.APIGatewayProxyReque
 
 	if request.HTTPMethod == "GET" {
 		log.Println("GET method called")
-		err := webhook.VerifyConnection(request.QueryStringParameters, c.FacebookWebhookVerificationString)
+		err := VerifyConnection(request.QueryStringParameters, c.FacebookWebhookVerificationString)
 		if err != nil {
 			log.Println(err)
 			return events.APIGatewayProxyResponse{
@@ -37,7 +36,7 @@ func (c config) handler(ctx context.Context, request events.APIGatewayProxyReque
 		// new session
 
 		// verify Signature
-		err := webhook.VerifyMessageSignature(request.Headers, []byte(request.Body), c.FacebookAppSecret)
+		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.FacebookAppSecret)
 		if err != nil {
 			log.Println(err)
 			return events.APIGatewayProxyResponse{
