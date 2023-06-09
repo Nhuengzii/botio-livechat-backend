@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type Client interface {
+type DBClient interface {
 	Close(ctx context.Context) error
 	InsertConversation(ctx context.Context, conversation *StdConversation) error
 	InsertMessage(ctx context.Context, message *StdMessage) error
