@@ -119,13 +119,15 @@ resource "aws_api_gateway_integration" "get_post_webhook" {
 locals {
   endpoint_with_handlers = {
     get_message = {
-      method                = "GET"
-      resource_id           = aws_api_gateway_resource.messages.id
-      resource_path         = aws_api_gateway_resource.messages.path
-      handler_name          = format("%s_get_messages_handler", var.platform)
-      handler_path          = format("%s/get_%s_messages_handler", path.root, var.platform)
-      role_arn              = aws_iam_role.assume_role_lambda.arn
-      environment_variables = {}
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_get_messages_handler", var.platform)
+      handler_path  = format("%s/get_%s_messages_handler", path.root, var.platform)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {
+        ACCESS_TOKEN = var.facebook_access_token
+      }
     }
     post_message = {
       method                = "POST"
