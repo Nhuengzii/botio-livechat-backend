@@ -2,7 +2,10 @@ module github.com/Nhuengzii/botio-livechat-backend
 
 go 1.20
 
-require github.com/aws/aws-sdk-go v1.44.278
+require (
+	github.com/aws/aws-sdk-go v1.44.278
+	github.com/line/line-bot-sdk-go/v7 v7.20.0
+)
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect
