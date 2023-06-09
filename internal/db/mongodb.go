@@ -110,3 +110,19 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 	}
 	return nil
 }
+
+func (c *Client) CheckConversationExist(ctx context.Context, conversationID string) (bool, error) {
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	filter := bson.D{{Key: "conversationID", Value: conversationID}}
+	result := coll.FindOne(ctx, filter)
+
+	if result.Err() != nil {
+		if result.Err() == mongo.ErrNoDocuments {
+			return false, nil
+		} else {
+			return false, result.Err()
+		}
+	}
+
+	return true, nil
+}
