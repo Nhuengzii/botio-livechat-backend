@@ -25,10 +25,10 @@ func (c *Client) PublishMessage(topicARN string, v any) error {
 	if err != nil {
 		return err
 	}
-	snsMessage := SNSMessage{
-		Message: string(message),
+	snsPublishMessage := SNSPublishMessage{
+		Default: string(message),
 	}
-	snsByte, err := json.Marshal(snsMessage)
+	snsByte, err := json.Marshal(snsPublishMessage)
 	if err != nil {
 		return err
 	}
@@ -42,6 +42,10 @@ func (c *Client) PublishMessage(topicARN string, v any) error {
 		return fmt.Errorf("sns.PublishMessage: %w", err)
 	}
 	return nil
+}
+
+type SNSPublishMessage struct {
+	Default string `json:"default"`
 }
 
 type SNSMessage struct {
