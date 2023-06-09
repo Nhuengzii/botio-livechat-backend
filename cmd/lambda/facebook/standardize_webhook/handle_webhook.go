@@ -26,11 +26,11 @@ func (c *config) handleWebhookEntry(message *Entry) error {
 		return errNoMessageEntry
 	}
 
-	for _, messageData := range message.Messagings {
-		if messageData.Message.MessageID != "" {
+	for _, messaging := range message.Messagings {
+		if messaging.Message.MessageID != "" {
 			// standardize messaging hooks
 			var standardMessage *livechat.StdMessage
-			standardMessage, err := msgfmt.NewStdMessage(c.FacebookPageAccessToken, messageData, message.PageID)
+			standardMessage, err := NewStdMessage(c.FacebookPageAccessToken, messaging, message.PageID)
 			if err != nil {
 				return err
 			}
