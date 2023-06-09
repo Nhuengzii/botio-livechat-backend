@@ -28,7 +28,7 @@ resource "aws_api_gateway_resource" "shop_id" {
 }
 
 module "facebook_rest_api" {
-  source                 = "./modules/platform_rest_api/"
+  source                 = "./modules/facebook_rest_api"
   platform               = "facebook"
   rest_api_id            = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
