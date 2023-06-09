@@ -102,17 +102,17 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 	return nil
 }
 
-func (c *Client) EnsureConversationExists(ctx context.Context, conversationID string) error {
+func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{{Key: "conversationID", Value: conversationID}}
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("mongodb.Client.EnsureConversationExists %w", ErrNoConversations)
+			return fmt.Errorf("mongodb.Client.CheckConversationExists %w", ErrNoConversations)
 		}
 		return err
 	}
 	return nil
 }
 
-// TODO add other methods required for getting conversation and messages to livechat.DBClient interface first then implement them here
+// TODO add other methods required for getting conversation and messages to livechat.DBClient interface then implement them here
