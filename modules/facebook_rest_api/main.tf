@@ -19,6 +19,14 @@ variable "rest_api_execution_arn" {
   type = string
 }
 
+variable "facebook_access_token" {
+  type = string
+}
+
+variable "facebook_app_secret" {
+  type = string
+}
+
 variable "parent_id" {
   type = string
 }
@@ -111,20 +119,22 @@ resource "aws_api_gateway_integration" "get_post_webhook" {
 locals {
   endpoint_with_handlers = {
     get_message = {
-      method        = "GET"
-      resource_id   = aws_api_gateway_resource.messages.id
-      resource_path = aws_api_gateway_resource.messages.path
-      handler_name  = format("%s_get_messages_handler", var.platform)
-      handler_path  = format("%s/get_%s_messages_handler", path.root, var.platform)
-      role_arn      = aws_iam_role.assume_role_lambda.arn
+      method                = "GET"
+      resource_id           = aws_api_gateway_resource.messages.id
+      resource_path         = aws_api_gateway_resource.messages.path
+      handler_name          = format("%s_get_messages_handler", var.platform)
+      handler_path          = format("%s/get_%s_messages_handler", path.root, var.platform)
+      role_arn              = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {}
     }
     post_message = {
-      method        = "POST"
-      resource_id   = aws_api_gateway_resource.messages.id
-      resource_path = aws_api_gateway_resource.messages.path
-      handler_name  = format("%s_post_message_handler", var.platform)
-      handler_path  = format("%s/post_%s_message_handler", path.root, var.platform)
-      role_arn      = aws_iam_role.assume_role_lambda.arn
+      method                = "POST"
+      resource_id           = aws_api_gateway_resource.messages.id
+      resource_path         = aws_api_gateway_resource.messages.path
+      handler_name          = format("%s_post_message_handler", var.platform)
+      handler_path          = format("%s/post_%s_message_handler", path.root, var.platform)
+      role_arn              = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {}
     }
     get_conversations = {
       method        = "GET"
@@ -133,6 +143,9 @@ locals {
       handler_name  = format("%s_get_conversations_handler", var.platform)
       handler_path  = format("%s/get_%s_conversation_handler", path.root, var.platform)
       role_arn      = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {
+        ACCESS_TOKEN = var.facebook_access_token
+      }
     }
   }
 }
@@ -146,11 +159,12 @@ resource "aws_api_gateway_method" "endpoint_method" {
 }
 
 module "endpoint_handlers" {
-  for_each     = local.endpoint_with_handlers
-  source       = "../lambda_handler/"
-  handler_name = each.value.handler_name
-  handler_path = each.value.handler_path
-  role_arn     = each.value.role_arn
+  for_each              = local.endpoint_with_handlers
+  source                = "../lambda_handler/"
+  handler_name          = each.value.handler_name
+  handler_path          = each.value.handler_path
+  role_arn              = each.value.role_arn
+  environment_variables = each.value.environment_variables
 }
 
 resource "aws_api_gateway_integration" "endpoint_handler_integrations" {
