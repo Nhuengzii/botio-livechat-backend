@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/msgfmt"
@@ -32,7 +33,7 @@ func main() {
 		config: config{
 			DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
 			SnsQueueURL:             os.Getenv("SNS_QUEUE_URL"),
-			SnsClient:               *snswrapper.NewClient(),
+			SnsClient:               *snswrapper.NewClient(os.Getenv("AWS_REGION")),
 			FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
 		},
 	}
