@@ -95,6 +95,12 @@ module "get_post_webhook_handler" {
   handler_name = format("%s_get_post_webhook_handler", var.platform)
   handler_path = format("%s/validate_%s_webhook_handler", path.root, var.platform)
   role_arn     = aws_iam_role.assume_role_lambda.arn
+  environment_variables = {
+    APP_SECRET    = var.facebook_app_secret
+    ACCESS_TOKEN  = var.facebook_access_token
+    SQS_QUEUE_URL = aws_sqs_queue.webhook_standardizer.url
+    SQS_QUEUE_ARN = aws_sqs_queue.webhook_standardizer.arn
+  }
 }
 
 resource "aws_lambda_permission" "get_post_webhook" {
@@ -186,4 +192,14 @@ resource "aws_lambda_permission" "endpoint_handler_permissions" {
   function_name = module.endpoint_handlers[each.key].lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, each.value.method, each.value.resource_path)
+}
+
+resource "aws_sqs_queue" "webhook_standardizer" {
+  name = format("%s_webhook_standardizer", var.platform)
+}
+
+resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
+  event_source_arn = aws_sqs_queue.webhook_standardizer.arn
+  function_name    = module.get_post_webhook_handler.lambda.function_name
+  batch_size       = 10
 }
