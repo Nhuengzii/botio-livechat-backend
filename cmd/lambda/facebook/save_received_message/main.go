@@ -38,11 +38,27 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		}
 		err = bson.UnmarshalExtJSON([]byte(recieveBody.Message), true, &recieveMessage)
 		if err != nil {
+			discord.Log(l.DiscordWebhookURL, "Error unmarshal recieveMessage")
 			return errUnmarshalRecievedMessage
 		}
 
 		// implement update conversation
+		convIsExist, err := l.DbClient.CheckConversationExist(context.TODO(), recieveMessage.ConversationID)
+		if err != nil {
+			discord.Log(l.DiscordWebhookURL, "Error checking if conversation already exist")
+			return err
+		}
+		if convIsExist {
+			err = l.DbClient.UpdateConversationOnNewMessage(context.TODO(), &recieveMessage)
+			if err != nil {
+				return err
+			}
+		}
 		// implement add message
+		l.DbClient.InsertMessage(context.TODO(), &recieveMessage)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -64,4 +80,5 @@ func main() {
 		},
 	}
 	lambda.Start(l.handler)
+	l.DbClient.Close(context.TODO())
 }
