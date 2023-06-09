@@ -72,7 +72,7 @@ module "get_post_webhook_handler" {
 }
 
 resource "aws_lambda_permission" "get_post_webhook" {
-  statement_id  = format("AllowMethod[%s]ExecutionFromAPIGateway", each.key)
+  statement_id  = format("AllowMethod_%s_ExecutionFromAPIGateway", each.key)
   action        = "lambda:InvokeFunction"
   function_name = module.get_post_webhook_handler.lambda.function_name
   principal     = "apigateway.amazonaws.com"
