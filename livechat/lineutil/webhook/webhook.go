@@ -36,7 +36,7 @@ type Body struct {
 	Events      []*linebot.Event `json:"events"`
 }
 
-func (w *Body) HandleWebhookBodyAndExtractMessages() []*livechat.StdMessage {
+func (w *Body) HandleWebhookBody() []*livechat.StdMessage {
 	botUserID := w.Destination
 	var messages []*livechat.StdMessage
 	for _, event := range w.Events {
