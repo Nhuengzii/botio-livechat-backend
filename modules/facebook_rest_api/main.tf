@@ -203,3 +203,13 @@ resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
   function_name    = module.get_post_webhook_handler.lambda.function_name
   batch_size       = 10
 }
+
+module "standardizer" {
+  source       = "../lambda_handler/"
+  handler_name = format("%s_standardizer", var.platform)
+  handler_path = format("%s/standardize_facebook_webhook_handler", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
+  environment_variables = {
+    ACCESS_TOKEN = var.facebook_access_token
+  }
+}
