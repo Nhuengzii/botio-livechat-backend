@@ -1,13 +1,12 @@
-package conversationfmt
+package main
 
 import (
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/lineutil/profile"
 )
 
-func NewStdConversation(lineChannelAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
-	userProfile, err := profile.GetUserProfile(lineChannelAccessToken, message.Source.UserID)
+func newStdConversation(lineChannelAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
+	userProfile, err := getUserProfile(lineChannelAccessToken, message.Source.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("lineutil/conversationfmt.NewStdConversation: %w", err)
 	}

@@ -1,4 +1,4 @@
-package profile
+package main
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ type UserProfile struct {
 	Message       string `json:"message"`       // only included in case of error
 }
 
-func GetUserProfile(channelAccessToken string, userID string) (_ *UserProfile, err error) {
+func getUserProfile(channelAccessToken string, userID string) (_ *UserProfile, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("usrprofile.GetLineUserProfile: %w", err)
