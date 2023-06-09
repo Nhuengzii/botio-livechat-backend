@@ -8,6 +8,7 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/internal/db"
 	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/conversationfmt"
 	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -54,7 +55,14 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 				return err
 			}
 		} else {
-			// err = l.DbClient.InsertConversation(context.TODO(), )
+			newConversation, err := conversationfmt.NewStdConversation(l.FacebookAccessToken, &recieveMessage)
+			if err != nil {
+				return err
+			}
+			err = l.DbClient.InsertConversation(context.TODO(), newConversation)
+			if err != nil {
+				return err
+			}
 		}
 		// implement add message
 		l.DbClient.InsertMessage(context.TODO(), &recieveMessage)
