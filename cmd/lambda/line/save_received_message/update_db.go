@@ -17,7 +17,7 @@ func updateDB(ctx context.Context, c *config, message *livechat.StdMessage) (err
 	err = c.dbClient.UpdateConversationOnNewMessage(ctx, message)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoConversations) {
-			conversation, err := newStdConversation(c.lineChannelAccessToken, message) // TODO get lineChannelAccessToken from db with message.ShopID and message.PageID
+			conversation, err := newStdConversation(c.lineChannelAccessToken, message) // TODO get lineChannelAccessToken from caller
 			if err != nil {
 				return err
 			}
