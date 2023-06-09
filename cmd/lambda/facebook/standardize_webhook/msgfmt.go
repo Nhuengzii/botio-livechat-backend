@@ -31,7 +31,6 @@ func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID strin
 		},
 	}
 
-	// check if messageAttachment should be nil
 	return &newMessage, nil
 }
 
