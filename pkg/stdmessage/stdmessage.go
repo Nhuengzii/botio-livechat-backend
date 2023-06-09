@@ -16,8 +16,8 @@ type StdMessage struct {
 }
 
 var (
-	ErrNoAttachment          = errors.New("error ToLastActivityString no attachment in stdmessage")
-	ErrUnknownAttachmentType = errors.New("error ToLastActivityString unknown attachment type")
+	ErrNoAttachment          = errors.New("stdmessage.ToLastActivityString no attachment in message")
+	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString unknown attachment type")
 )
 
 const (
