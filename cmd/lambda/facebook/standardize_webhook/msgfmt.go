@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	fbrequest "github.com/Nhuengzii/botio-livechat-backend/livechat/external/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 )
 
 func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*livechat.StdMessage, error) {
