@@ -18,7 +18,7 @@ type UserProfile struct {
 func GetUserProfile(channelAccessToken string, userID string) (_ *UserProfile, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("profile.GetLineUserProfile: %w", err)
+			err = fmt.Errorf("usrprofile.GetLineUserProfile: %w", err)
 		}
 	}()
 	apiURL := "https://api.line.me/v2/bot/profile/" + userID
