@@ -1,4 +1,4 @@
-package stdconversation
+package livechat
 
 type StdConversation struct {
 	ShopID          string         `json:"shopID" bson:"shopID"`
@@ -17,6 +17,6 @@ type Participant struct {
 	ProfilePic Payload `json:"profilePic" bson:"profilePic"`
 }
 
-type Payload struct {
-	Src string `json:"src" bson:"src"`
-}
+//type Payload struct {
+//	Src string `json:"src" bson:"src"`
+//}

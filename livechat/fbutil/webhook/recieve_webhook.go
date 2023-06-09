@@ -1,6 +1,6 @@
 package webhook
 
-type RecieveWebhook struct {
+type ReceiveWebhook struct {
 	Object string         `json:"object"`
 	Entry  []Notification `json:"entry"`
 }

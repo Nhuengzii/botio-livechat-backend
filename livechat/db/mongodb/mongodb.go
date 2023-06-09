@@ -1,12 +1,10 @@
-package db
+package mongodb
 
 import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdconversation"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -44,7 +42,7 @@ func (c *Client) Close(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) InsertConversation(ctx context.Context, conversation *stdconversation.StdConversation) error {
+func (c *Client) InsertConversation(ctx context.Context, conversation *livechat.StdConversation) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	_, err := coll.InsertOne(ctx, conversation)
 	if err != nil {
@@ -53,7 +51,7 @@ func (c *Client) InsertConversation(ctx context.Context, conversation *stdconver
 	return nil
 }
 
-func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessage) error {
+func (c *Client) InsertMessage(ctx context.Context, message *livechat.StdMessage) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	_, err := coll.InsertOne(ctx, message)
 	if err != nil {
@@ -62,7 +60,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 	return nil
 }
 
-func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
+func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *livechat.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("db.Client.UpdateConversationOnNewMessage: %w", err)
@@ -111,7 +109,7 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 	return nil
 }
 
-func (c *Client) CheckConversationExist(ctx context.Context, conversationID string) (bool, error) {
+func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) (bool, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{{Key: "conversationID", Value: conversationID}}
 	result := coll.FindOne(ctx, filter)

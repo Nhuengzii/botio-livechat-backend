@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
 )
 
 type config struct {

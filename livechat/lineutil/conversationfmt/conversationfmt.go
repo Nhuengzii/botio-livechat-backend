@@ -2,27 +2,26 @@ package conversationfmt
 
 import (
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/lineutil/profile"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdconversation"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/lineutil/profile"
 )
 
-func NewStdConversation(lineChannelAccessToken string, message *stdmessage.StdMessage) (*stdconversation.StdConversation, error) {
+func NewStdConversation(lineChannelAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
 	userProfile, err := profile.GetUserProfile(lineChannelAccessToken, message.Source.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("lineutil/conversationfmt.NewStdConversation: %w", err)
 	}
 	lastActivity, err := message.ToLastActivityString()
-	return &stdconversation.StdConversation{
+	return &livechat.StdConversation{
 		ShopID:          message.ShopID,
 		PageID:          message.PageID,
 		ConversationID:  message.ConversationID,
-		ConversationPic: stdconversation.Payload{Src: userProfile.PictureURL},
+		ConversationPic: livechat.Payload{Src: userProfile.PictureURL},
 		UpdatedTime:     message.Timestamp,
-		Participants: []*stdconversation.Participant{{
+		Participants: []*livechat.Participant{{
 			UserID:     message.Source.UserID,
 			Username:   userProfile.DisplayName,
-			ProfilePic: stdconversation.Payload{Src: userProfile.PictureURL},
+			ProfilePic: livechat.Payload{Src: userProfile.PictureURL},
 		}},
 		LastActivity: lastActivity,
 		IsRead:       false,

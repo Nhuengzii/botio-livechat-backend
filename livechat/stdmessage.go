@@ -1,4 +1,4 @@
-package stdmessage
+package livechat
 
 import "errors"
 
@@ -16,8 +16,8 @@ type StdMessage struct {
 }
 
 var (
-	ErrNoAttachments         = errors.New("stdmessage.ToLastActivityString no attachment in message")
-	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString unknown attachment type")
+	ErrNoAttachments         = errors.New("stdmessage.ToLastActivityString: no attachment in message")
+	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
 )
 
 const (

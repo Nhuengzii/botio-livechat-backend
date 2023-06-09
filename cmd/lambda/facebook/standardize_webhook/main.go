@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/msgfmt"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/webhook"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/snswrapper"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
-
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/msgfmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/webhook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -43,7 +42,7 @@ func main() {
 func (l *Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	discord.Log(l.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
-	var recieveMessage webhook.RecieveWebhook
+	var recieveMessage webhook.ReceiveWebhook
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveMessage)
 		if err != nil || recieveMessage.Object != "page" {
@@ -70,7 +69,7 @@ func (l *Lambda) handleWebhookEntry(message webhook.Notification) error {
 	for _, messageData := range message.MessageDatas {
 		if messageData.Message.MessageID != "" {
 			// standardize messaging hooks
-			var standardMessage *stdmessage.StdMessage
+			var standardMessage *livechat.StdMessage
 			standardMessage, err := msgfmt.NewStdMessage(l.FacebookPageAccessToken, messageData, message.PageID)
 			if err != nil {
 				return err

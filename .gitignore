@@ -30,3 +30,4 @@ websocket.auto.tfvars
 
 # Go workspace file
 go.work
+!/cmd/lambda/line/

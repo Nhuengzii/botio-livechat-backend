@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Nhuengzii/botio-livechat-backend/internal/snswrapper"
+import "github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 
 type config struct {
 	DiscordWebhookURL       string

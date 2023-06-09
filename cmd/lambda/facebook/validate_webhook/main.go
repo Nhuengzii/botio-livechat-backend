@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/webhook"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/sqswrapper"
-	transport "github.com/Nhuengzii/botio-livechat-backend/internal/transport/lambda"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/webhook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
+	transport "github.com/Nhuengzii/botio-livechat-backend/livechat/transport/lambda"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"

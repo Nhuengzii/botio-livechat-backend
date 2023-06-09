@@ -5,8 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/lineutil/messagefmt"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/lineutil/messagefmt"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
@@ -36,9 +36,9 @@ type Body struct {
 	Events      []*linebot.Event `json:"events"`
 }
 
-func (w *Body) HandleWebhookBodyAndExtractMessages() []*stdmessage.StdMessage {
+func (w *Body) HandleWebhookBodyAndExtractMessages() []*livechat.StdMessage {
 	botUserID := w.Destination
-	var messages []*stdmessage.StdMessage
+	var messages []*livechat.StdMessage
 	for _, event := range w.Events {
 		switch event.Type {
 		case linebot.EventTypeMessage:

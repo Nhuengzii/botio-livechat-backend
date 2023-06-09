@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"os"
 
-	"github.com/Nhuengzii/botio-livechat-backend/internal/db"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/internal/fbutil/conversationfmt"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/conversationfmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,7 +30,7 @@ var (
 
 func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	var recieveBody recievedSqsMessage
-	var recieveMessage stdmessage.StdMessage
+	var recieveMessage livechat.StdMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &recieveBody)
 		if err != nil {
@@ -44,7 +44,7 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		}
 
 		// implement update conversation
-		convIsExist, err := l.DbClient.CheckConversationExist(context.TODO(), recieveMessage.ConversationID)
+		convIsExist, err := l.DbClient.CheckConversationExists(context.TODO(), recieveMessage.ConversationID)
 		if err != nil {
 			discord.Log(l.DiscordWebhookURL, "Error checking if conversation already exist")
 			return err
@@ -74,7 +74,7 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 }
 
 func main() {
-	dbClient, err := db.NewClient(context.TODO(), &db.Target{
+	dbClient, err := mongodb.NewClient(context.TODO(), &mongodb.Target{
 		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
 		Database:                "BotioLivechat",
 		CollectionMessages:      "facebook_messages",

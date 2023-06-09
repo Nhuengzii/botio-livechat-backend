@@ -2,13 +2,13 @@ package messagefmt
 
 import (
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/pkg/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"reflect"
 )
 
-func NewStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessage {
-	platform := stdmessage.PlatformLine
+func NewStdMessage(event *linebot.Event, botUserID string) *livechat.StdMessage {
+	platform := livechat.PlatformLine
 	pageID := botUserID
 	shopID := "1" // TODO get from some db with botUserID?
 	source := ToStdMessageSource(event.Source)
@@ -18,8 +18,8 @@ func NewStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessag
 	// message-type-specific fields
 	var messageID string
 	var message string
-	var attachments []*stdmessage.Attachment
-	var replyTo *stdmessage.RepliedMessage
+	var attachments []*livechat.Attachment
+	var replyTo *livechat.RepliedMessage
 
 	switch msg := event.Message.(type) {
 	case *linebot.TextMessage:
@@ -44,7 +44,7 @@ func NewStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessag
 		messageID = msg.ID
 		message = ToLocationString(msg)
 	}
-	return &stdmessage.StdMessage{
+	return &livechat.StdMessage{
 		ShopID:         shopID,
 		Platform:       platform,
 		PageID:         pageID,
@@ -58,54 +58,54 @@ func NewStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessag
 	}
 }
 
-func ToStdMessageSource(s *linebot.EventSource) *stdmessage.Source {
+func ToStdMessageSource(s *linebot.EventSource) *livechat.Source {
 	var userID string
-	var userType stdmessage.UserType
+	var userType livechat.UserType
 	switch s.Type {
 	case linebot.EventSourceTypeUser:
 		userID = s.UserID
-		userType = stdmessage.UserTypeUser
+		userType = livechat.UserTypeUser
 	case linebot.EventSourceTypeGroup:
 		userID = s.GroupID
-		userType = stdmessage.UserTypeGroup
+		userType = livechat.UserTypeGroup
 	}
-	return &stdmessage.Source{
+	return &livechat.Source{
 		UserID:   userID,
 		UserType: userType,
 	}
 }
 
-func ToImageAttachment(m *linebot.ImageMessage) *stdmessage.Attachment {
+func ToImageAttachment(m *linebot.ImageMessage) *livechat.Attachment {
 	// TODO get image file from m.ID and save it to some db
-	return &stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeImage,
-		Payload: stdmessage.Payload{
+	return &livechat.Attachment{
+		AttachmentType: livechat.AttachmentTypeImage,
+		Payload: livechat.Payload{
 			Src: "", // TODO get url of the image stored in some db
 		}}
 }
 
-func ToVideoAttachment(m *linebot.VideoMessage) *stdmessage.Attachment {
+func ToVideoAttachment(m *linebot.VideoMessage) *livechat.Attachment {
 	// TODO get video file from m.ID and save it to some db
-	return &stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeVideo,
-		Payload: stdmessage.Payload{
+	return &livechat.Attachment{
+		AttachmentType: livechat.AttachmentTypeVideo,
+		Payload: livechat.Payload{
 			Src: "", // TODO get url of the video stored in some db
 		}}
 }
 
-func ToAudioAttachment(m *linebot.AudioMessage) *stdmessage.Attachment {
+func ToAudioAttachment(m *linebot.AudioMessage) *livechat.Attachment {
 	// TODO get audio file from m.ID and save it to some db
-	return &stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeAudio,
-		Payload: stdmessage.Payload{
+	return &livechat.Attachment{
+		AttachmentType: livechat.AttachmentTypeAudio,
+		Payload: livechat.Payload{
 			Src: "", // TODO get url of the audio stored in some db
 		}}
 }
 
-func ToStickerAttachment(m *linebot.StickerMessage) *stdmessage.Attachment {
-	return &stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeSticker,
-		Payload: stdmessage.Payload{
+func ToStickerAttachment(m *linebot.StickerMessage) *livechat.Attachment {
+	return &livechat.Attachment{
+		AttachmentType: livechat.AttachmentTypeSticker,
+		Payload: livechat.Payload{
 			Src: ToStickerURL(m),
 		}}
 }
@@ -119,8 +119,8 @@ func HasLineEmojis(m *linebot.TextMessage) bool {
 	return v != reflect.Value{}
 }
 
-func ToLineEmojiAttachments(m *linebot.TextMessage) []*stdmessage.Attachment {
-	var attachments []*stdmessage.Attachment
+func ToLineEmojiAttachments(m *linebot.TextMessage) []*livechat.Attachment {
+	var attachments []*livechat.Attachment
 	// TODO implement me
 	return attachments
 }
