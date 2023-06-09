@@ -3,7 +3,6 @@ package snswrapper
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -14,9 +13,9 @@ type Client struct {
 	client *sns.SNS
 }
 
-func NewClient() *Client {
+func NewClient(awsRegion string) *Client {
 	sess := session.Must(session.NewSession())
-	client := sns.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+	client := sns.New(sess, aws.NewConfig().WithRegion(awsRegion))
 	return &Client{client}
 }
 

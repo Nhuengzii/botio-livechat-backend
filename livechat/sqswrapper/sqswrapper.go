@@ -2,7 +2,6 @@ package sqswrapper
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -13,9 +12,9 @@ type Client struct {
 	client *sqs.SQS
 }
 
-func NewClient() *Client {
+func NewClient(awsRegion string) *Client {
 	sess := session.Must(session.NewSession())
-	client := sqs.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+	client := sqs.New(sess, aws.NewConfig().WithRegion(awsRegion))
 	return &Client{client}
 }
 
