@@ -77,8 +77,9 @@ func main() {
 	}
 	l := Lambda{
 		config: config{
-			DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-			DbClient:          dbClient,
+			DiscordWebhookURL:   os.Getenv("DISCORD_WEBHOOK_URL"),
+			DbClient:            dbClient,
+			FacebookAccessToken: os.Getenv("ACCESS_TOKEN"),
 		},
 	}
 	defer func() {
