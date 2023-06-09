@@ -2,23 +2,24 @@ package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	fbrequest "github.com/Nhuengzii/botio-livechat-backend/livechat/external/facebook"
 )
 
 func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*livechat.StdMessage, error) {
-	// // conversationID, err := request.RequestFacebookConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
-	// if err != nil {
-	// 	return &livechat.StdMessage{}, err
-	// }
+	conversationID, err := fbrequest.RequestFacebookConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
+	if err != nil {
+		return &livechat.StdMessage{}, err
+	}
 
 	attachments := fmtAttachment(messaging)
 
 	newMessage := livechat.StdMessage{
-		ShopID:   "1", // TODO:botio API
-		Platform: "Facebook",
-		PageID:   pageID,
-		// ConversationID: conversationID,
-		MessageID: messaging.Message.MessageID,
-		Timestamp: messaging.Timestamp,
+		ShopID:         "1", // TODO:botio API
+		Platform:       "Facebook",
+		PageID:         pageID,
+		ConversationID: conversationID,
+		MessageID:      messaging.Message.MessageID,
+		Timestamp:      messaging.Timestamp,
 		Source: livechat.Source{
 			UserID:   messaging.Sender.ID,
 			UserType: "User",
