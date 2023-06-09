@@ -56,6 +56,24 @@ resource "aws_api_gateway_resource" "webhook" {
   path_part   = "webhook"
 }
 
+resource "aws_api_gateway_resource" "conversations" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.page_id.id
+  path_part   = "conversations"
+}
+
+resource "aws_api_gateway_resource" "conversation_id" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.conversations.id
+  path_part   = "{conversation_id}"
+}
+
+resource "aws_api_gateway_resource" "messages" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.conversation_id.id
+  path_part   = "messages"
+}
+
 resource "aws_api_gateway_method" "get_post_webhook" {
   for_each      = toset(["GET", "POST"])
   http_method   = each.key
