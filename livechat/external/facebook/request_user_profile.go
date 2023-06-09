@@ -1,4 +1,4 @@
-package request
+package fbrequest
 
 import (
 	"encoding/json"
