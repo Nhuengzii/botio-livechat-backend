@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/fbutil/conversationfmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"go.mongodb.org/mongo-driver/bson"
@@ -55,7 +55,7 @@ func (l Lambda) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 				return err
 			}
 		} else {
-			newConversation, err := conversationfmt.NewStdConversation(l.FacebookAccessToken, &recieveMessage)
+			newConversation, err := NewStdConversation(l.FacebookAccessToken, &recieveMessage)
 			if err != nil {
 				return err
 			}
