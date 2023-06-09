@@ -198,6 +198,11 @@ resource "aws_sqs_queue" "webhook_standardizer" {
   name = format("%s_webhook_standardizer", var.platform)
 }
 
+resource "aws_iam_role_policy_attachment" "sqs_full_access" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
 resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
   event_source_arn = aws_sqs_queue.webhook_standardizer.arn
   function_name    = module.get_post_webhook_handler.lambda.function_name
