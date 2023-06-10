@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 
@@ -21,7 +23,31 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	// shopID := pathParams["shop_id"]
 	pageID := pathParams["page_id"]
 
-	return events.APIGatewayProxyResponse{}, nil
+	stdConversations, err := c.DbClient.QueryConversations(ctx, pageID)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 502,
+			Body:       "Bad Gateway",
+		}, err
+	}
+
+	jsonBodyByte, err := json.Marshal(*stdConversations)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+		}, err
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Body:       string(jsonBodyByte),
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
+	}, nil
 }
 
 func main() {
