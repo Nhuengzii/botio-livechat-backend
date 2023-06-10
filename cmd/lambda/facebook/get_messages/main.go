@@ -61,7 +61,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 }
 
 func main() {
-	dbClient, err := mongodb.NewClient(context.TODO(), &mongodb.Target{
+	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
+	defer cancel()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
 		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
 		Database:                "BotioLivechat",
 		CollectionMessages:      "facebook_messages",
@@ -76,4 +78,5 @@ func main() {
 	}
 
 	lambda.Start(c.handler)
+	c.DbClient.Close(ctx)
 }
