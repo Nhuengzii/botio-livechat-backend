@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/apirequest/sendmsgrequest"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 )
 
