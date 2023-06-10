@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -108,7 +109,7 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("mongodb.Client.CheckConversationExists %w", ErrNoConversations)
+			return mongo.ErrNoDocuments
 		}
 		return err
 	}
