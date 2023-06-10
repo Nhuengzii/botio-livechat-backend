@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -13,6 +14,11 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+var (
+	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
+)
+
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	discord.Log(c.DiscordWebhookURL, "facebook get messages handler")
 
@@ -21,8 +27,22 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
-	pageID := pathParams["page_id"]
-	conversationID := pathParams["conversation_id"]
+	pageID, ok := pathParams["page_id"]
+	if !ok {
+		discord.Log(c.DiscordWebhookURL, "err path param page_id was not given")
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+		}, errNoPageIDPath
+	}
+	conversationID, ok := pathParams["conversation_id"]
+	if !ok {
+		discord.Log(c.DiscordWebhookURL, "err path param conversation_id was not given")
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+		}, errNoConversationIDPath
+	}
 
 	stdMessages, err := c.DbClient.QueryMessages(ctx, pageID, conversationID)
 	if err != nil {
