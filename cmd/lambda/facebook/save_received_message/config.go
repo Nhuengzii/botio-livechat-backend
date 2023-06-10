@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 )
 
 type config struct {
 	DiscordWebhookURL   string
-	DbClient            *mongodb.Client
+	DbClient            livechat.DBClient
 	FacebookAccessToken string
 }
