@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -41,6 +44,17 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Bad Request",
 		}, errNoConversationIDPath
 	}
+
+	var requestMessage sendmsgrequest.RequestMessage
+	err := json.Unmarshal([]byte(request.Body), &requestMessage)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+		}, err
+	}
+	// request external facebook post
 	return events.APIGatewayProxyResponse{}, nil
 }
 
