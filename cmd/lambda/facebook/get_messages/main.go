@@ -76,7 +76,10 @@ func main() {
 		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
 		DbClient:          dbClient,
 	}
+	defer func() {
+		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
+		c.DbClient.Close(ctx)
+	}()
 
 	lambda.Start(c.handler)
-	c.DbClient.Close(ctx)
 }

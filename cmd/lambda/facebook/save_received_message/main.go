@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -63,7 +64,9 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 }
 
 func main() {
-	dbClient, err := mongodb.NewClient(context.TODO(), &mongodb.Target{
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
+	defer cancel()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
 		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
 		Database:                "BotioLivechat",
 		CollectionMessages:      "facebook_messages",
@@ -80,7 +83,7 @@ func main() {
 
 	defer func() {
 		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(context.TODO())
+		c.DbClient.Close(ctx)
 	}()
 
 	lambda.Start(c.handler)
