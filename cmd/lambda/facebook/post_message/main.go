@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/apiresponse/sendmsgresponse"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -54,8 +56,36 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Internal Server Error",
 		}, err
 	}
-	// request external facebook post
-	return events.APIGatewayProxyResponse{}, nil
+	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid)
+	facebookResponse, err := fbrequest.RequestFacebookPostMessage(c.FacebookPageAccessToken, *facebookRequest, pageID, psid)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 502,
+			Body:       "Bad Gateway",
+		}, err
+	}
+	// map facebook response to api response
+	response := sendmsgresponse.Response{
+		RecipientID: facebookResponse.RecipientID,
+		MessageID:   facebookResponse.MessageID,
+		Timestamp:   facebookResponse.Timestamp,
+	}
+	jsonBodyByte, err := json.Marshal(response)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+		}, err
+	}
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Body:       string(jsonBodyByte),
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
+	}, nil
 }
 
 func main() {
