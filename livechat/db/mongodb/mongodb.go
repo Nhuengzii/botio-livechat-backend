@@ -120,7 +120,7 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (*[]livechat.StdMessage, error) {
 	var StdMessages []livechat.StdMessage
 
-	coll := c.client.Database("BotioLivechat").Collection("facebook_messages")
+	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
@@ -132,4 +132,22 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 		return nil, err
 	}
 	return &StdMessages, nil
+}
+
+func (c *Client) QueryConversations(ctx context.Context, pageID string) (*[]livechat.StdConversation, error) {
+	var StdConversations []livechat.StdConversation
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	filter := bson.D{{Key: "pageID", Value: pageID}}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cur.All(ctx, &StdConversations)
+	if err != nil {
+		return nil, err
+	}
+
+	return &StdConversations, nil
 }
