@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/apirequest/sendmsgrequest"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/apiresponse/sendmsgresponse"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
