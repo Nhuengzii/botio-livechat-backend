@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/apiresponse/sendmsgresponse"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 	"github.com/aws/aws-lambda-go/events"
@@ -71,12 +73,22 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,
 	}
+
 	jsonBodyByte, err := json.Marshal(response)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+		}, err
+	}
+
+	err = c.updateDB(ctx, requestMessage, *facebookResponse, pageID, conversationID, psid)
+	if err != nil {
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode: 502,
+			Body:       "Bad Gateway",
 		}, err
 	}
 	return events.APIGatewayProxyResponse{
@@ -89,10 +101,26 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 }
 
 func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
+	defer cancel()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
+		Database:                "BotioLivechat",
+		CollectionMessages:      "facebook_messages",
+		CollectionConversations: "facebook_conversations",
+	})
+	if err != nil {
+		return
+	}
 	c := config{
 		DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
 		FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
+		DbClient:                dbClient,
 	}
+	defer func() {
+		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
+		c.DbClient.Close(ctx)
+	}()
 
 	lambda.Start(c.handler)
 }
