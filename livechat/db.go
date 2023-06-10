@@ -11,4 +11,5 @@ type DBClient interface {
 	UpdateConversationOnNewMessage(ctx context.Context, message *StdMessage) error
 	UpdateConversationIsRead(ctx context.Context, conversationID string) error
 	CheckConversationExists(ctx context.Context, conversationID string) error
+	QueryMessages(ctx context.Context, pageID string, conversationID string) (*[]StdMessage, error)
 }
