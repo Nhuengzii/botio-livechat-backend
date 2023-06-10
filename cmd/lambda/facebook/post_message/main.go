@@ -45,7 +45,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	var requestMessage sendmsgrequest.RequestMessage
+	var requestMessage sendmsgrequest.Request
 	err := json.Unmarshal([]byte(request.Body), &requestMessage)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))

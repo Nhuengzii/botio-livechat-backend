@@ -1,6 +1,6 @@
 package sendmsgrequest
 
-type RequestMessage struct {
+type Request struct {
 	Message    string     `json:"message"`
 	Attachment Attachment `json:"attachment"`
 }
