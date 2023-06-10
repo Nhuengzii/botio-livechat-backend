@@ -117,3 +117,19 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 }
 
 // TODO add other methods required for getting conversation and messages to livechat.DBClient interface then implement them here
+func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (*[]livechat.StdMessage, error) {
+	var StdMessages []livechat.StdMessage
+
+	coll := c.client.Database("BotioLivechat").Collection("facebook_messages")
+	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cur.All(ctx, &StdMessages)
+	if err != nil {
+		return nil, err
+	}
+	return &StdMessages, nil
+}
