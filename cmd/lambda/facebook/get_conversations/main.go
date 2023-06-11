@@ -42,7 +42,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	jsonBodyByte, err := json.Marshal(*stdConversations)
+	jsonBodyByte, err := json.Marshal(stdConversations)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{

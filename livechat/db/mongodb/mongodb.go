@@ -11,7 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ErrNoConversations = errors.New("mongodb: no conversations")
+var (
+	ErrNoConversations = errors.New("mongodb: no conversations")
+	ErrNoMessages      = errors.New("mongodb: no messages")
+)
 
 type Client struct {
 	client *mongo.Client
@@ -109,45 +112,55 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return mongo.ErrNoDocuments
+			return fmt.Errorf("mongodb.Client.CheckConversationExists %w", ErrNoConversations)
 		}
 		return err
 	}
 	return nil
 }
 
-// TODO add other methods required for getting conversation and messages to livechat.DBClient interface then implement them here
-func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (*[]livechat.StdMessage, error) {
-	var StdMessages []livechat.StdMessage
-
+func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*livechat.StdMessage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
+		}
+	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoMessages
+		}
 		return nil, err
 	}
-
-	err = cur.All(ctx, &StdMessages)
+	var messages []*livechat.StdMessage
+	err = cur.All(ctx, &messages)
 	if err != nil {
 		return nil, err
 	}
-	return &StdMessages, nil
+	return messages, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, pageID string) (*[]livechat.StdConversation, error) {
-	var StdConversations []livechat.StdConversation
-
+func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*livechat.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
+		}
+	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{{Key: "pageID", Value: pageID}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoConversations
+		}
 		return nil, err
 	}
-
-	err = cur.All(ctx, &StdConversations)
+	var conversations []*livechat.StdConversation
+	err = cur.All(ctx, &conversations)
 	if err != nil {
 		return nil, err
 	}
-
-	return &StdConversations, nil
+	return conversations, nil
 }
