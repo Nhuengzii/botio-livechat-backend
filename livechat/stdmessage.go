@@ -65,27 +65,23 @@ type RepliedMessage struct {
 	MessageID string `json:"messageID" bson:"messageID"`
 }
 
-func (message StdMessage) ToLastActivityString() (string, error) {
+func (message *StdMessage) ToLastActivityString() (string, error) {
 	if message.Message != "" {
 		return message.Message, nil
 	}
-	if len(message.Attachments) == 0 { // this really shouldn't be the case but just in case
+	if len(message.Attachments) == 0 {
 		return "", ErrNoAttachments
 	}
 	switch message.Attachments[0].AttachmentType {
 	case AttachmentTypeImage:
-		// return fmt.Sprintf("%s sent an image", displayName)
 		return "ส่งรูปภาพ", nil
 	case AttachmentTypeVideo:
-		// return fmt.Sprintf("%s sent a video", displayName)
 		return "ส่งวิดีโอ", nil
 	case AttachmentTypeAudio:
-		// return fmt.Sprintf("%s sent an audio", displayName)
 		return "ส่งข้อความเสียง", nil
 	case AttachmentTypeFile:
 		return "ส่งไฟล์", nil
 	case AttachmentTypeSticker:
-		// return fmt.Sprintf("%s sent a sticker", displayName)
 		return "ส่งสติกเกอร์", nil
 	case AttachmentTypeTemplate:
 		return "ส่งเทมเพลท", nil
