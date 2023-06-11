@@ -113,7 +113,7 @@ resource "aws_api_gateway_method" "get_post_webhook" {
 module "get_post_webhook_handler" {
   source       = "../lambda_handler/"
   handler_name = format("%s_get_post_webhook_handler", var.platform)
-  handler_path = format("%s/validate_%s_webhook_handler", path.root, var.platform)
+  handler_path = format("%s/cmd/lambda/line/validate_webhook", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -149,7 +149,7 @@ locals {
       resource_id   = aws_api_gateway_resource.messages.id
       resource_path = aws_api_gateway_resource.messages.path
       handler_name  = format("%s_get_messages_handler", var.platform)
-      handler_path  = format("%s/get_%s_messages_handler", path.root, var.platform)
+      handler_path  = format("%s/cmd/lambda/line/get_messages", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         DISCORD_WEBHOOK_URL              = var.discord_webhook_url
@@ -163,7 +163,7 @@ locals {
       resource_id           = aws_api_gateway_resource.messages.id
       resource_path         = aws_api_gateway_resource.messages.path
       handler_name          = format("%s_post_message_handler", var.platform)
-      handler_path          = format("%s/post_%s_message_handler", path.root, var.platform)
+      handler_path          = format("%s/cmd/lambda/line/post_message", path.root)
       role_arn              = aws_iam_role.assume_role_lambda.arn
       environment_variables = {}
     }
@@ -172,7 +172,7 @@ locals {
       resource_id   = aws_api_gateway_resource.conversations.id
       resource_path = aws_api_gateway_resource.conversations.path
       handler_name  = format("%s_get_conversations_handler", var.platform)
-      handler_path  = format("%s/get_%s_conversations_handler", path.root, var.platform)
+      handler_path  = format("%s/cmd/lambda/line/get_conversations", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
@@ -238,7 +238,7 @@ resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
 module "standardizer" {
   source       = "../lambda_handler/"
   handler_name = format("%s_standardizer", var.platform)
-  handler_path = format("%s/standardize_line_webhook_handler", path.root)
+  handler_path = format("%s/cmd/lambda/line/standardize_webhook", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -318,7 +318,7 @@ resource "aws_sns_topic_subscription" "save_received_message" {
 module "save_received_message" {
   source       = "../lambda_handler"
   handler_name = format("%s_save_received_message", var.platform)
-  handler_path = format("%s/save_line_received_message_handler", path.root)
+  handler_path = format("%s/cmd/lambda/line/save_received_message", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
