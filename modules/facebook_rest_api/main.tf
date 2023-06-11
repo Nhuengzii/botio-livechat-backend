@@ -215,6 +215,85 @@ module "standardizer" {
   handler_path = format("%s/standardize_facebook_webhook_handler", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
+    ACCESS_TOKEN  = var.facebook_access_token
+    SNS_TOPIC_ARN = aws_sns_topic.save_and_send_received_message.arn
+  }
+}
+data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
+  statement {
+    sid = "AllowSendMessageFromFacebookReceiveMessageTopic"
+    actions = [
+      "sqs:SendMessage"
+    ]
+    effect = "Allow"
+    resources = [
+      aws_sqs_queue.save_and_send_received_message["save"].arn,
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.save_and_send_received_message.arn]
+    }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_snsexecution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_sqs_queue_policy" "sqs_allow_send_message_from_sns" {
+  for_each  = toset(["save"])
+  queue_url = aws_sqs_queue.save_and_send_received_message[each.key].id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_sns.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_apigateway_invoke_full_access_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
+}
+
+resource "aws_sns_topic" "save_and_send_received_message" {
+  name = format("%s_save_and_send_receive_message", var.platform)
+}
+
+resource "aws_sqs_queue" "save_and_send_received_message" {
+  for_each = toset(["save", "send"])
+  name     = format("%s_%s_received_message", var.platform, each.key)
+}
+
+resource "aws_lambda_event_source_mapping" "save_received_message" {
+  event_source_arn = aws_sqs_queue.save_and_send_received_message["save"].arn
+  function_name    = module.save_received_message.lambda.function_name
+  batch_size       = 1
+}
+
+resource "aws_sns_topic_subscription" "save_received_message" {
+  topic_arn = aws_sns_topic.save_and_send_received_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.save_and_send_received_message["save"].arn
+}
+
+module "save_received_message" {
+  source       = "../lambda_handler"
+  handler_name = format("%s_save_received_message", var.platform)
+  handler_path = format("%s/save_facebook_received_message_handler", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
+  environment_variables = {
     ACCESS_TOKEN = var.facebook_access_token
   }
 }
