@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/sendmsgrequest"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/response/sendmsgresponse"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagreq"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/response/postmessageresp"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
@@ -49,7 +49,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	var requestMessage sendmsgrequest.Request
+	var requestMessage postmessagreq.Request
 	err := json.Unmarshal([]byte(request.Body), &requestMessage)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
@@ -68,7 +68,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 	// map facebook response to api response
-	response := sendmsgresponse.Response{
+	response := postmessageresp.Response{
 		RecipientID: facebookResponse.RecipientID,
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,

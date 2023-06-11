@@ -134,6 +134,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 		}
 		return nil, err
 	}
+	defer cur.Close(ctx)
 	var messages []*livechat.StdMessage
 	err = cur.All(ctx, &messages)
 	if err != nil {
@@ -157,6 +158,7 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*li
 		}
 		return nil, err
 	}
+	defer cur.Close(ctx)
 	var conversations []*livechat.StdConversation
 	err = cur.All(ctx, &conversations)
 	if err != nil {

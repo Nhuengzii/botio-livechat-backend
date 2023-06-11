@@ -17,6 +17,7 @@ type Participant struct {
 	ProfilePic Payload `json:"profilePic" bson:"profilePic"`
 }
 
+// Payload here is the same as Payload in stdmessage.go
 //type Payload struct {
 //	Src string `json:"src" bson:"src"`
 //}

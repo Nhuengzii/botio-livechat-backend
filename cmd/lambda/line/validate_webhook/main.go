@@ -22,7 +22,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	//pathParameters := req.PathParameters
 	//shopID := pathParameters["shop_id"]
 	//pageID := pathParameters["page_id"]
-	//lineChannelSecret := "" // TODO get from some db with shopID and pageID here
+	//lineChannelSecret := // TODO get from db
 	lineSignature := req.Headers["x-line-signature"]
 	webhookBodyString := req.Body
 	err = validateSignature(c.lineChannelSecret, lineSignature, webhookBodyString)

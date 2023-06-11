@@ -1,4 +1,4 @@
-package sendmsgresponse
+package postmessageresp
 
 type Response struct {
 	RecipientID string `json:"recipient_id"`

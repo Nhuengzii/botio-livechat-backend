@@ -37,7 +37,7 @@ const (
 	AttachmentTypeAudio     AttachmentType = "audio"
 	AttachmentTypeFile      AttachmentType = "file"
 	AttachmentTypeSticker   AttachmentType = "sticker"
-	AttachmentTypeLineEmoji AttachmentType = "line emoji"
+	AttachmentTypeLineEmoji AttachmentType = "lineEmoji"
 	AttachmentTypeTemplate  AttachmentType = "template"
 )
 

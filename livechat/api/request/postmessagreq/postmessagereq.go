@@ -1,4 +1,4 @@
-package sendmsgrequest
+package postmessagreq
 
 type Request struct {
 	Message    string     `json:"message"`

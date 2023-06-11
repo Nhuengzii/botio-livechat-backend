@@ -12,7 +12,7 @@ func newStdMessage(event *linebot.Event, botUserID string) *livechat.StdMessage 
 	pageID := botUserID
 	shopID := "1" // TODO get from some db with botUserID?
 	source := ToStdMessageSource(event.Source)
-	conversationID := botUserID + ":" + source.UserID
+	conversationID := source.UserID
 	timestamp := event.Timestamp.UnixMilli()
 
 	// message-type-specific fields
