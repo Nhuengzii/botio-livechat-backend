@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
@@ -39,7 +39,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		var stdMessage *livechat.StdMessage
+		var stdMessage *stdmessage.StdMessage
 		err = json.Unmarshal([]byte(snsMessage.Message), stdMessage)
 		if err != nil {
 			return err

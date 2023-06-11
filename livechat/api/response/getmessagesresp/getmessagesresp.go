@@ -1,7 +1,9 @@
 package getmessagesresp
 
-import "github.com/Nhuengzii/botio-livechat-backend/livechat"
+import (
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
+)
 
 type Response struct {
-	Messages []*livechat.StdMessage `json:"messages"`
+	Messages []*stdmessage.StdMessage `json:"messages"`
 }

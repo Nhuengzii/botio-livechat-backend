@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -27,7 +27,7 @@ var (
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	var receiveBody receivedMessage
-	var receiveMessage livechat.StdMessage
+	var receiveMessage stdmessage.StdMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &receiveBody)
 		if err != nil {

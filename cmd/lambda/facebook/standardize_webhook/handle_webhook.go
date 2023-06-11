@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 )
 
@@ -30,7 +30,7 @@ func (c *config) handleWebhookEntry(message *Entry) error {
 	for _, messaging := range message.Messagings {
 		if messaging.Message.MessageID != "" {
 			// standardize messaging hooks
-			var standardMessage *livechat.StdMessage
+			var standardMessage *stdmessage.StdMessage
 			standardMessage, err := NewStdMessage(c.FacebookPageAccessToken, messaging, message.PageID)
 			if err != nil {
 				return err

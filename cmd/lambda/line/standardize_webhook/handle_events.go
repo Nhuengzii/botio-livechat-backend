@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
@@ -14,7 +14,7 @@ func handleEvents(c *config, hookBody *webhookBody) (err error) {
 		}
 	}()
 	botUserID := hookBody.Destination
-	var stdMessages []*livechat.StdMessage
+	var stdMessages []*stdmessage.StdMessage
 	for _, event := range hookBody.Events {
 		switch event.Type {
 		case linebot.EventTypeMessage:

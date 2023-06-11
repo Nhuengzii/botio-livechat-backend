@@ -1,7 +1,9 @@
 package getconversationsresp
 
-import "github.com/Nhuengzii/botio-livechat-backend/livechat"
+import (
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
+)
 
-type Response struct {
-	Conversations []*livechat.StdConversation `json:"conversations"`
+type Resp struct {
+	Conversations []*stdconversation.StdConversation `json:"conversations"`
 }

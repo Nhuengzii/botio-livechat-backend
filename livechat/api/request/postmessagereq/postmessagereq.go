@@ -2,14 +2,14 @@ package postmessagereq
 
 type Request struct {
 	Message    string     `json:"message"`
-	Attachment Attachment `json:"attachment"`
+	Attachment Attachment `json:"attachment"` // Why is this not Attachments []Attachment `json:"attachments"`?
 }
 
 type Attachment struct {
-	AttachmentType string      `json:"type"`
-	Payload        PayloadType `json:"payload"`
+	AttachmentType string  `json:"type"`
+	Payload        Payload `json:"payload"`
 }
 
-type PayloadType struct {
+type Payload struct {
 	Src string `json:"src"`
 }

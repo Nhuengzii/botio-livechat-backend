@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagreq"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 )
 
-func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.Request, fbResponseMessage fbrequest.FBSendMsgResponse, pageID string, conversationID string, psid string) error {
+func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.Request, fbResponseMessage facebook.FBSendMsgResponse, pageID string, conversationID string, psid string) error {
 	stdMessage := fmtStdMessage(apiRequestMessage, fbResponseMessage, pageID, conversationID, psid)
 	err := c.DbClient.UpdateConversationOnNewMessage(ctx, stdMessage)
 	if err != nil {
@@ -22,26 +22,26 @@ func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.R
 	return nil
 }
 
-func fmtStdMessage(apiRequestMessage postmessagreq.Request, fbResponseMessage fbrequest.FBSendMsgResponse, pageID string, conversationID string, psid string) *livechat.StdMessage {
-	stdMessage := livechat.StdMessage{
+func fmtStdMessage(apiRequestMessage postmessagreq.Request, fbResponseMessage facebook.FBSendMsgResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
+	stdMessage := stdmessage.StdMessage{
 		ShopID:         "1",
 		Platform:       "Facebook",
 		PageID:         pageID,
 		ConversationID: conversationID,
 		MessageID:      fbResponseMessage.MessageID,
 		Timestamp:      fbResponseMessage.Timestamp,
-		Source: livechat.Source{
+		Source: stdmessage.Source{
 			UserID:   pageID, // botio user id?
 			UserType: "Admin",
 		},
 		Message: apiRequestMessage.Message,
-		Attachments: []*livechat.Attachment{
+		Attachments: []*stdmessage.Attachment{
 			{
-				AttachmentType: livechat.AttachmentType(apiRequestMessage.Attachment.AttachmentType),
-				Payload:        livechat.Payload(apiRequestMessage.Attachment.Payload),
+				AttachmentType: stdmessage.AttachmentType(apiRequestMessage.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload(apiRequestMessage.Attachment.Payload),
 			},
 		},
-		ReplyTo: &livechat.RepliedMessage{
+		ReplyTo: &stdmessage.RepliedMessage{
 			MessageID: "", // TODO: implement reply
 		},
 	}

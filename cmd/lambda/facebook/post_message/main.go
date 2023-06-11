@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/response/postmessageresp"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagreq"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/response/postmessageresp"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -49,7 +48,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	var requestMessage postmessagreq.Request
+	var requestMessage facebook.FBSendMsgRequest
 	err := json.Unmarshal([]byte(request.Body), &requestMessage)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
@@ -58,8 +57,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Internal Server Error",
 		}, err
 	}
-	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid)
-	facebookResponse, err := fbrequest.RequestFacebookPostMessage(c.FacebookPageAccessToken, *facebookRequest, pageID, psid)
+	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid) // TODO type error
+	facebookResponse, err := facebook.PostMessage(c.FacebookPageAccessToken, *facebookRequest, pageID)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
@@ -68,13 +67,13 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 	// map facebook response to api response
-	response := postmessageresp.Response{
+	resp := postmessageresp.Response{
 		RecipientID: facebookResponse.RecipientID,
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,
 	}
 
-	jsonBodyByte, err := json.Marshal(response)
+	jsonBodyByte, err := json.Marshal(resp)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{

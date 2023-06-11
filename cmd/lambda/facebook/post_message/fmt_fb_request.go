@@ -1,32 +1,32 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagreq"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagereq"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
 )
 
-func fmtFbRequest(req *postmessagreq.Request, pageID string, psid string) *fbrequest.FBSendMsgRequest {
-	var fbRequest fbrequest.FBSendMsgRequest
+func fmtFbRequest(req *postmessagereq.Request, pageID string, psid string) *facebook.FBSendMsgRequest {
+	var fbRequest facebook.FBSendMsgRequest
 	if req.Message != "" {
-		fbRequest = fbrequest.FBSendMsgRequest{
-			Recipient: fbrequest.Recipient{
+		fbRequest = facebook.FBSendMsgRequest{
+			Recipient: facebook.Recipient{
 				Id: psid,
 			},
 			MessagingType: "RESPONSE",
-			Message: fbrequest.MessageText{
+			Message: facebook.MessageText{
 				Text: req.Message,
 			},
 		}
 	} else {
-		fbRequest = fbrequest.FBSendMsgRequest{
-			Recipient: fbrequest.Recipient{
+		fbRequest = facebook.FBSendMsgRequest{
+			Recipient: facebook.Recipient{
 				Id: psid,
 			},
 			MessagingType: "RESPONSE",
-			Message: fbrequest.MessageAttachment{
-				Attachment: fbrequest.AttachmentFacebookRequest{
+			Message: facebook.MessageAttachment{
+				Attachment: facebook.AttachmentFacebookRequest{
 					AttachmentType: req.Attachment.AttachmentType,
-					Payload: fbrequest.AttachmentFacebookPayload{
+					Payload: facebook.AttachmentFacebookPayload{
 						Src:        req.Attachment.Payload.Src,
 						IsReusable: true,
 					},

@@ -1,33 +1,44 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
+	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func newStdConversation(facebookAccessToken string, message *livechat.StdMessage) (*livechat.StdConversation, error) {
-	userProfile, err := fbrequest.RequestFacebookUserProfile(facebookAccessToken, message.Source.UserID)
+func newStdConversation(facebookAccessToken string, message *stdmessage.StdMessage) (_ *stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("lambda/facebook/save_received_message/main.newStdConversation: %w", err)
+		}
+	}()
+	userProfile, err := facebook.GetUserProfile(facebookAccessToken, message.Source.UserID)
 	if err != nil {
-		return &livechat.StdConversation{}, err
+		return nil, err
 	}
-	newConversation := &livechat.StdConversation{
+	lastActivity, err := message.ToLastActivityString()
+	if err != nil {
+		return nil, err
+	}
+	newConversation := &stdconversation.StdConversation{
 		ShopID:         message.ShopID,
 		PageID:         message.PageID,
 		ConversationID: message.ConversationID,
-		ConversationPic: livechat.Payload{
+		ConversationPic: stdconversation.Payload{
 			Src: userProfile.ProfilePic,
 		},
 		UpdatedTime: message.Timestamp,
-		Participants: []*livechat.Participant{
+		Participants: []*stdconversation.Participant{
 			{
 				UserID:   message.Source.UserID,
 				Username: userProfile.Name,
-				ProfilePic: livechat.Payload{
+				ProfilePic: stdconversation.Payload{
 					Src: userProfile.ProfilePic,
 				},
 			},
 		},
-		LastActivity: message.Message,
+		LastActivity: lastActivity,
 		IsRead:       false,
 	}
 	return newConversation, nil

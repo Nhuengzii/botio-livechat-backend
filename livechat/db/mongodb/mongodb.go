@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -46,7 +46,7 @@ func (c *Client) Close(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) InsertConversation(ctx context.Context, conversation *livechat.StdConversation) error {
+func (c *Client) InsertConversation(ctx context.Context, conversation *stdconversation.StdConversation) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	_, err := coll.InsertOne(ctx, conversation)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *Client) InsertConversation(ctx context.Context, conversation *livechat.
 	return nil
 }
 
-func (c *Client) InsertMessage(ctx context.Context, message *livechat.StdMessage) error {
+func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessage) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	_, err := coll.InsertOne(ctx, message)
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *livechat.StdMessage
 	return nil
 }
 
-func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *livechat.StdMessage) (err error) {
+func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.UpdateConversationOnNewMessage: %w", err)
@@ -79,6 +79,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *li
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "lastActivity", Value: lastActivity},
 		{Key: "updatedTime", Value: message.Timestamp},
+		{Key: "isRead", Value: false},
 	}}}
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
@@ -119,7 +120,7 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*livechat.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
@@ -135,7 +136,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var messages []*livechat.StdMessage
+	var messages []*stdmessage.StdMessage
 	err = cur.All(ctx, &messages)
 	if err != nil {
 		return nil, err
@@ -143,7 +144,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 	return messages, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*livechat.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -159,10 +160,15 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*li
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var conversations []*livechat.StdConversation
+	var conversations []*stdconversation.StdConversation
 	err = cur.All(ctx, &conversations)
 	if err != nil {
 		return nil, err
 	}
 	return conversations, nil
+}
+
+func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
+	// TODO implement
+	return nil
 }

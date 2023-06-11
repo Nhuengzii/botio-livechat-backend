@@ -1,32 +1,32 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external/fbrequest"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*livechat.StdMessage, error) {
-	conversationID, err := fbrequest.RequestFacebookConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
+func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
+	conversationID, err := facebook.GetConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
 	if err != nil {
-		return &livechat.StdMessage{}, err
+		return &stdmessage.StdMessage{}, err
 	}
 
 	attachments := fmtAttachment(messaging)
 
-	newMessage := livechat.StdMessage{
+	newMessage := stdmessage.StdMessage{
 		ShopID:         "1", // TODO:botio API
-		Platform:       "Facebook",
+		Platform:       stdmessage.PlatformFacebook,
 		PageID:         pageID,
 		ConversationID: conversationID,
 		MessageID:      messaging.Message.MessageID,
 		Timestamp:      messaging.Timestamp,
-		Source: livechat.Source{
+		Source: stdmessage.Source{
 			UserID:   messaging.Sender.ID,
 			UserType: "User",
 		},
 		Message:     messaging.Message.Text,
 		Attachments: attachments,
-		ReplyTo: &livechat.RepliedMessage{
+		ReplyTo: &stdmessage.RepliedMessage{
 			MessageID: messaging.Message.ReplyTo.MessageId,
 		},
 	}
@@ -34,13 +34,13 @@ func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID strin
 	return &newMessage, nil
 }
 
-func fmtAttachment(messaging Messaging) []*livechat.Attachment {
-	var attachments []*livechat.Attachment
+func fmtAttachment(messaging Messaging) []*stdmessage.Attachment {
+	var attachments []*stdmessage.Attachment
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
-			attachments = append(attachments, &livechat.Attachment{
-				AttachmentType: livechat.AttachmentType(attachment.AttachmentType),
-				Payload:        livechat.Payload{Src: attachment.Payload.Src},
+			attachments = append(attachments, &stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: attachment.Payload.Src},
 			})
 		}
 	} else {

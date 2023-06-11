@@ -1,4 +1,4 @@
-package livechat
+package stdmessage
 
 import "errors"
 
