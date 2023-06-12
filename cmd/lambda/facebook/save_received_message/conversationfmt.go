@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbuserprofile"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -24,6 +25,7 @@ func newStdConversation(facebookAccessToken string, message *stdmessage.StdMessa
 	newConversation := &stdconversation.StdConversation{
 		ShopID:         message.ShopID,
 		PageID:         message.PageID,
+		Platform:       stdconversation.PlatformFacebook,
 		ConversationID: message.ConversationID,
 		ConversationPic: stdconversation.Payload{
 			Src: userProfile.ProfilePic,
