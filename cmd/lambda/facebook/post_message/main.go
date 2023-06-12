@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -103,8 +104,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
 	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
-		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
-		Database:                "BotioLivechat",
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
 		CollectionConversations: "facebook_conversations",
 	})

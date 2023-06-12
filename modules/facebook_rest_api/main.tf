@@ -147,17 +147,25 @@ locals {
       handler_path  = format("%s/cmd/lambda/facebook/get_messages", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
-        ACCESS_TOKEN = var.facebook_access_token
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
     }
     post_message = {
-      method                = "POST"
-      resource_id           = aws_api_gateway_resource.messages.id
-      resource_path         = aws_api_gateway_resource.messages.path
-      handler_name          = format("%s_post_message_handler", var.platform)
-      handler_path          = format("%s/cmd/lambda/facebook/post_message", path.root)
-      role_arn              = aws_iam_role.assume_role_lambda.arn
-      environment_variables = {}
+      method        = "POST"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_post_message_handler", var.platform)
+      handler_path  = format("%s/cmd/lambda/facebook/post_message", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
     }
     get_conversations = {
       method        = "GET"
@@ -167,7 +175,10 @@ locals {
       handler_path  = format("%s/cmd/lambda/facebook/get_conversations", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
-        ACCESS_TOKEN = var.facebook_access_token
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
     }
   }

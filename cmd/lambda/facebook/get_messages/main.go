@@ -84,8 +84,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
 	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
-		URI:                     os.Getenv("DATABASE_CONNECTION_URI"),
-		Database:                "BotioLivechat",
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
 		CollectionConversations: "facebook_conversations",
 	})
