@@ -58,7 +58,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			}, err
 		}
 		elasped := time.Since(start)
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(elasped))
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint("elasped : ", elasped))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",
