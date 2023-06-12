@@ -15,6 +15,12 @@ variable "facebook_webhook_verification_string" {
   type = string
 }
 
+variable "mongo_uri" {
+  type = string
+}
+variable "mongo_database" {
+  type = string
+}
 variable "discord_webhook_url" {
   type = string
 }
@@ -304,6 +310,9 @@ module "save_received_message" {
   handler_path = format("%s/cmd/lambda/facebook/save_received_message", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    ACCESS_TOKEN = var.facebook_access_token
+    DISCORD_WEBHOOK_URL = var.discord_webhook_url
+    ACCESS_TOKEN        = var.facebook_access_token
+    MONGODB_URI         = var.mongo_uri
+    MONGODB_DATABASE    = var.mongo_database
   }
 }
