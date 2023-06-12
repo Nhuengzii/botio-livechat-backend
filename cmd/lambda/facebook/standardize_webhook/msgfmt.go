@@ -23,6 +23,12 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		return nil, err
 	}
 
+	var sender stdmessage.UserType
+	if messaging.Message.IsEcho {
+		sender = stdmessage.UserTypeAdmin
+	} else {
+		sender = stdmessage.UserTypeUser
+	}
 	attachments := fmtAttachment(messaging)
 
 	newMessage := stdmessage.StdMessage{
@@ -34,7 +40,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		Timestamp:      messaging.Timestamp,
 		Source: stdmessage.Source{
 			UserID:   messaging.Sender.ID,
-			UserType: stdmessage.UserTypeUser,
+			UserType: sender,
 		},
 		Message:     messaging.Message.Text,
 		Attachments: attachments,

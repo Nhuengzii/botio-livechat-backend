@@ -25,6 +25,7 @@ type Delivery struct {
 }
 
 type Message struct {
+	IsEcho      bool         `json:"is_echo"`
 	MessageID   string       `json:"mid"`
 	Text        string       `json:"text"`
 	Attachments []Attachment `json:"attachments"`
