@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
-	"os"
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -39,14 +40,14 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		//var stdMessage *stdmessage.StdMessage
+		// var stdMessage *stdmessage.StdMessage
 		var stdMessage stdmessage.StdMessage
 		err = json.Unmarshal([]byte(snsMessage.Message), &stdMessage)
 		if err != nil {
 			return err
 		}
 		// TODO get lineChannelAccessToken from db with shopID and pageID here and pass to updateDB through a parameter
-		err = updateDB(ctx, c, &stdMessage)
+		err = c.updateDB(ctx, &stdMessage)
 		if err != nil {
 			return err
 		}

@@ -15,6 +15,12 @@ variable "facebook_webhook_verification_string" {
   type = string
 }
 
+variable "mongo_uri" {
+  type = string
+}
+variable "mongo_database" {
+  type = string
+}
 variable "discord_webhook_url" {
   type = string
 }
@@ -141,17 +147,25 @@ locals {
       handler_path  = format("%s/cmd/lambda/facebook/get_messages", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
-        ACCESS_TOKEN = var.facebook_access_token
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
     }
     post_message = {
-      method                = "POST"
-      resource_id           = aws_api_gateway_resource.messages.id
-      resource_path         = aws_api_gateway_resource.messages.path
-      handler_name          = format("%s_post_message_handler", var.platform)
-      handler_path          = format("%s/cmd/lambda/facebook/post_message", path.root)
-      role_arn              = aws_iam_role.assume_role_lambda.arn
-      environment_variables = {}
+      method        = "POST"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_post_message_handler", var.platform)
+      handler_path  = format("%s/cmd/lambda/facebook/post_message", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
     }
     get_conversations = {
       method        = "GET"
@@ -161,7 +175,10 @@ locals {
       handler_path  = format("%s/cmd/lambda/facebook/get_conversations", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
-        ACCESS_TOKEN = var.facebook_access_token
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
     }
   }
@@ -224,8 +241,9 @@ module "standardizer" {
   handler_path = format("%s/cmd/lambda/facebook/standardize_webhook", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    ACCESS_TOKEN  = var.facebook_access_token
-    SNS_TOPIC_ARN = aws_sns_topic.save_and_send_received_message.arn
+    DISCORD_WEBHOOK_URL = var.discord_webhook_url
+    ACCESS_TOKEN        = var.facebook_access_token
+    SNS_TOPIC_ARN       = aws_sns_topic.save_and_send_received_message.arn
   }
 }
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
@@ -303,6 +321,9 @@ module "save_received_message" {
   handler_path = format("%s/cmd/lambda/facebook/save_received_message", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    ACCESS_TOKEN = var.facebook_access_token
+    DISCORD_WEBHOOK_URL = var.discord_webhook_url
+    ACCESS_TOKEN        = var.facebook_access_token
+    MONGODB_URI         = var.mongo_uri
+    MONGODB_DATABASE    = var.mongo_database
   }
 }

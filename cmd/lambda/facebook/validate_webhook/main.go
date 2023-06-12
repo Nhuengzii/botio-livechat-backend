@@ -58,7 +58,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			}, err
 		}
 		elasped := time.Since(start)
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(elasped))
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint("elasped : ", elasped))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",
@@ -77,7 +77,7 @@ func main() {
 	c := config{
 		DiscordWebhookURL:                 os.Getenv("DISCORD_WEBHOOK_URL"),
 		SqsQueueURL:                       os.Getenv("SQS_QUEUE_URL"),
-		FacebookAppSecret:                 os.Getenv("FACEBOOK_APP_SECRET"), // TODO to be removed and get from some db instead
+		FacebookAppSecret:                 os.Getenv("APP_SECRET"), // TODO to be removed and get from some db instead
 		FacebookWebhookVerificationString: os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING"),
 		SqsClient:                         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
 	}

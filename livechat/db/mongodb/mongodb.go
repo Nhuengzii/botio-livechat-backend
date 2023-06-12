@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcredentials"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,6 +16,7 @@ import (
 var (
 	ErrNoConversations = errors.New("mongodb: no conversations")
 	ErrNoMessages      = errors.New("mongodb: no messages")
+	ErrNoCredentials   = errors.New("mongodb: no credentials")
 )
 
 type Client struct {
@@ -26,6 +29,8 @@ type Target struct {
 	Database                string
 	CollectionConversations string
 	CollectionMessages      string
+	CollectionCredentials   string
+	CollectionShops         string
 }
 
 func NewClient(ctx context.Context, target *Target) (*Client, error) {
@@ -35,7 +40,10 @@ func NewClient(ctx context.Context, target *Target) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("db.NewClient: %w", err)
 	}
-	return &Client{client: client}, nil
+	return &Client{
+		client: client,
+		Target: *target,
+	}, nil
 }
 
 func (c *Client) Close(ctx context.Context) error {
@@ -171,4 +179,27 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
 	// TODO implement
 	return nil
+}
+
+func (c *Client) QueryFacebookCredentials(ctx context.Context, shopID string, pageID string) (_ *shopcredentials.FacebookCredentials, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryFacebookCredentials: %w", err)
+		}
+	}()
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionCredentials)
+	filter := bson.D{{Key: "shopID", Value: shopID}, {Key: "pageID", Value: pageID}}
+	cur := coll.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, ErrNoCredentials
+	}
+
+	var fbCredentials shopcredentials.FacebookCredentials
+	err = cur.Decode(&fbCredentials)
+	if err != nil {
+		return nil, err
+	}
+	return &fbCredentials, nil
 }

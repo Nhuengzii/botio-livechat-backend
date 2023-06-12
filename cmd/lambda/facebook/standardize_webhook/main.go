@@ -24,7 +24,7 @@ var (
 func main() {
 	c := config{
 		DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
-		SnsQueueURL:             os.Getenv("SNS_QUEUE_URL"),
+		SnsTopicARN:             os.Getenv("SNS_TOPIC_ARN"),
 		SnsClient:               snswrapper.NewClient(os.Getenv("AWS_REGION")),
 		FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
 	}
