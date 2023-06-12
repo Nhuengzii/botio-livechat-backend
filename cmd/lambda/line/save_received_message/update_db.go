@@ -17,7 +17,7 @@ func (c *config) updateDB(ctx context.Context, message *stdmessage.StdMessage) (
 	}()
 	err = c.dbClient.UpdateConversationOnNewMessage(ctx, message)
 	if err != nil {
-		if errors.Is(err, mongodb.ErrNoConversations) {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
 			conversation, err := newStdConversation(c.lineChannelAccessToken, message) // TODO get lineChannelAccessToken from caller
 			if err != nil {
 				return err

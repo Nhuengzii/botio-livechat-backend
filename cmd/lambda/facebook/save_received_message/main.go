@@ -47,7 +47,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 		err = c.DbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
 		if err != nil {
-			if errors.Is(err, mongodb.ErrNoConversations) {
+			if errors.Is(err, mongodb.ErrNoDocuments) {
 				conversation, err := c.newStdConversation(ctx, &receiveMessage)
 				if err != nil {
 					return err

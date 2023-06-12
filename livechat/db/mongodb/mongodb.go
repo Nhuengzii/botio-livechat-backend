@@ -13,11 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	ErrNoConversations = errors.New("mongodb: no conversations")
-	ErrNoMessages      = errors.New("mongodb: no messages")
-	ErrNoCredentials   = errors.New("mongodb: no credentials")
-)
+var ErrNoDocuments = mongo.ErrNoDocuments
 
 type Client struct {
 	client *mongo.Client
@@ -92,7 +88,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrNoConversations
+			return ErrNoDocuments
 		}
 		return err
 	}
@@ -108,7 +104,7 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 	err := coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("mongodb.Client.UpdateConversationIsRead %w", ErrNoConversations)
+			return fmt.Errorf("mongodb.Client.UpdateConversationIsRead %w", ErrNoDocuments)
 		}
 		return err
 	}
@@ -121,7 +117,7 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("mongodb.Client.CheckConversationExists %w", ErrNoConversations)
+			return fmt.Errorf("mongodb.Client.CheckConversationExists %w", ErrNoDocuments)
 		}
 		return err
 	}
@@ -139,7 +135,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrNoMessages
+			return nil, ErrNoDocuments
 		}
 		return nil, err
 	}
@@ -163,7 +159,7 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrNoConversations
+			return nil, ErrNoDocuments
 		}
 		return nil, err
 	}
@@ -187,21 +183,135 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 			err = fmt.Errorf("mongodb.Client.QueryShop: %w", err)
 		}
 	}()
-	//coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
-	//filter := bson.D{
-	//	{},
-	//}
-	return nil, nil
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.M{
+		"$or": []bson.D{
+			bson.D{
+				{"facebookPages", bson.D{
+					{"$elemMatch", bson.D{
+						{"pageID", pageID},
+					}},
+				}},
+			},
+			bson.D{
+				{"linePages", bson.D{
+					{"$elemMatch", bson.D{
+						{"pageID", pageID},
+					}},
+				}},
+			},
+			bson.D{
+				{"instagramPages", bson.D{
+					{"$elemMatch", bson.D{
+						{"pageID", pageID},
+					}},
+				}},
+			},
+		},
+	}
+	var shop shops.Shop
+	err = coll.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	return &shop, nil
 }
 
-func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string) (*shops.FacebookPage, error) {
-	return nil, nil
+func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.QueryFacebookPageCredentials: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{"facebookPages", bson.D{
+			{"$elemMatch", bson.D{
+				{"pageID", pageID},
+			}},
+		}},
+	}
+	var shop shops.Shop
+	err = coll.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	var facebookPage shops.FacebookPage
+	for _, page := range shop.FacebookPages {
+		if pageID == page.PageID {
+			facebookPage = page
+			break
+		}
+	}
+	return &facebookPage, nil
 }
 
-func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (*shops.LinePage, error) {
-	return nil, nil
+func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.QueryLinePageCredentials: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{"linePages", bson.D{
+			{"$elemMatch", bson.D{
+				{"pageID", pageID},
+			}},
+		}},
+	}
+	var shop shops.Shop
+	err = coll.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	var linePage shops.LinePage
+	for _, page := range shop.LinePages {
+		if pageID == page.PageID {
+			linePage = page
+			break
+		}
+	}
+	return &linePage, nil
 }
 
-func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID string) (*shops.InstagramPage, error) {
-	return nil, nil
+func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.QueryInstagramPageCredentials: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{"instagramPages", bson.D{
+			{"$elemMatch", bson.D{
+				{"pageID", pageID},
+			}},
+		}},
+	}
+	var shop shops.Shop
+	err = coll.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	var instagramPage shops.InstagramPage
+	for _, page := range shop.InstagramPages {
+		if pageID == page.PageID {
+			instagramPage = page
+			break
+		}
+	}
+	return &instagramPage, nil
 }

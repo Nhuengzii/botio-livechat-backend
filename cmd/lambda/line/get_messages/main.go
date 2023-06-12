@@ -43,7 +43,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversationID := pathParameters["conversation_id"]
 	messages, err := c.dbClient.QueryMessages(ctx, pageID, conversationID)
 	if err != nil {
-		if errors.Is(err, mongodb.ErrNoMessages) {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 404,
 				Headers: map[string]string{
