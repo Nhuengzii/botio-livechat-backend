@@ -16,17 +16,19 @@ import (
 
 var errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
 
-func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	discord.Log(c.DiscordWebhookURL, "facebook get conversations handler")
+func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
+	defer func() {
+		if err != nil {
+			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
+		}
+	}()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
-	defer cancel()
+	discord.Log(c.DiscordWebhookURL, "facebook get conversations handler")
 
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		discord.Log(c.DiscordWebhookURL, "err path param page_id was not given")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
@@ -35,7 +37,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdConversations, err := c.DbClient.QueryConversations(ctx, pageID)
 	if err != nil {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
@@ -44,7 +45,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	jsonBodyByte, err := json.Marshal(stdConversations)
 	if err != nil {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
