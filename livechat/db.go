@@ -17,5 +17,5 @@ type DBClient interface {
 	CheckConversationExists(ctx context.Context, conversationID string) error
 	QueryMessages(ctx context.Context, pageID string, conversationID string) ([]*stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, pageID string) ([]*stdconversation.StdConversation, error)
-	QueryFacebookCredentials(ctx context.Context, shopID string, pageID string) (_ *shopcredentials.FacebookCredentials, err error)
+	QueryFacebookCredentials(ctx context.Context, shopID string, pageID string) (*shopcredentials.FacebookCredentials, error)
 }
