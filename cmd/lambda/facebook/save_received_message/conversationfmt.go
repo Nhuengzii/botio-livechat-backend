@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbuserprofile"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
@@ -13,7 +13,7 @@ func newStdConversation(facebookAccessToken string, message *stdmessage.StdMessa
 			err = fmt.Errorf("lambda/facebook/save_received_message/main.newStdConversation: %w", err)
 		}
 	}()
-	userProfile, err := facebook.GetUserProfile(facebookAccessToken, message.Source.UserID)
+	userProfile, err := getfbuserprofile.GetUserProfile(facebookAccessToken, message.Source.UserID)
 	if err != nil {
 		return nil, err
 	}

@@ -58,7 +58,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, nil
 	}
-	resp := &getconversations.Resp{
+	resp := &getconversations.Response{
 		Conversations: conversations,
 	}
 	responseJSON, err := json.Marshal(resp)

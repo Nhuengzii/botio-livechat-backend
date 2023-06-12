@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbconversationid"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
 func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
-	conversationID, err := facebook.GetConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
+	conversationID, err := getfbconversationid.GetConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
 	if err != nil {
 		return &stdmessage.StdMessage{}, err
 	}

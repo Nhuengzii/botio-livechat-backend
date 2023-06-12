@@ -4,6 +4,6 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 )
 
-type Resp struct {
+type Response struct {
 	Conversations []*stdconversation.StdConversation `json:"conversations"`
 }

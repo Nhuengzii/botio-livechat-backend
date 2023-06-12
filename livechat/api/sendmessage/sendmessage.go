@@ -1,4 +1,4 @@
-package postmessage
+package sendmessage
 
 type Request struct {
 	Message    string     `json:"message"`

@@ -1,4 +1,4 @@
-package facebook
+package sendfbmessage
 
 import (
 	"bytes"
@@ -8,38 +8,39 @@ import (
 	"time"
 )
 
-func SendMessage(accessToken string, fbRequest FBSendMsgRequest, pageID string) (*FBSendMsgResponse, error) {
-	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, accessToken)
-
-	facebookReqBody, err := json.Marshal(fbRequest)
+func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *SendingMessageResponse, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("sendfbmessage.SendMessage: %w", err)
+		}
+	}()
+	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, accessToken)
+	facebookReqBody, err := json.Marshal(message)
 	if err != nil {
-		return &FBSendMsgResponse{}, err
+		return nil, err
 	}
-
-	var response FBSendMsgResponse
-	resp, err := http.Post(uri, "application/json", bytes.NewReader(facebookReqBody))
+	resp, err := http.Post(url, "application/json", bytes.NewReader(facebookReqBody))
 	if err != nil {
-		return &FBSendMsgResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
-
 	now := time.Now().UnixMilli()
-	err = json.NewDecoder(resp.Body).Decode(&response)
-
+	var response *SendingMessageResponse
+	err = json.NewDecoder(resp.Body).Decode(response)
 	response.Timestamp = now
 	if err != nil {
-		return &FBSendMsgResponse{}, err
+		return nil, err
 	}
-	return &response, nil
+	return response, nil
 }
 
-type FBSendMsgResponse struct {
+type SendingMessageResponse struct {
 	RecipientID string `json:"recipient_id"`
 	MessageID   string `json:"message_id"`
 	Timestamp   int64  `json:"timestamp"`
 }
 
-type FBSendMsgRequest struct {
+type SendingMessage struct {
 	Recipient     Recipient `json:"recipient"`
 	Message       any       `json:"message"`
 	MessagingType string    `json:"messaging_type"`
