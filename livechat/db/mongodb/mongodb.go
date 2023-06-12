@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -178,4 +179,20 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
 	// TODO implement
 	return nil
+}
+
+func (c *Client) QueryShop(ctx context.Context, pageID string) ([]shops.Shop, error) {
+	return nil, nil
+}
+
+func (c *Client) QueryFacebookPageCredentials(ctx context.Context, shopID string, pageID string) (*shops.FacebookPage, error) {
+	return nil, nil
+}
+
+func (c *Client) QueryLinePageCredentials(ctx context.Context, shopID string, pageID string) (*shops.LinePage, error) {
+	return nil, nil
+}
+
+func (c *Client) QueryInstagramPageCredentials(ctx context.Context, shopID string, pageID string) (*shops.InstagramPage, error) {
+	return nil, nil
 }
