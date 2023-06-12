@@ -4,6 +4,7 @@ type StdConversation struct {
 	ShopID          string         `json:"shopID" bson:"shopID"`
 	PageID          string         `json:"pageID" bson:"pageID"`
 	ConversationID  string         `json:"conversationID" bson:"conversationID"`
+	Platform        Platform       `json:"platform" bson:"platform"`
 	ConversationPic Payload        `json:"conversationPic" bson:"conversationPic"`
 	UpdatedTime     int64          `json:"updatedTime" bson:"updatedTime"`
 	Participants    []*Participant `json:"participants" bson:"participants"`
@@ -20,3 +21,11 @@ type Participant struct {
 type Payload struct {
 	Src string `json:"src" bson:"src"`
 }
+
+const (
+	PlatformFacebook  Platform = "facebook"
+	PlatformInstagram Platform = "instagram"
+	PlatformLine      Platform = "line"
+)
+
+type Platform string
