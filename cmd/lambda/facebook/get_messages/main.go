@@ -19,14 +19,18 @@ var (
 	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
 )
 
-func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	discord.Log(c.DiscordWebhookURL, "facebook get messages handler")
 
+	defer func() {
+		if err != nil {
+			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
+		}
+	}()
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		discord.Log(c.DiscordWebhookURL, "err path param page_id was not given")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
@@ -34,7 +38,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 	conversationID, ok := pathParams["conversation_id"]
 	if !ok {
-		discord.Log(c.DiscordWebhookURL, "err path param conversation_id was not given")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
@@ -43,7 +46,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdMessages, err := c.DbClient.QueryMessages(ctx, pageID, conversationID)
 	if err != nil {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
@@ -52,7 +54,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	jsonBodyByte, err := json.Marshal(stdMessages)
 	if err != nil {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
@@ -61,7 +62,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	err = c.DbClient.UpdateConversationIsRead(ctx, conversationID)
 	if err != nil {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
