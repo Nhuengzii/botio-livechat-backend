@@ -9,6 +9,7 @@ func NewStdMessage(messaging Messaging, pageID string) (*stdmessage.StdMessage, 
 	// TODO: query shopID
 
 	// TODO: query accessToken
+	var facebookAccessToken string
 	conversationID, err := getfbconversationid.GetConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
 	if err != nil {
 		return &stdmessage.StdMessage{}, err

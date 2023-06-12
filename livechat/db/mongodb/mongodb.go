@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcredentials"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -179,27 +178,4 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
 	// TODO implement
 	return nil
-}
-
-func (c *Client) QueryFacebookCredentials(ctx context.Context, shopID string, pageID string) (_ *shopcredentials.FacebookCredentials, err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryFacebookCredentials: %w", err)
-		}
-	}()
-
-	coll := c.client.Database(c.Database).Collection(c.CollectionCredentials)
-	filter := bson.D{{Key: "shopID", Value: shopID}, {Key: "pageID", Value: pageID}}
-	cur := coll.FindOne(ctx, filter)
-
-	if cur.Err() != nil {
-		return nil, ErrNoCredentials
-	}
-
-	var fbCredentials shopcredentials.FacebookCredentials
-	err = cur.Decode(&fbCredentials)
-	if err != nil {
-		return nil, err
-	}
-	return &fbCredentials, nil
 }

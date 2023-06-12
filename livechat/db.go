@@ -3,7 +3,6 @@ package livechat
 import (
 	"context"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcredentials"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
@@ -17,5 +16,4 @@ type DBClient interface {
 	CheckConversationExists(ctx context.Context, conversationID string) error
 	QueryMessages(ctx context.Context, pageID string, conversationID string) ([]*stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, pageID string) ([]*stdconversation.StdConversation, error)
-	QueryFacebookCredentials(ctx context.Context, shopID string, pageID string) (*shopcredentials.FacebookCredentials, error)
 }
