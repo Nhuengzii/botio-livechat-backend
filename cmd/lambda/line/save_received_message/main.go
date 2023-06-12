@@ -34,7 +34,8 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 	}
 	for _, sqsMessage := range sqsEvent.Records {
 		snsMessageString := sqsMessage.Body
-		var snsMessage *snswrapper.SNSMessage
+		//var snsMessage *snswrapper.SNSMessage
+		snsMessage := &snswrapper.SNSMessage{}
 		err = json.Unmarshal([]byte(snsMessageString), snsMessage)
 		if err != nil {
 			return err
