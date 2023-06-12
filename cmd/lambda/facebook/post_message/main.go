@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/sendmessage"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/sendfbmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 	"os"
 	"time"
 
@@ -48,7 +48,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	var requestMessage sendmessage.Request
+	var requestMessage postmessage.Request
 	err := json.Unmarshal([]byte(request.Body), &requestMessage)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
@@ -58,7 +58,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid)
-	facebookResponse, err := sendfbmessage.SendMessage(c.FacebookPageAccessToken, *facebookRequest, pageID)
+	facebookResponse, err := postfbmessage.SendMessage(c.FacebookPageAccessToken, *facebookRequest, pageID)
 	if err != nil {
 		discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 		return events.APIGatewayProxyResponse{
@@ -67,7 +67,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 	// map facebook response to api response
-	resp := sendmessage.Response{
+	resp := postmessage.Response{
 		RecipientID: facebookResponse.RecipientID,
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,

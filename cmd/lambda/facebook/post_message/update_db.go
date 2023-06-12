@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/sendfbmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagreq"
 )
 
-func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.Request, fbResponseMessage sendfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) error {
+func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) error {
 	stdMessage := fmtStdMessage(apiRequestMessage, fbResponseMessage, pageID, conversationID, psid)
 	err := c.DbClient.UpdateConversationOnNewMessage(ctx, stdMessage)
 	if err != nil {
@@ -22,7 +22,7 @@ func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessagreq.R
 	return nil
 }
 
-func fmtStdMessage(apiRequestMessage postmessagreq.Request, fbResponseMessage sendfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
+func fmtStdMessage(apiRequestMessage postmessagreq.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
 	stdMessage := stdmessage.StdMessage{
 		ShopID:         "1",
 		Platform:       "Facebook",
