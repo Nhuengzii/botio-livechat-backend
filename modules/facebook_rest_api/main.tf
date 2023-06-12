@@ -14,6 +14,10 @@ variable "platform" {
 variable "facebook_webhook_verification_string" {
   type = string
 }
+
+variable "discord_webhook_url" {
+  type = string
+}
 variable "rest_api_id" {
   type = string
 }
@@ -104,6 +108,7 @@ module "get_post_webhook_handler" {
     SQS_QUEUE_URL                        = aws_sqs_queue.webhook_standardizer.url
     SQS_QUEUE_ARN                        = aws_sqs_queue.webhook_standardizer.arn
     facebook_webhook_verification_string = var.facebook_webhook_verification_string
+    discord_webhook_url                  = var.discord_webhook_url
 
   }
 }

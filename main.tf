@@ -64,6 +64,7 @@ module "facebook_rest_api" {
   facebook_access_token                = var.facebook_access_token
   facebook_app_secret                  = var.facebook_app_secret
   facebook_webhook_verification_string = var.facebook_webhook_verification_string
+  discord_webhook_url                  = var.discord_webhook_url
 }
 
 module "line_rest_api" {
