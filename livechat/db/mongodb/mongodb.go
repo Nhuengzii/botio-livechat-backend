@@ -189,19 +189,19 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	}()
 	//coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	//filter := bson.D{
-	//	{"", ""},
+	//	{},
 	//}
 	return nil, nil
 }
 
-func (c *Client) QueryFacebookPageCredentials(ctx context.Context, shopID string, pageID string) (*shops.FacebookPage, error) {
+func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string) (*shops.FacebookPage, error) {
 	return nil, nil
 }
 
-func (c *Client) QueryLinePageCredentials(ctx context.Context, shopID string, pageID string) (*shops.LinePage, error) {
+func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (*shops.LinePage, error) {
 	return nil, nil
 }
 
-func (c *Client) QueryInstagramPageCredentials(ctx context.Context, shopID string, pageID string) (*shops.InstagramPage, error) {
+func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID string) (*shops.InstagramPage, error) {
 	return nil, nil
 }
