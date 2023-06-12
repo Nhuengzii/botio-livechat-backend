@@ -20,7 +20,7 @@ variable "role_arn" {
 }
 
 variable "environment_variables" {
-  type = map(string)
+  type    = map(string)
   default = {
     foo = "bar"
   }

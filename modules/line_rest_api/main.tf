@@ -111,10 +111,10 @@ resource "aws_api_gateway_method" "get_post_webhook" {
 }
 
 module "get_post_webhook_handler" {
-  source       = "../lambda_handler/"
-  handler_name = format("%s_get_post_webhook_handler", var.platform)
-  handler_path = format("%s/cmd/lambda/line/validate_webhook", path.root)
-  role_arn     = aws_iam_role.assume_role_lambda.arn
+  source                = "../lambda_handler/"
+  handler_name          = format("%s_get_post_webhook_handler", var.platform)
+  handler_path          = format("%s/cmd/lambda/line/validate_webhook", path.root)
+  role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
     SQS_QUEUE_URL       = aws_sqs_queue.webhook_standardizer.url
@@ -145,12 +145,12 @@ resource "aws_api_gateway_integration" "get_post_webhook" {
 locals {
   endpoint_with_handlers = {
     get_message = {
-      method        = "GET"
-      resource_id   = aws_api_gateway_resource.messages.id
-      resource_path = aws_api_gateway_resource.messages.path
-      handler_name  = format("%s_get_messages_handler", var.platform)
-      handler_path  = format("%s/cmd/lambda/line/get_messages", path.root)
-      role_arn      = aws_iam_role.assume_role_lambda.arn
+      method                = "GET"
+      resource_id           = aws_api_gateway_resource.messages.id
+      resource_path         = aws_api_gateway_resource.messages.path
+      handler_name          = format("%s_get_messages_handler", var.platform)
+      handler_path          = format("%s/cmd/lambda/line/get_messages", path.root)
+      role_arn              = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         DISCORD_WEBHOOK_URL              = var.discord_webhook_url
         MONGODB_URI                      = var.mongo_uri
@@ -168,12 +168,12 @@ locals {
       environment_variables = {}
     }
     get_conversations = {
-      method        = "GET"
-      resource_id   = aws_api_gateway_resource.conversations.id
-      resource_path = aws_api_gateway_resource.conversations.path
-      handler_name  = format("%s_get_conversations_handler", var.platform)
-      handler_path  = format("%s/cmd/lambda/line/get_conversations", path.root)
-      role_arn      = aws_iam_role.assume_role_lambda.arn
+      method                = "GET"
+      resource_id           = aws_api_gateway_resource.conversations.id
+      resource_path         = aws_api_gateway_resource.conversations.path
+      handler_name          = format("%s_get_conversations_handler", var.platform)
+      handler_path          = format("%s/cmd/lambda/line/get_conversations", path.root)
+      role_arn              = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
         MONGODB_URI                           = var.mongo_uri
@@ -236,10 +236,10 @@ resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
 }
 
 module "standardizer" {
-  source       = "../lambda_handler/"
-  handler_name = format("%s_standardizer", var.platform)
-  handler_path = format("%s/cmd/lambda/line/standardize_webhook", path.root)
-  role_arn     = aws_iam_role.assume_role_lambda.arn
+  source                = "../lambda_handler/"
+  handler_name          = format("%s_standardizer", var.platform)
+  handler_path          = format("%s/cmd/lambda/line/standardize_webhook", path.root)
+  role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
     SNS_TOPIC_ARN       = aws_sns_topic.save_and_send_received_message.arn
@@ -248,11 +248,11 @@ module "standardizer" {
 }
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
   statement {
-    sid = "AllowSendMessageFromLineReceiveMessageTopic"
+    sid     = "AllowSendMessageFromLineReceiveMessageTopic"
     actions = [
       "sqs:SendMessage"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = [
       aws_sqs_queue.save_and_send_received_message["save"].arn,
     ]
@@ -316,10 +316,10 @@ resource "aws_sns_topic_subscription" "save_received_message" {
 }
 
 module "save_received_message" {
-  source       = "../lambda_handler"
-  handler_name = format("%s_save_received_message", var.platform)
-  handler_path = format("%s/cmd/lambda/line/save_received_message", path.root)
-  role_arn     = aws_iam_role.assume_role_lambda.arn
+  source                = "../lambda_handler"
+  handler_name          = format("%s_save_received_message", var.platform)
+  handler_path          = format("%s/cmd/lambda/line/save_received_message", path.root)
+  role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
     LINE_CHANNEL_ACCESS_TOKEN             = var.line_channel_access_token
