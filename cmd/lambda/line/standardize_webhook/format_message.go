@@ -62,9 +62,11 @@ func newStdMessage(event *linebot.Event, botUserID string) (*stdmessage.StdMessa
 	}, nil
 }
 
+var errMessageSourceUnsupported = errors.New("message source unsupported")
+
 func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	if s.Type != linebot.EventSourceTypeUser {
-		return nil, errors.New("toStdMessageSource: message source not supported")
+		return nil, errMessageSourceUnsupported
 	}
 	return &stdmessage.Source{
 		UserID:   s.UserID,

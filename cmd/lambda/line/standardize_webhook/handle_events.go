@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -20,6 +21,9 @@ func handleEvents(c *config, hookBody *webhookBody) (err error) {
 		case linebot.EventTypeMessage:
 			stdMessage, err := newStdMessage(event, botUserID)
 			if err != nil {
+				if errors.Is(err, errMessageSourceUnsupported) {
+					continue
+				}
 				return err
 			}
 			stdMessages = append(stdMessages, stdMessage)
