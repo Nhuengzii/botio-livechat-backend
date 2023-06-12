@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func updateDB(ctx context.Context, c *config, message *stdmessage.StdMessage) (err error) {
+func (c *config) updateDB(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("lambda/line/save_received_message/main.updateDB: %w", err)
