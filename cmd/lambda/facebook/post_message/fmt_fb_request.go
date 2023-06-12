@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/request/postmessagereq"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook"
 )
 
-func fmtFbRequest(req *postmessagereq.Request, pageID string, psid string) *facebook.FBSendMsgRequest {
+func fmtFbRequest(req *postmessage.Request, pageID string, psid string) *facebook.FBSendMsgRequest {
 	var fbRequest facebook.FBSendMsgRequest
 	if req.Message != "" {
 		fbRequest = facebook.FBSendMsgRequest{

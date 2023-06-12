@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func PostMessage(accessToken string, fbRequest FBSendMsgRequest, pageID string) (*FBSendMsgResponse, error) {
+func SendMessage(accessToken string, fbRequest FBSendMsgRequest, pageID string) (*FBSendMsgResponse, error) {
 	uri := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, accessToken)
 
 	facebookReqBody, err := json.Marshal(fbRequest)

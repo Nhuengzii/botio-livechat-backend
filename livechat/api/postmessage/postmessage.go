@@ -1,8 +1,8 @@
-package postmessagereq
+package postmessage
 
 type Request struct {
 	Message    string     `json:"message"`
-	Attachment Attachment `json:"attachment"` // Why is this not Attachments []Attachment `json:"attachments"`?
+	Attachment Attachment `json:"attachment"`
 }
 
 type Attachment struct {
@@ -12,4 +12,10 @@ type Attachment struct {
 
 type Payload struct {
 	Src string `json:"src"`
+}
+
+type Response struct {
+	RecipientID string `json:"recipient_id"`
+	MessageID   string `json:"message_id"`
+	Timestamp   int64  `json:"timestamp"`
 }

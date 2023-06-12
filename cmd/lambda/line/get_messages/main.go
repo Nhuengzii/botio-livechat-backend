@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/response/getmessagesresp"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -69,7 +69,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
-	resp := &getmessagesresp.Response{
+	resp := &getmessages.Response{
 		Messages: messages,
 	}
 	responseJSON, err := json.Marshal(resp)

@@ -1,4 +1,4 @@
-package getmessagesresp
+package getmessages
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
