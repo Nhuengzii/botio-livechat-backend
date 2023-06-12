@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -35,7 +36,10 @@ func NewClient(ctx context.Context, target *Target) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("db.NewClient: %w", err)
 	}
-	return &Client{client: client}, nil
+	return &Client{
+		client: client,
+		Target: *target,
+	}, nil
 }
 
 func (c *Client) Close(ctx context.Context) error {
