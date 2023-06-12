@@ -13,7 +13,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		return nil, err
 	}
 
-	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, shop.ShopID, pageID)
+	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}

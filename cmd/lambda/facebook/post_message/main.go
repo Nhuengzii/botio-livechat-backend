@@ -60,8 +60,17 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Internal Server Error",
 		}, err
 	}
+
+	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, pageID)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+		}, err
+	}
+
 	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid)
-	facebookResponse, err := postfbmessage.SendMessage(c.FacebookPageAccessToken, *facebookRequest, pageID)
+	facebookResponse, err := postfbmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -112,9 +121,8 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL:       os.Getenv("DISCORD_WEBHOOK_URL"),
-		FacebookPageAccessToken: os.Getenv("ACCESS_TOKEN"),
-		DbClient:                dbClient,
+		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		DbClient:          dbClient,
 	}
 	defer func() {
 		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
