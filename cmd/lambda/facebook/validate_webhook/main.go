@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -14,10 +16,10 @@ import (
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Println("Facebook websocket verify lambda handler")
+	discord.Log(c.DiscordWebhookURL, "Facebook websocket verify lambda handler")
 
 	if request.HTTPMethod == "GET" {
-		log.Println("GET method called")
+		discord.Log(c.DiscordWebhookURL, "GET method called")
 		err := VerifyConnection(request.QueryStringParameters, c.FacebookWebhookVerificationString)
 		if err != nil {
 			log.Println(err)
@@ -31,14 +33,14 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       request.QueryStringParameters["hub.challenge"],
 		}, err
 	} else if request.HTTPMethod == "POST" {
-		log.Println("POST method  called")
+		discord.Log(c.DiscordWebhookURL, "POST method called")
 		start := time.Now()
 		// new session
 
 		// verify Signature
 		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.FacebookAppSecret)
 		if err != nil {
-			log.Println(err)
+			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
 				Body:       "Unauthorized",
@@ -49,22 +51,21 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 		err = c.SqsClient.SendMessage(c.SqsQueueURL, msg)
 		if err != nil {
-			log.Println(err)
+			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 			return events.APIGatewayProxyResponse{
 				StatusCode: 502,
 				Body:       "Bad Gateway",
 			}, err
 		}
 		elasped := time.Since(start)
-		log.Println("Elapsed : ", elasped)
-
+		discord.Log(c.DiscordWebhookURL, fmt.Sprint(elasped))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",
 		}, err
 
 	} else {
-		log.Printf("%v : method does not exist", request.HTTPMethod)
+		discord.Log(c.DiscordWebhookURL, fmt.Sprintf("%v : method does not exist", request.HTTPMethod))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 405,
 			Body:       "Method",
