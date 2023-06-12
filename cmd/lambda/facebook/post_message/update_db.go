@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
@@ -25,14 +26,14 @@ func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Req
 func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
 	stdMessage := stdmessage.StdMessage{
 		ShopID:         "1",
-		Platform:       "Facebook",
+		Platform:       stdmessage.PlatformFacebook,
 		PageID:         pageID,
 		ConversationID: conversationID,
 		MessageID:      fbResponseMessage.MessageID,
 		Timestamp:      fbResponseMessage.Timestamp,
 		Source: stdmessage.Source{
 			UserID:   pageID, // botio user id?
-			UserType: "Admin",
+			UserType: stdmessage.UserTypeAdmin,
 		},
 		Message: apiRequestMessage.Message,
 		Attachments: []*stdmessage.Attachment{

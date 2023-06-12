@@ -26,7 +26,7 @@ func NewStdMessage(messaging Messaging, pageID string) (*stdmessage.StdMessage, 
 		Timestamp:      messaging.Timestamp,
 		Source: stdmessage.Source{
 			UserID:   messaging.Sender.ID,
-			UserType: "User",
+			UserType: stdmessage.UserTypeUser,
 		},
 		Message:     messaging.Message.Text,
 		Attachments: attachments,
