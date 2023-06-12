@@ -181,7 +181,16 @@ func (c *Client) UpdateConversationParticipants(ctx context.Context, conversatio
 	return nil
 }
 
-func (c *Client) QueryShop(ctx context.Context, pageID string) ([]shops.Shop, error) {
+func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryShop: %w", err)
+		}
+	}()
+	//coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	//filter := bson.D{
+	//	{"", ""},
+	//}
 	return nil, nil
 }
 
