@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -15,14 +14,21 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+var errMethodNotAllowed = errors.New("HTTP method not allowed")
+
+func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
+	defer func() {
+		if err != nil {
+			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		}
+	}()
+
 	discord.Log(c.DiscordWebhookURL, "Facebook websocket verify lambda handler")
 
 	if request.HTTPMethod == "GET" {
 		discord.Log(c.DiscordWebhookURL, "GET method called")
 		err := VerifyConnection(request.QueryStringParameters, c.FacebookWebhookVerificationString)
 		if err != nil {
-			log.Println(err)
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
 				Body:       "Unauthorized",
@@ -40,7 +46,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		// verify Signature
 		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.FacebookAppSecret)
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
 				Body:       "Unauthorized",
@@ -51,7 +56,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 		err = c.SqsClient.SendMessage(c.SqsQueueURL, msg)
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
 			return events.APIGatewayProxyResponse{
 				StatusCode: 502,
 				Body:       "Bad Gateway",
@@ -65,11 +69,10 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 
 	} else {
-		discord.Log(c.DiscordWebhookURL, fmt.Sprintf("%v : method does not exist", request.HTTPMethod))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 405,
 			Body:       "Method",
-		}, errors.New("Method Not Allowed")
+		}, errMethodNotAllowed
 	}
 }
 
