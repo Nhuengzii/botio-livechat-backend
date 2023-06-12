@@ -4,7 +4,7 @@ type Shop struct {
 	ShopID         string          `bson:"shopID"`
 	FacebookPages  []FacebookPage  `bson:"facebookPages"`
 	LinePages      []LinePage      `bson:"linePages"`
-	InstagramPages []InstagramPage `bson:"InstagramPages"`
+	InstagramPages []InstagramPage `bson:"instagramPages"`
 }
 type FacebookPage struct {
 	PageID      string `bson:"pageID"`
