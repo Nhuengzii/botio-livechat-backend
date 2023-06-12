@@ -20,7 +20,7 @@ variable "role_arn" {
 }
 
 variable "environment_variables" {
-  type    = map(string)
+  type = map(string)
   default = {
     foo = "bar"
   }
@@ -29,7 +29,7 @@ variable "environment_variables" {
 
 resource "null_resource" "build_handler" {
   triggers = {
-    source_code_hash = filebase64sha256(format("%s/main.go", var.handler_path))
+    entire_source_code_hash = sha1(join("", [for f in fileset(format("%s/%s", path.root, var.handler_path), "*.go") : filesha1(format("%s/%s/%s", path.root, var.handler_path, f))]))
   }
   provisioner "local-exec" {
     command = format("CGO_ENABLED=0 GOOS=linux go build -C %s -o main .", var.handler_path)
