@@ -107,9 +107,8 @@ module "get_post_webhook_handler" {
     ACCESS_TOKEN                         = var.facebook_access_token
     SQS_QUEUE_URL                        = aws_sqs_queue.webhook_standardizer.url
     SQS_QUEUE_ARN                        = aws_sqs_queue.webhook_standardizer.arn
-    facebook_webhook_verification_string = var.facebook_webhook_verification_string
-    discord_webhook_url                  = var.discord_webhook_url
-
+    FACEBOOK_WEBHOOK_VERIFICATION_STRING = var.facebook_webhook_verification_string
+    DISCORD_WEBHOOK_URL                  = var.discord_webhook_url
   }
 }
 
