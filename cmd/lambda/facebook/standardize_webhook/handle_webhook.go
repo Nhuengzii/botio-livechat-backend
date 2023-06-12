@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -40,7 +41,7 @@ func (c *config) handleWebhookEntry(message *Entry) error {
 			if err != nil {
 				return err
 			}
-			err = c.SnsClient.PublishMessage(c.SnsQueueURL, string(standardMessageJSON))
+			err = c.SnsClient.PublishMessage(c.SnsTopicARN, string(standardMessageJSON))
 			if err != nil {
 				return err
 			}
