@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbuserprofile"
@@ -8,13 +9,17 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func newStdConversation(facebookAccessToken string, message *stdmessage.StdMessage) (_ *stdconversation.StdConversation, err error) {
+func (c *config) newStdConversation(ctx context.Context, message *stdmessage.StdMessage) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("lambda/facebook/save_received_message/main.newStdConversation: %w", err)
 		}
 	}()
-	userProfile, err := getfbuserprofile.GetUserProfile(facebookAccessToken, message.Source.UserID)
+	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, message.ShopID, message.PageID)
+	if err != nil {
+		return nil, err
+	}
+	userProfile, err := getfbuserprofile.GetUserProfile(facebookCredentials.AccessToken, message.Source.UserID)
 	if err != nil {
 		return nil, err
 	}

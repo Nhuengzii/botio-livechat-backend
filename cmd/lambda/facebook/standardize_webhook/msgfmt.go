@@ -13,7 +13,6 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		return nil, err
 	}
 
-	// TODO: query accessToken
 	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, shop.ShopID, pageID)
 	if err != nil {
 		return nil, err

@@ -43,7 +43,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		err = c.DbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
 		if err != nil {
 			if errors.Is(err, mongodb.ErrNoConversations) {
-				conversation, err := newStdConversation(c.FacebookAccessToken, &receiveMessage)
+				conversation, err := c.newStdConversation(ctx, &receiveMessage)
 				if err != nil {
 					return err
 				}
