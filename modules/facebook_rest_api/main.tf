@@ -224,8 +224,9 @@ module "standardizer" {
   handler_path = format("%s/cmd/lambda/facebook/standardize_webhook", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    ACCESS_TOKEN  = var.facebook_access_token
-    SNS_TOPIC_ARN = aws_sns_topic.save_and_send_received_message.arn
+    DISCORD_WEBHOOK_URL = var.discord_webhook_url
+    ACCESS_TOKEN        = var.facebook_access_token
+    SNS_TOPIC_ARN       = aws_sns_topic.save_and_send_received_message.arn
   }
 }
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
