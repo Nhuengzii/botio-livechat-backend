@@ -5,9 +5,9 @@ import (
 )
 
 type config struct {
-	DiscordWebhookURL                 string
-	SqsQueueURL                       string
-	FacebookAppSecret                 string
-	FacebookWebhookVerificationString string
-	SqsClient                         livechat.MessageQueueClient
+	discordWebhookURL                 string
+	sqsQueueURL                       string
+	facebookAppSecret                 string
+	facebookWebhookVerificationString string
+	sqsClient                         livechat.MessageQueueClient
 }

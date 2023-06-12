@@ -19,15 +19,15 @@ var errMethodNotAllowed = errors.New("HTTP method not allowed")
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprint(err))
 		}
 	}()
 
-	discord.Log(c.DiscordWebhookURL, "Facebook websocket verify lambda handler")
+	discord.Log(c.discordWebhookURL, "Facebook websocket verify lambda handler")
 
 	if request.HTTPMethod == "GET" {
-		discord.Log(c.DiscordWebhookURL, "GET method called")
-		err := VerifyConnection(request.QueryStringParameters, c.FacebookWebhookVerificationString)
+		discord.Log(c.discordWebhookURL, "GET method called")
+		err := VerifyConnection(request.QueryStringParameters, c.facebookWebhookVerificationString)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
@@ -39,12 +39,12 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       request.QueryStringParameters["hub.challenge"],
 		}, err
 	} else if request.HTTPMethod == "POST" {
-		discord.Log(c.DiscordWebhookURL, "POST method called")
+		discord.Log(c.discordWebhookURL, "POST method called")
 		start := time.Now()
 		// new session
 
 		// verify Signature
-		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.FacebookAppSecret)
+		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.facebookAppSecret)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
@@ -54,15 +54,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 		msg := request.Body
 
-		err = c.SqsClient.SendMessage(c.SqsQueueURL, msg)
+		err = c.sqsClient.SendMessage(c.sqsQueueURL, msg)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 502,
 				Body:       "Bad Gateway",
 			}, err
 		}
-		elasped := time.Since(start)
-		discord.Log(c.DiscordWebhookURL, fmt.Sprint("elasped : ", elasped))
+		elapsed := time.Since(start)
+		discord.Log(c.discordWebhookURL, fmt.Sprint("elapsed : ", elapsed))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",
@@ -78,11 +78,11 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 func main() {
 	c := config{
-		DiscordWebhookURL:                 os.Getenv("DISCORD_WEBHOOK_URL"),
-		SqsQueueURL:                       os.Getenv("SQS_QUEUE_URL"),
-		FacebookAppSecret:                 os.Getenv("APP_SECRET"), // TODO to be removed and get from some db instead
-		FacebookWebhookVerificationString: os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING"),
-		SqsClient:                         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
+		discordWebhookURL:                 os.Getenv("DISCORD_WEBHOOK_URL"),
+		sqsQueueURL:                       os.Getenv("SQS_QUEUE_URL"),
+		facebookAppSecret:                 os.Getenv("APP_SECRET"), // TODO to be removed and get from some db instead
+		facebookWebhookVerificationString: os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING"),
+		sqsClient:                         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
 	}
 	lambda.Start(c.handler)
 }

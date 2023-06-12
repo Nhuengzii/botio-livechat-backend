@@ -30,7 +30,7 @@ var (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+			discord.Log(c.discordWebhookUrl, fmt.Sprint(err))
 		}
 	}()
 
@@ -45,14 +45,14 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return errUnmarshalReceivedMessage
 		}
-		err = c.DbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
+		err = c.dbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
 		if err != nil {
 			if errors.Is(err, mongodb.ErrNoDocuments) {
 				conversation, err := c.newStdConversation(ctx, &receiveMessage)
 				if err != nil {
 					return err
 				}
-				err = c.DbClient.InsertConversation(ctx, conversation)
+				err = c.dbClient.InsertConversation(ctx, conversation)
 				if err != nil {
 					return err
 				}
@@ -60,7 +60,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 				return err
 			}
 		}
-		err = c.DbClient.InsertMessage(ctx, &receiveMessage)
+		err = c.dbClient.InsertMessage(ctx, &receiveMessage)
 		if err != nil {
 			return err
 		}
@@ -82,14 +82,14 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL:   os.Getenv("DISCORD_WEBHOOK_URL"),
-		DbClient:            dbClient,
-		FacebookAccessToken: os.Getenv("ACCESS_TOKEN"),
+		discordWebhookUrl:   os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:            dbClient,
+		facebookAccessToken: os.Getenv("ACCESS_TOKEN"),
 	}
 
 	defer func() {
-		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(ctx)
+		discord.Log(c.discordWebhookUrl, "defer dbclient close")
+		c.dbClient.Close(ctx)
 	}()
 
 	lambda.Start(c.handler)

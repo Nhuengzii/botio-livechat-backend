@@ -25,11 +25,11 @@ var (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprint(err))
 		}
 	}()
 
-	discord.Log(c.DiscordWebhookURL, "facebook standardize webhook handler")
+	discord.Log(c.discordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
 	var recieveWebhook ReceiveWebhook
 
@@ -43,7 +43,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 	}
-	discord.Log(c.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
+	discord.Log(c.discordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return nil
 }
 
@@ -62,14 +62,14 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		SnsTopicARN:       os.Getenv("SNS_TOPIC_ARN"),
-		SnsClient:         snswrapper.NewClient(os.Getenv("AWS_REGION")),
-		DbClient:          dbClient,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		snsTopicARN:       os.Getenv("SNS_TOPIC_ARN"),
+		snsClient:         snswrapper.NewClient(os.Getenv("AWS_REGION")),
+		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(ctx)
+		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		c.dbClient.Close(ctx)
 	}()
 	lambda.Start(c.handler)
 }

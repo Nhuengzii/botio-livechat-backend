@@ -8,12 +8,12 @@ import (
 )
 
 func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
-	shop, err := c.DbClient.QueryShop(ctx, pageID)
+	shop, err := c.dbClient.QueryShop(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}
 
-	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookPageCredentials(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}

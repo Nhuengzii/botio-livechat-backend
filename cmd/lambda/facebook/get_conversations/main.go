@@ -19,11 +19,11 @@ var errNoPageIDPath = errors.New("err path parameter parameters page_id not give
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
 		}
 	}()
 
-	discord.Log(c.DiscordWebhookURL, "facebook get conversations handler")
+	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
 
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
@@ -35,7 +35,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoPageIDPath
 	}
 
-	stdConversations, err := c.DbClient.QueryConversations(ctx, pageID)
+	stdConversations, err := c.dbClient.QueryConversations(ctx, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -73,12 +73,12 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		DbClient:          dbClient,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(ctx)
+		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		c.dbClient.Close(ctx)
 	}()
 
 	lambda.Start(c.handler)

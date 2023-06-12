@@ -26,7 +26,7 @@ var (
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
 		}
 	}()
 
@@ -61,7 +61,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookCredentials, err := c.DbClient.QueryFacebookPageCredentials(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookPageCredentials(ctx, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -121,12 +121,12 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		DbClient:          dbClient,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(ctx)
+		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		c.dbClient.Close(ctx)
 	}()
 
 	lambda.Start(c.handler)

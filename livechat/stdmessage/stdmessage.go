@@ -28,7 +28,6 @@ const (
 
 const (
 	UserTypeUser  UserType = "user"
-	UserTypeGroup UserType = "group"
 	UserTypeAdmin UserType = "admin"
 )
 

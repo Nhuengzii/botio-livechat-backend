@@ -18,7 +18,11 @@ func handleEvents(c *config, hookBody *webhookBody) (err error) {
 	for _, event := range hookBody.Events {
 		switch event.Type {
 		case linebot.EventTypeMessage:
-			stdMessages = append(stdMessages, newStdMessage(event, botUserID))
+			stdMessage, err := newStdMessage(event, botUserID)
+			if err != nil {
+				return err
+			}
+			stdMessages = append(stdMessages, stdMessage)
 		default:
 			// TODO implement user join/leave events -> updateConversationParticipants
 			// info to be updated: group pic, group name, group members, and each member's name and profile pic

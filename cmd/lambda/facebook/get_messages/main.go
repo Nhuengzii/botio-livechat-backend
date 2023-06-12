@@ -20,11 +20,11 @@ var (
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
-	discord.Log(c.DiscordWebhookURL, "facebook get messages handler")
+	discord.Log(c.discordWebhookURL, "facebook get messages handler")
 
 	defer func() {
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
 		}
 	}()
 
@@ -45,7 +45,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	stdMessages, err := c.DbClient.QueryMessages(ctx, pageID, conversationID)
+	stdMessages, err := c.dbClient.QueryMessages(ctx, pageID, conversationID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -61,7 +61,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	err = c.DbClient.UpdateConversationIsRead(ctx, conversationID)
+	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -91,12 +91,12 @@ func main() {
 		return
 	}
 	c := config{
-		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		DbClient:          dbClient,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.DiscordWebhookURL, "defer dbclient close")
-		c.DbClient.Close(ctx)
+		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		c.dbClient.Close(ctx)
 	}()
 
 	lambda.Start(c.handler)

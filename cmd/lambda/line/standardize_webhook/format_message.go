@@ -1,17 +1,21 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"reflect"
 )
 
-func newStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessage {
+func newStdMessage(event *linebot.Event, botUserID string) (*stdmessage.StdMessage, error) {
 	platform := stdmessage.PlatformLine
 	pageID := botUserID
 	shopID := "1" // TODO get from some db with botUserID?
-	source := ToStdMessageSource(event.Source)
+	source, err := toStdMessageSource(event.Source)
+	if err != nil {
+		return nil, fmt.Errorf("newStdMessage: %w", err)
+	}
 	conversationID := source.UserID
 	timestamp := event.Timestamp.UnixMilli()
 
@@ -25,24 +29,24 @@ func newStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessag
 	case *linebot.TextMessage:
 		messageID = msg.ID
 		message = msg.Text
-		if HasLineEmojis(msg) {
-			attachments = ToLineEmojiAttachments(msg) // currently nil
+		if hasLineEmojis(msg) {
+			attachments = toLineEmojiAttachments(msg) // currently nil
 		}
 	case *linebot.ImageMessage:
 		messageID = msg.ID
-		attachments = append(attachments, ToImageAttachment(msg))
+		attachments = append(attachments, toImageAttachment(msg))
 	case *linebot.VideoMessage:
 		messageID = msg.ID
-		attachments = append(attachments, ToVideoAttachment(msg))
+		attachments = append(attachments, toVideoAttachment(msg))
 	case *linebot.AudioMessage:
 		messageID = msg.ID
-		attachments = append(attachments, ToAudioAttachment(msg))
+		attachments = append(attachments, toAudioAttachment(msg))
 	case *linebot.StickerMessage:
 		messageID = msg.ID
-		attachments = append(attachments, ToStickerAttachment(msg))
+		attachments = append(attachments, toStickerAttachment(msg))
 	case *linebot.LocationMessage:
 		messageID = msg.ID
-		message = ToLocationString(msg)
+		message = toLocationString(msg)
 	}
 	return &stdmessage.StdMessage{
 		ShopID:         shopID,
@@ -55,27 +59,20 @@ func newStdMessage(event *linebot.Event, botUserID string) *stdmessage.StdMessag
 		Message:        message,
 		Attachments:    attachments, // always nil for pure texts and locations, currently nil for texts with line emoji(s) and pure line emojis
 		ReplyTo:        replyTo,     // always nil
-	}
+	}, nil
 }
 
-func ToStdMessageSource(s *linebot.EventSource) *stdmessage.Source {
-	var userID string
-	var userType stdmessage.UserType
-	switch s.Type {
-	case linebot.EventSourceTypeUser:
-		userID = s.UserID
-		userType = stdmessage.UserTypeUser
-	case linebot.EventSourceTypeGroup:
-		userID = s.GroupID
-		userType = stdmessage.UserTypeGroup
+func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
+	if s.Type != linebot.EventSourceTypeUser {
+		return nil, errors.New("toStdMessageSource: message source not supported")
 	}
 	return &stdmessage.Source{
-		UserID:   userID,
-		UserType: userType,
-	}
+		UserID:   s.UserID,
+		UserType: stdmessage.UserTypeUser,
+	}, nil
 }
 
-func ToImageAttachment(m *linebot.ImageMessage) *stdmessage.Attachment {
+func toImageAttachment(m *linebot.ImageMessage) *stdmessage.Attachment {
 	// TODO get image file from m.ID and save it to some db
 	return &stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeImage,
@@ -84,7 +81,7 @@ func ToImageAttachment(m *linebot.ImageMessage) *stdmessage.Attachment {
 		}}
 }
 
-func ToVideoAttachment(m *linebot.VideoMessage) *stdmessage.Attachment {
+func toVideoAttachment(m *linebot.VideoMessage) *stdmessage.Attachment {
 	// TODO get video file from m.ID and save it to some db
 	return &stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeVideo,
@@ -93,7 +90,7 @@ func ToVideoAttachment(m *linebot.VideoMessage) *stdmessage.Attachment {
 		}}
 }
 
-func ToAudioAttachment(m *linebot.AudioMessage) *stdmessage.Attachment {
+func toAudioAttachment(m *linebot.AudioMessage) *stdmessage.Attachment {
 	// TODO get audio file from m.ID and save it to some db
 	return &stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeAudio,
@@ -102,33 +99,33 @@ func ToAudioAttachment(m *linebot.AudioMessage) *stdmessage.Attachment {
 		}}
 }
 
-func ToStickerAttachment(m *linebot.StickerMessage) *stdmessage.Attachment {
+func toStickerAttachment(m *linebot.StickerMessage) *stdmessage.Attachment {
 	return &stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeSticker,
 		Payload: stdmessage.Payload{
-			Src: ToStickerURL(m),
+			Src: toStickerURL(m),
 		}}
 }
 
-func ToStickerURL(m *linebot.StickerMessage) string {
+func toStickerURL(m *linebot.StickerMessage) string {
 	return fmt.Sprintf("https://stickershop.line-scdn.net/stickershop/v1/sticker/%s/android/sticker.png", m.StickerID)
 }
 
-func HasLineEmojis(m *linebot.TextMessage) bool {
+func hasLineEmojis(m *linebot.TextMessage) bool {
 	v := reflect.ValueOf(m).Elem().FieldByName("Emojis")
 	return v != reflect.Value{}
 }
 
-func ToLineEmojiAttachments(m *linebot.TextMessage) []*stdmessage.Attachment {
+func toLineEmojiAttachments(m *linebot.TextMessage) []*stdmessage.Attachment {
 	var attachments []*stdmessage.Attachment
 	// TODO implement me
 	return attachments
 }
 
-func ToLineEmojiURL(e *linebot.Emoji) string {
+func toLineEmojiURL(e *linebot.Emoji) string {
 	return fmt.Sprintf("https://stickershop.line-scdn.net/sticonshop/v1/sticon/%s/android/%s.png", e.ProductID, e.EmojiID)
 }
 
-func ToLocationString(m *linebot.LocationMessage) string {
+func toLocationString(m *linebot.LocationMessage) string {
 	return fmt.Sprintf("Title: %s\nAddress: %s\nLatitude: %f\nLongitude: %f", m.Title, m.Address, m.Latitude, m.Longitude)
 }

@@ -17,7 +17,7 @@ func (c *config) handleRecieveWebhook(ctx context.Context, recieveWebhook *Recei
 	for _, entry := range recieveWebhook.Entries {
 		err := c.handleWebhookEntry(ctx, &entry)
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, fmt.Sprintf("error handling webhook entry : %v", err))
+			discord.Log(c.discordWebhookURL, fmt.Sprintf("error handling webhook entry : %v", err))
 			return err
 		}
 	}
@@ -42,7 +42,7 @@ func (c *config) handleWebhookEntry(ctx context.Context, message *Entry) error {
 			if err != nil {
 				return err
 			}
-			err = c.SnsClient.PublishMessage(c.SnsTopicARN, string(standardMessageJSON))
+			err = c.snsClient.PublishMessage(c.snsTopicARN, string(standardMessageJSON))
 			if err != nil {
 				return err
 			}

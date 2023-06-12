@@ -29,7 +29,7 @@ variable "environment_variables" {
 
 resource "null_resource" "build_handler" {
   triggers = {
-    entire_source_code_hash   = sha1(join("", [
+    entire_source_code_hash = sha1(join("", [
       for f in fileset(format("%s/%s", path.root, var.handler_path), "*.go") :
       filesha1(format("%s/%s/%s", path.root, var.handler_path, f))
     ]))

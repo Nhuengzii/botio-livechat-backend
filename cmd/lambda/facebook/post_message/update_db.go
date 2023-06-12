@@ -11,12 +11,12 @@ import (
 
 func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) error {
 	stdMessage := fmtStdMessage(apiRequestMessage, fbResponseMessage, pageID, conversationID, psid)
-	err := c.DbClient.UpdateConversationOnNewMessage(ctx, stdMessage)
+	err := c.dbClient.UpdateConversationOnNewMessage(ctx, stdMessage)
 	if err != nil {
 		return err
 	}
 
-	err = c.DbClient.InsertMessage(ctx, stdMessage)
+	err = c.dbClient.InsertMessage(ctx, stdMessage)
 	if err != nil {
 		return err
 	}
