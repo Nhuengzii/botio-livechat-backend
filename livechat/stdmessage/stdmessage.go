@@ -16,7 +16,6 @@ type StdMessage struct {
 }
 
 var (
-	ErrNoAttachments         = errors.New("stdmessage.ToLastActivityString: no attachment in message")
 	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
 )
 
@@ -32,13 +31,17 @@ const (
 )
 
 const (
-	AttachmentTypeImage     AttachmentType = "image"
-	AttachmentTypeVideo     AttachmentType = "video"
-	AttachmentTypeAudio     AttachmentType = "audio"
-	AttachmentTypeFile      AttachmentType = "file"
-	AttachmentTypeSticker   AttachmentType = "sticker"
-	AttachmentTypeLineEmoji AttachmentType = "lineEmoji"
-	AttachmentTypeTemplate  AttachmentType = "template"
+	AttachmentTypeImage                     AttachmentType = "image"
+	AttachmentTypeVideo                     AttachmentType = "video"
+	AttachmentTypeAudio                     AttachmentType = "audio"
+	AttachmentTypeFile                      AttachmentType = "file"
+	AttachmentTypeSticker                   AttachmentType = "sticker"
+	AttachmentTypeLineEmoji                 AttachmentType = "lineEmoji"
+	AttachmentTypeLineTemplateButtons       AttachmentType = "lineTemplateButtons"
+	AttachmentTypeLineTemplateConfirm       AttachmentType = "lineTemplateConfirm"
+	AttachmentTypeLineTemplateCarousel      AttachmentType = "lineTemplateCarousel"
+	AttachmentTypeLineTemplateImageCarousel AttachmentType = "lineTemplateImageCarousel"
+	AttachmentTypeLineFlex                  AttachmentType = "lineFlex"
 )
 
 type Platform string
@@ -66,11 +69,8 @@ type RepliedMessage struct {
 }
 
 func (message *StdMessage) ToLastActivityString() (string, error) {
-	if message.Message != "" {
-		return message.Message, nil
-	}
 	if len(message.Attachments) == 0 {
-		return "", ErrNoAttachments
+		return message.Message, nil
 	}
 	switch message.Attachments[0].AttachmentType {
 	case AttachmentTypeImage:
@@ -83,8 +83,15 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 		return "ส่งไฟล์", nil
 	case AttachmentTypeSticker:
 		return "ส่งสติกเกอร์", nil
-	case AttachmentTypeTemplate:
+	case AttachmentTypeLineEmoji:
+		return message.Message, nil
+	case AttachmentTypeLineTemplateButtons,
+		AttachmentTypeLineTemplateConfirm,
+		AttachmentTypeLineTemplateCarousel,
+		AttachmentTypeLineTemplateImageCarousel:
 		return "ส่งเทมเพลท", nil
+	case AttachmentTypeLineFlex:
+		return "ส่งเฟลกซ์", nil
 	default:
 		return "", ErrUnknownAttachmentType
 	}

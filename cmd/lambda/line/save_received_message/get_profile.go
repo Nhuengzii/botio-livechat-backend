@@ -43,5 +43,3 @@ func getUserProfile(channelAccessToken string, userID string) (_ *userProfile, e
 	}
 	return &profile, nil
 }
-
-// TODO implement get group info
