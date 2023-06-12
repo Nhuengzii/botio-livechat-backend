@@ -34,18 +34,19 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 	}
 	for _, sqsMessage := range sqsEvent.Records {
 		snsMessageString := sqsMessage.Body
-		var snsMessage *snswrapper.SNSMessage
-		err = json.Unmarshal([]byte(snsMessageString), snsMessage)
+		var snsMessage snswrapper.SNSMessage
+		err = json.Unmarshal([]byte(snsMessageString), &snsMessage)
 		if err != nil {
 			return err
 		}
-		var stdMessage *stdmessage.StdMessage
-		err = json.Unmarshal([]byte(snsMessage.Message), stdMessage)
+		//var stdMessage *stdmessage.StdMessage
+		var stdMessage stdmessage.StdMessage
+		err = json.Unmarshal([]byte(snsMessage.Message), &stdMessage)
 		if err != nil {
 			return err
 		}
 		// TODO get lineChannelAccessToken from db with shopID and pageID here and pass to updateDB through a parameter
-		err = updateDB(ctx, c, stdMessage)
+		err = updateDB(ctx, c, &stdMessage)
 		if err != nil {
 			return err
 		}

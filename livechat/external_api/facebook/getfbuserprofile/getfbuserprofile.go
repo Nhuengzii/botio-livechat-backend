@@ -26,10 +26,10 @@ func GetUserProfile(accessToken string, psid string) (_ *UserProfile, err error)
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var userProfile *UserProfile
-	err = json.NewDecoder(resp.Body).Decode(userProfile)
+	var userProfile UserProfile
+	err = json.NewDecoder(resp.Body).Decode(&userProfile)
 	if err != nil {
 		return nil, err
 	}
-	return userProfile, nil
+	return &userProfile, nil
 }
