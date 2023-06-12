@@ -40,7 +40,8 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		var stdMessage *stdmessage.StdMessage
+		//var stdMessage *stdmessage.StdMessage
+		stdMessage := &stdmessage.StdMessage{}
 		err = json.Unmarshal([]byte(snsMessage.Message), stdMessage)
 		if err != nil {
 			return err
