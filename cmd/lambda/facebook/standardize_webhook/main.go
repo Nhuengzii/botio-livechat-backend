@@ -25,6 +25,8 @@ var (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	discord.Log(c.DiscordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
+	defer cancel()
 	var recieveWebhook ReceiveWebhook
 
 	for _, record := range sqsEvent.Records {
@@ -33,7 +35,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 			discord.Log(c.DiscordWebhookURL, fmt.Sprintf("error unmarshal recieve webhook "))
 			return errUnknownWebhookObject
 		}
-		c.handleRecieveWebhook(&recieveWebhook)
+		c.handleRecieveWebhook(ctx, &recieveWebhook)
 	}
 	discord.Log(c.DiscordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return nil
