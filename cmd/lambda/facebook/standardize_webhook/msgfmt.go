@@ -5,7 +5,11 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func NewStdMessage(facebookAccessToken string, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
+func NewStdMessage(messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
+	// TODO: query shopID
+
+	// TODO: query accessToken
+	var facebookAccessToken string
 	conversationID, err := getfbconversationid.GetConversationID(facebookAccessToken, messaging.Sender.ID, pageID)
 	if err != nil {
 		return &stdmessage.StdMessage{}, err

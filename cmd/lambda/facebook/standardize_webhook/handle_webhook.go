@@ -32,7 +32,7 @@ func (c *config) handleWebhookEntry(message *Entry) error {
 		if messaging.Message.MessageID != "" {
 			// standardize messaging hooks
 			var standardMessage *stdmessage.StdMessage
-			standardMessage, err := NewStdMessage(c.FacebookPageAccessToken, messaging, message.PageID)
+			standardMessage, err := NewStdMessage(messaging, message.PageID)
 			if err != nil {
 				return err
 			}

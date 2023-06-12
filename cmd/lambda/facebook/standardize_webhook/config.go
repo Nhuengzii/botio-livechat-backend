@@ -5,8 +5,8 @@ import (
 )
 
 type config struct {
-	DiscordWebhookURL       string
-	SnsTopicARN             string
-	SnsClient               livechat.PushNotificationClient
-	FacebookPageAccessToken string
+	DiscordWebhookURL string
+	SnsTopicARN       string
+	SnsClient         livechat.PushNotificationClient
+	DbClient          livechat.DBClient
 }

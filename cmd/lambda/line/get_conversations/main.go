@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
+	"os"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
-	"os"
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {

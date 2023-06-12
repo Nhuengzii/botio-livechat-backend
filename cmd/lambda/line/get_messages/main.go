@@ -4,19 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
+	"os"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
-	"os"
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "lambda/line/get_messages/main.config.handler: " + err.Error()
+			logMessage := "lambda/line/get_messages/main.config.handler!: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
