@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -26,18 +27,22 @@ var (
 	errUnmarshalReceivedMessage = errors.New("Error json unmarshal recieve message")
 )
 
-func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
+	defer func() {
+		if err != nil {
+			discord.Log(c.DiscordWebhookURL, fmt.Sprint(err))
+		}
+	}()
+
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &receiveBody)
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, "Error unmarshal receiveBody")
 			return errUnmarshalReceivedBody
 		}
 		err = bson.UnmarshalExtJSON([]byte(receiveBody.Message), true, &receiveMessage)
 		if err != nil {
-			discord.Log(c.DiscordWebhookURL, "Error unmarshal receiveMessage")
 			return errUnmarshalReceivedMessage
 		}
 		err = c.DbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)

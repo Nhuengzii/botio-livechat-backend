@@ -27,6 +27,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			discord.Log(c.DiscordWebhookURL, fmt.Sprintln(err))
 		}
 	}()
+
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
