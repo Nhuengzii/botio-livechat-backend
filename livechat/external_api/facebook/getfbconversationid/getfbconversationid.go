@@ -27,8 +27,8 @@ func GetConversationID(accessToken string, senderID string, pageID string) (_ st
 		return "", err
 	}
 	defer resp.Body.Close()
-	var conversations *Conversations
-	err = json.NewDecoder(resp.Body).Decode(conversations)
+	var conversations Conversations
+	err = json.NewDecoder(resp.Body).Decode(&conversations)
 	if err != nil {
 		return "", err
 	}

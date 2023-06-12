@@ -25,13 +25,13 @@ func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *
 	}
 	defer resp.Body.Close()
 	now := time.Now().UnixMilli()
-	var response *SendingMessageResponse
-	err = json.NewDecoder(resp.Body).Decode(response)
+	var response SendingMessageResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
 	response.Timestamp = now
 	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return &response, nil
 }
 
 type SendingMessageResponse struct {
