@@ -22,9 +22,6 @@ var (
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	discord.Log(c.DiscordWebhookURL, "facebook get messages handler")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
-	defer cancel()
-
 	pathParams := request.PathParameters
 	// shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
