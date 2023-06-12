@@ -11,6 +11,13 @@ variable "platform" {
   type = string
 }
 
+variable "facebook_webhook_verification_string" {
+  type = string
+}
+
+variable "discord_webhook_url" {
+  type = string
+}
 variable "rest_api_id" {
   type = string
 }
@@ -91,15 +98,18 @@ resource "aws_api_gateway_method" "get_post_webhook" {
 }
 
 module "get_post_webhook_handler" {
-  source                = "../lambda_handler/"
-  handler_name          = format("%s_get_post_webhook_handler", var.platform)
-  handler_path          = format("%s/cmd/lambda/facebook/validate_webhook", path.root)
-  role_arn              = aws_iam_role.assume_role_lambda.arn
+  source       = "../lambda_handler/"
+  handler_name = format("%s_get_post_webhook_handler", var.platform)
+  handler_path = format("%s/cmd/lambda/facebook/validate_webhook", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    APP_SECRET    = var.facebook_app_secret
-    ACCESS_TOKEN  = var.facebook_access_token
-    SQS_QUEUE_URL = aws_sqs_queue.webhook_standardizer.url
-    SQS_QUEUE_ARN = aws_sqs_queue.webhook_standardizer.arn
+    APP_SECRET                           = var.facebook_app_secret
+    ACCESS_TOKEN                         = var.facebook_access_token
+    SQS_QUEUE_URL                        = aws_sqs_queue.webhook_standardizer.url
+    SQS_QUEUE_ARN                        = aws_sqs_queue.webhook_standardizer.arn
+    facebook_webhook_verification_string = var.facebook_webhook_verification_string
+    discord_webhook_url                  = var.discord_webhook_url
+
   }
 }
 
@@ -125,12 +135,12 @@ resource "aws_api_gateway_integration" "get_post_webhook" {
 locals {
   endpoint_with_handlers = {
     get_message = {
-      method                = "GET"
-      resource_id           = aws_api_gateway_resource.messages.id
-      resource_path         = aws_api_gateway_resource.messages.path
-      handler_name          = format("%s_get_messages_handler", var.platform)
-      handler_path          = format("%s/cmd/lambda/facebook/get_messages", path.root)
-      role_arn              = aws_iam_role.assume_role_lambda.arn
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.messages.id
+      resource_path = aws_api_gateway_resource.messages.path
+      handler_name  = format("%s_get_messages_handler", var.platform)
+      handler_path  = format("%s/cmd/lambda/facebook/get_messages", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         ACCESS_TOKEN = var.facebook_access_token
       }
@@ -145,12 +155,12 @@ locals {
       environment_variables = {}
     }
     get_conversations = {
-      method                = "GET"
-      resource_id           = aws_api_gateway_resource.conversations.id
-      resource_path         = aws_api_gateway_resource.conversations.path
-      handler_name          = format("%s_get_conversations_handler", var.platform)
-      handler_path          = format("%s/cmd/lambda/facebook/get_conversations", path.root)
-      role_arn              = aws_iam_role.assume_role_lambda.arn
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.conversations.id
+      resource_path = aws_api_gateway_resource.conversations.path
+      handler_name  = format("%s_get_conversations_handler", var.platform)
+      handler_path  = format("%s/cmd/lambda/facebook/get_conversations", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
         ACCESS_TOKEN = var.facebook_access_token
       }
@@ -210,10 +220,10 @@ resource "aws_lambda_event_source_mapping" "webhook_to_standardizer" {
 }
 
 module "standardizer" {
-  source                = "../lambda_handler/"
-  handler_name          = format("%s_standardizer", var.platform)
-  handler_path          = format("%s/cmd/lambda/facebook/standardize_webhook", path.root)
-  role_arn              = aws_iam_role.assume_role_lambda.arn
+  source       = "../lambda_handler/"
+  handler_name = format("%s_standardizer", var.platform)
+  handler_path = format("%s/cmd/lambda/facebook/standardize_webhook", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     ACCESS_TOKEN  = var.facebook_access_token
     SNS_TOPIC_ARN = aws_sns_topic.save_and_send_received_message.arn
@@ -221,11 +231,11 @@ module "standardizer" {
 }
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
   statement {
-    sid     = "AllowSendMessageFromFacebookReceiveMessageTopic"
+    sid = "AllowSendMessageFromFacebookReceiveMessageTopic"
     actions = [
       "sqs:SendMessage"
     ]
-    effect    = "Allow"
+    effect = "Allow"
     resources = [
       aws_sqs_queue.save_and_send_received_message["save"].arn,
     ]
@@ -289,10 +299,10 @@ resource "aws_sns_topic_subscription" "save_received_message" {
 }
 
 module "save_received_message" {
-  source                = "../lambda_handler"
-  handler_name          = format("%s_save_received_message", var.platform)
-  handler_path          = format("%s/cmd/lambda/facebook/save_received_message", path.root)
-  role_arn              = aws_iam_role.assume_role_lambda.arn
+  source       = "../lambda_handler"
+  handler_name = format("%s_save_received_message", var.platform)
+  handler_path = format("%s/cmd/lambda/facebook/save_received_message", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     ACCESS_TOKEN = var.facebook_access_token
   }

@@ -33,15 +33,15 @@ func getUserProfile(channelAccessToken string, userID string) (_ *userProfile, e
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var profile *userProfile
-	err = json.NewDecoder(resp.Body).Decode(profile)
+	var profile userProfile
+	err = json.NewDecoder(resp.Body).Decode(&profile)
 	if err != nil {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New(profile.Message)
 	}
-	return profile, nil
+	return &profile, nil
 }
 
 // TODO implement get group info
