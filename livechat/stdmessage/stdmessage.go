@@ -94,8 +94,16 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 	case AttachmentTypeLineTemplateButtons,
 		AttachmentTypeLineTemplateConfirm,
 		AttachmentTypeLineTemplateCarousel,
-		AttachmentTypeLineTemplateImageCarousel:
-		return "ส่งเทมเพลท", nil
+		AttachmentTypeLineTemplateImageCarousel,
+		AttachmentTypeFBTemplateButton,
+		AttachmentTypeFBTemplateCoupon,
+		AttachmentTypeFBTemplateCustomerFeedback,
+		AttachmentTypeFBTemplateGeneric,
+		AttachmentTypeFBTemplateMedia,
+		AttachmentTypeFBTemplateProduct,
+		AttachmentTypeFBTemplateReceipt,
+		AttachmentTypeFBTemplateStructuredInformation:
+		return "ส่งเทมเพลต", nil
 	case AttachmentTypeLineFlex:
 		return "ส่งเฟล็กซ์", nil
 	default:
