@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -114,7 +115,7 @@ func main() {
 	}
 	if err != nil {
 		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
-		return
+		log.Fatalln(err)
 	}
 	defer func() {
 		discord.Log(c.discordWebhookURL, "defer dbClient close")
