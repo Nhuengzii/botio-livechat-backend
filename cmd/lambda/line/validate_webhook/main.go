@@ -31,24 +31,36 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		if errors.Is(err, errInvalidSignature) {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 401,
-				Body:       "Unauthorized",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Unauthorized",
 			}, err
 		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
-			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
 		}, err
 	}
 	err = c.sqsClient.SendMessage(c.sqsQueueURL, webhookBodyString)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
-			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
 		}, err
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       "OK",
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
+		Body: "OK",
 	}, nil
 }
 
