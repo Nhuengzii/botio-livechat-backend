@@ -202,8 +202,8 @@ module "standardizer" {
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
-    SNS_TOPIC_ARN       = aws_sns_topic.save_and_send_received_message.arn
-    SNS_TOPIC_NAME      = aws_sns_topic.save_and_send_received_message.name
+    SNS_TOPIC_ARN       = aws_sns_topic.save_and_relay_message.arn
+    SNS_TOPIC_NAME      = aws_sns_topic.save_and_relay_message.name
     MONGODB_URI         = var.mongo_uri
     MONGODB_DATABASE    = var.mongo_database
   }
