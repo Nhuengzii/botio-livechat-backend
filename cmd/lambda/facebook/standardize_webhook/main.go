@@ -37,9 +37,8 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &receiveWebhook)
 		if err != nil {
-			return errUnknownWebhookObject
+			return err
 		}
-		discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v\n", receiveWebhook))
 		err = c.handleReceiveWebhook(ctx, &receiveWebhook)
 		if err != nil {
 			return err
