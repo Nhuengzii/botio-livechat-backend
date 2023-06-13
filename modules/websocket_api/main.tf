@@ -101,3 +101,34 @@ resource "aws_apigatewayv2_integration" "route_handlers" {
   content_handling_strategy = "CONVERT_TO_TEXT"
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
+
+resource "aws_sqs_queue" "relay_received_message" {
+  name = "relay_received_message"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_role_lambda" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
+resource "aws_lambda_event_source_mapping" "relay_received_message" {
+  event_source_arn = aws_sqs_queue.relay_received_message.arn
+  function_name    = module.relay_received_message.lambda.function_name
+  batch_size       = 1
+}
+
+module "relay_received_message" {
+  source = "../lambda_handler"
+
+  handler_name = "relay_received_message"
+  handler_path = format("%s/cmd/lambda/websocket/relay", path.root)
+  role_arn     = aws_iam_role.assume_role_lambda.arn
+  environment_variables = {
+    REDIS_ADDR     = local.redis_addr
+    REDIS_PASSWORD = local.redis_password
+  }
+}
+
+output "relay_received_message_queue" {
+  value = aws_sqs_queue.relay_received_message
+}
