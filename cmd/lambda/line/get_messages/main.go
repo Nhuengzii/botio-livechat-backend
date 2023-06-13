@@ -27,6 +27,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			URI:                c.mongodbURI,
 			Database:           c.mongodbDatabase,
 			CollectionMessages: c.mongodbCollectionLineMessages,
+			CollectionShops:    c.mongodbCollectionShops,
 		})
 		if err != nil {
 			return events.APIGatewayProxyResponse{
@@ -38,11 +39,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			}, err
 		}
 	}
-	// debug
-	discord.Log(c.discordWebhookURL, c.mongodbURI)
-	discord.Log(c.discordWebhookURL, c.mongodbDatabase)
-	discord.Log(c.discordWebhookURL, c.mongodbCollectionLineMessages)
-	// end debug
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
@@ -102,7 +98,8 @@ func main() {
 		discordWebhookURL:             os.Getenv("DISCORD_WEBHOOK_URL"),
 		mongodbURI:                    os.Getenv("MONGODB_URI"),
 		mongodbDatabase:               os.Getenv("MONGODB_DATABASE"),
-		mongodbCollectionLineMessages: os.Getenv("MONGODB_COLLECTION_LINE_MESSAGES"),
+		mongodbCollectionLineMessages: "line_messages",
+		mongodbCollectionShops:        "shops",
 		dbClient:                      nil,
 	}
 	lambda.Start(c.handler)

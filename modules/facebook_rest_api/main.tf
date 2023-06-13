@@ -161,7 +161,6 @@ locals {
       handler_path  = format("%s/cmd/lambda/facebook/post_message", path.root)
       role_arn      = aws_iam_role.assume_role_lambda.arn
       environment_variables = {
-        ACCESS_TOKEN        = var.facebook_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url

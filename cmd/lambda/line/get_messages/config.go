@@ -7,5 +7,6 @@ type config struct {
 	mongodbURI                    string
 	mongodbDatabase               string
 	mongodbCollectionLineMessages string
+	mongodbCollectionShops        string
 	dbClient                      livechat.DBClient
 }

@@ -116,6 +116,7 @@ func main() {
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
 		CollectionConversations: "facebook_conversations",
+		CollectionShops:         "shops",
 	})
 	if err != nil {
 		return
