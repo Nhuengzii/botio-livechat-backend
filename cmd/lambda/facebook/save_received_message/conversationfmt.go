@@ -29,8 +29,8 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 	}
 	newConversation := &stdconversation.StdConversation{
 		ShopID:         message.ShopID,
-		PageID:         message.PageID,
 		Platform:       stdconversation.PlatformFacebook,
+		PageID:         message.PageID,
 		ConversationID: message.ConversationID,
 		ConversationPic: stdconversation.Payload{
 			Src: userProfile.ProfilePic,
