@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -24,6 +25,15 @@ func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Req
 }
 
 func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
+	log.Println(apiRequestMessage.Attachment.AttachmentType)
+	log.Println(apiRequestMessage.Attachment.Payload)
+	var attachments []*stdmessage.Attachment
+	if apiRequestMessage.Attachment.AttachmentType != "" {
+		attachments = append(attachments, &stdmessage.Attachment{
+			AttachmentType: stdmessage.AttachmentType(apiRequestMessage.Attachment.AttachmentType),
+			Payload:        stdmessage.Payload(apiRequestMessage.Attachment.Payload),
+		})
+	}
 	stdMessage := stdmessage.StdMessage{
 		ShopID:         "1",
 		Platform:       stdmessage.PlatformFacebook,
@@ -35,13 +45,8 @@ func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage post
 			UserID:   pageID, // botio user id?
 			UserType: stdmessage.UserTypeAdmin,
 		},
-		Message: apiRequestMessage.Message,
-		Attachments: []*stdmessage.Attachment{
-			{
-				AttachmentType: stdmessage.AttachmentType(apiRequestMessage.Attachment.AttachmentType),
-				Payload:        stdmessage.Payload(apiRequestMessage.Attachment.Payload),
-			},
-		},
+		Message:     apiRequestMessage.Message,
+		Attachments: attachments,
 		ReplyTo: &stdmessage.RepliedMessage{
 			MessageID: "", // TODO: implement reply
 		},

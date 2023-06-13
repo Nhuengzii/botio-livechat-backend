@@ -7,6 +7,7 @@ import (
 
 func fmtFbRequest(req *postmessage.Request, pageID string, psid string) *postfbmessage.SendingMessage {
 	var fbRequest postfbmessage.SendingMessage
+
 	if req.Message != "" {
 		fbRequest = postfbmessage.SendingMessage{
 			Recipient: postfbmessage.Recipient{
