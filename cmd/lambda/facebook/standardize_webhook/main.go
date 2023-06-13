@@ -51,17 +51,25 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
 
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+		snsTopicARN       = os.Getenv("SNS_TOPIC_ARN")
+		awsRegion         = os.Getenv("AWS_REGION")
+	)
+
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
 	c := config{
-		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		snsTopicARN:       os.Getenv("SNS_TOPIC_ARN"),
-		snsClient:         snswrapper.NewClient(os.Getenv("AWS_REGION")),
+		discordWebhookURL: discordWebhookURL,
+		snsTopicARN:       snsTopicARN,
+		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
 	}
 	if err != nil {

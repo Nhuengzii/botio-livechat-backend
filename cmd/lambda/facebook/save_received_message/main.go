@@ -74,17 +74,23 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
+
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+	)
+
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
 	c := config{
-		discordWebhookURL:   os.Getenv("DISCORD_WEBHOOK_URL"),
-		dbClient:            dbClient,
-		facebookAccessToken: os.Getenv("ACCESS_TOKEN"),
+		discordWebhookURL: discordWebhookURL,
+		dbClient:          dbClient,
 	}
 	if err != nil {
 		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))

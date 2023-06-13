@@ -96,14 +96,20 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
+
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
 	})
 	c := config{
-		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		discordWebhookURL: discordWebhookURL,
 		dbClient:          dbClient,
 	}
 	if err != nil {
