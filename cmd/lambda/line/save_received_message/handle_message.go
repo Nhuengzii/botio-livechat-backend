@@ -9,16 +9,16 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func (c *config) updateDB(ctx context.Context, message *stdmessage.StdMessage) (err error) {
+func (c *config) handleMessage(ctx context.Context, lineChannelAccessToken string, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("lambda/line/save_received_message/main.updateDB: %w", err)
+			err = fmt.Errorf("handleMessage: %w", err)
 		}
 	}()
 	err = c.dbClient.UpdateConversationOnNewMessage(ctx, message)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			conversation, err := newStdConversation(c.lineChannelAccessToken, message) // TODO get lineChannelAccessToken from caller
+			conversation, err := newStdConversation(lineChannelAccessToken, message)
 			if err != nil {
 				return err
 			}

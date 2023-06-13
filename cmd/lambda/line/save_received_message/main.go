@@ -17,22 +17,11 @@ import (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "lambda/line/save_received_message/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/line/save_received_message/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	if c.dbClient == nil {
-		c.dbClient, err = mongodb.NewClient(ctx, &mongodb.Target{
-			URI:                     c.mongodbURI,
-			Database:                c.mongodbDatabase,
-			CollectionConversations: c.mongodbCollectionLineConversations,
-			CollectionMessages:      c.mongodbCollectionLineMessages,
-		})
-		if err != nil {
-			return err
-		}
-	}
 	for _, sqsMessage := range sqsEvent.Records {
 		snsMessageString := sqsMessage.Body
 		var snsMessage snswrapper.SNSMessage
@@ -40,14 +29,18 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		// var stdMessage *stdmessage.StdMessage
 		var stdMessage stdmessage.StdMessage
 		err = json.Unmarshal([]byte(snsMessage.Message), &stdMessage)
 		if err != nil {
 			return err
 		}
-		// TODO get lineChannelAccessToken from db with shopID and pageID here and pass to updateDB through a parameter
-		err = c.updateDB(ctx, &stdMessage)
+		pageID := stdMessage.PageID
+		shop, err := c.dbClient.QueryLinePageCredentials(ctx, pageID)
+		if err != nil {
+			return err
+		}
+		lineChannelAccessToken := shop.AccessToken
+		err = c.handleMessage(ctx, lineChannelAccessToken, &stdMessage)
 		if err != nil {
 			return err
 		}
@@ -56,14 +49,21 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 }
 
 func main() {
+	ctx := context.Background()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
+		CollectionConversations: "conversations",
+		CollectionMessages:      "messages",
+		CollectionShops:         "shops",
+	})
+	if err != nil {
+		log.Fatalln("cmd/lambda/line/save_received_message/main.main: " + err.Error())
+	}
+	defer dbClient.Close(ctx)
 	c := &config{
-		discordWebhookURL:                  os.Getenv("DISCORD_WEBHOOK_URL"),
-		lineChannelAccessToken:             os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"), // TODO remove and get from db with shopID and pageID
-		mongodbURI:                         os.Getenv("MONGODB_URI"),
-		mongodbDatabase:                    os.Getenv("MONGODB_DATABASE"),
-		mongodbCollectionLineConversations: os.Getenv("MONGODB_COLLECTION_LINE_CONVERSATIONS"),
-		mongodbCollectionLineMessages:      os.Getenv("MONGODB_COLLECTION_LINE_MESSAGES"),
-		dbClient:                           nil,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)
 }

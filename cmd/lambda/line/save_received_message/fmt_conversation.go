@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/line/getlineuserprofile"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -13,7 +14,7 @@ func newStdConversation(lineChannelAccessToken string, message *stdmessage.StdMe
 			err = fmt.Errorf("newStdConversation: %w", err)
 		}
 	}()
-	userProfile, err := getUserProfile(lineChannelAccessToken, message.Source.UserID)
+	userProfile, err := getlineuserprofile.GetUserProfile(lineChannelAccessToken, message.Source.UserID)
 	if err != nil {
 		return nil, err
 	}
