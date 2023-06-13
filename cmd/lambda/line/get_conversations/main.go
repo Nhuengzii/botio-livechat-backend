@@ -17,27 +17,11 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "lambda/line/get_conversations/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/line/get_conversations/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	if c.dbClient == nil {
-		c.dbClient, err = mongodb.NewClient(ctx, &mongodb.Target{
-			URI:                     c.mongodbURI,
-			Database:                c.mongodbDatabase,
-			CollectionConversations: c.mongodbCollectionLineConversations,
-		})
-		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Internal Server Error",
-			}, err
-		}
-	}
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
 	conversations, err := c.dbClient.QueryConversations(ctx, pageID)
@@ -49,7 +33,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 					"Access-Control-Allow-Origin": "*",
 				},
 				Body: "Not Found",
-			}, nil
+			}, err
 		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -57,9 +41,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				"Access-Control-Allow-Origin": "*",
 			},
 			Body: "Internal Server Error",
-		}, nil
+		}, err
 	}
-	resp := &getconversations.Response{
+	resp := getconversations.Response{
 		Conversations: conversations,
 	}
 	responseJSON, err := json.Marshal(resp)
@@ -70,7 +54,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				"Access-Control-Allow-Origin": "*",
 			},
 			Body: "Internal Server Error",
-		}, nil
+		}, err
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
@@ -82,12 +66,21 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 }
 
 func main() {
+	ctx := context.Background()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
+		CollectionConversations: "conversations",
+		CollectionMessages:      "messages",
+		CollectionShops:         "shops",
+	})
+	if err != nil {
+		log.Fatalln("cmd/lambda/line/get_conversations/main.main: " + err.Error())
+	}
+	defer dbClient.Close(ctx)
 	c := &config{
-		discordWebhookURL:                  os.Getenv("DISCORD_WEBHOOK_URL"),
-		mongodbURI:                         os.Getenv("MONGODB_URI"),
-		mongodbDatabase:                    os.Getenv("MONGODB_DATABASE"),
-		mongodbCollectionLineConversations: os.Getenv("MONGODB_COLLECTION_LINE_CONVERSATIONS"),
-		dbClient:                           nil,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)
 }
