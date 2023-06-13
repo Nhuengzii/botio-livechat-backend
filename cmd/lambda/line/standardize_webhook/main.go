@@ -24,7 +24,10 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		err = c.handleEvents(ctx, hookBody)
+		pageID := hookBody.Destination
+		shop, err := c.dbClient.QueryShop(ctx, pageID)
+		shopID := shop.ShopID
+		err = c.handleEvents(ctx, shopID, pageID, hookBody)
 		if err != nil {
 			return err
 		}

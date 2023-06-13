@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -9,11 +8,8 @@ import (
 	"reflect"
 )
 
-func (c *config) newStdMessage(ctx context.Context, event *linebot.Event, botUserID string) (*stdmessage.StdMessage, error) {
+func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Event) (*stdmessage.StdMessage, error) {
 	platform := stdmessage.PlatformLine
-	pageID := botUserID
-	shop, err := c.dbClient.QueryShop(ctx, pageID)
-	shopID := shop.ShopID
 	source, err := toStdMessageSource(event.Source)
 	if err != nil {
 		return nil, fmt.Errorf("newStdMessage: %w", err)
