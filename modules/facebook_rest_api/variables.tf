@@ -34,3 +34,10 @@ variable "facebook_app_secret" {
 variable "parent_id" {
   type = string
 }
+
+variable "relay_received_message_queue" {
+  type = object({
+    arn = string
+    id  = string
+  })
+}

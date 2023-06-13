@@ -207,7 +207,7 @@ module "standardizer" {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
     MONGODB_URI         = var.mongo_uri
     MONGODB_DATABASE    = var.mongo_database
-    SNS_TOPIC_ARN       = aws_sns_topic.save_and_send_received_message.arn
+    SNS_TOPIC_ARN       = aws_sns_topic.save_and_relay_received_message.arn
   }
 }
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
@@ -218,7 +218,8 @@ data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
     ]
     effect = "Allow"
     resources = [
-      aws_sqs_queue.save_and_send_received_message["save"].arn,
+      aws_sqs_queue.save_received_message.arn,
+      var.relay_received_message_queue.arn
     ]
     principals {
       type        = "Service"
@@ -227,7 +228,7 @@ data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
-      values   = [aws_sns_topic.save_and_send_received_message.arn]
+      values   = [aws_sns_topic.save_and_relay_received_message.arn]
     }
   }
 }
@@ -247,9 +248,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_sqs_queue_policy" "sqs_allow_send_message_from_sns" {
-  for_each  = toset(["save"])
-  queue_url = aws_sqs_queue.save_and_send_received_message[each.key].id
+resource "aws_sqs_queue_policy" "save_received_message" {
+  queue_url = aws_sqs_queue.save_received_message.id
+  policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_sns.json
+}
+resource "aws_sqs_queue_policy" "relay_received_message" {
+  queue_url = var.relay_received_message_queue.id
   policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_sns.json
 }
 
@@ -258,25 +262,29 @@ resource "aws_iam_role_policy_attachment" "lambda_apigateway_invoke_full_access_
   policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
 }
 
-resource "aws_sns_topic" "save_and_send_received_message" {
-  name = format("%s_save_and_send_receive_message", var.platform)
+resource "aws_sns_topic" "save_and_relay_received_message" {
+  name = "facebook_save_and_relay_received_message"
 }
 
-resource "aws_sqs_queue" "save_and_send_received_message" {
-  for_each = toset(["save", "send"])
-  name     = format("%s_%s_received_message", var.platform, each.key)
+resource "aws_sqs_queue" "save_received_message" {
+  name = "facebook_save_received_message"
 }
 
 resource "aws_lambda_event_source_mapping" "save_received_message" {
-  event_source_arn = aws_sqs_queue.save_and_send_received_message["save"].arn
+  event_source_arn = aws_sqs_queue.save_received_message.arn
   function_name    = module.save_received_message.lambda.function_name
   batch_size       = 1
 }
 
 resource "aws_sns_topic_subscription" "save_received_message" {
-  topic_arn = aws_sns_topic.save_and_send_received_message.arn
+  topic_arn = aws_sns_topic.save_and_relay_received_message.arn
   protocol  = "sqs"
-  endpoint  = aws_sqs_queue.save_and_send_received_message["save"].arn
+  endpoint  = aws_sqs_queue.save_received_message.arn
+}
+resource "aws_sns_topic_subscription" "relay_received_message" {
+  topic_arn = aws_sns_topic.save_and_relay_received_message.arn
+  protocol  = "sqs"
+  endpoint  = var.relay_received_message_queue.arn
 }
 
 module "save_received_message" {
