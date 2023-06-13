@@ -39,7 +39,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Bad Request",
 		}, errNoPSIDParam
 	}
-	shopID, ok := request.PathParameters["shop_id"]
+	// shopID, ok := request.PathParameters["shop_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
@@ -53,7 +53,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Bad Request",
 		}, errNoPageIDPath
 	}
-	conversationID, ok := request.PathParameters["conversation_id"]
+	// conversationID, ok := request.PathParameters["conversation_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
@@ -101,7 +101,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	err = c.updateDB(ctx, requestMessage, *facebookResponse, shopID, pageID, conversationID, psid)
+	// err = c.updateDB(ctx, requestMessage, *facebookResponse, shopID, pageID, conversationID, psid)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,

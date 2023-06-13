@@ -34,6 +34,8 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 	}()
 
+	discord.Log(c.discordWebhookUrl, "facebook save recieved message handler")
+
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
 	for _, record := range sqsEvent.Records {
