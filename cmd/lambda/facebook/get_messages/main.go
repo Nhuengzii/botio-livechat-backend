@@ -35,6 +35,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoPageIDPath
 	}
 	conversationID, ok := pathParams["conversation_id"]
@@ -42,6 +45,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoConversationIDPath
 	}
 
@@ -50,6 +56,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -58,6 +67,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -66,6 +78,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 

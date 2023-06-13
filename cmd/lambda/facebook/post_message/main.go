@@ -32,11 +32,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}()
 
 	discord.Log(c.discordWebhookURL, "facebook POST messages handler")
+	//**check parameters**//
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoPSIDParam
 	}
 	pageID, ok := request.PathParameters["page_id"]
@@ -44,8 +48,12 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoPageIDPath
 	}
+	//**finish checking parameters**//
 
 	var requestMessage postmessage.Request
 	err = json.Unmarshal([]byte(request.Body), &requestMessage)
@@ -53,6 +61,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -61,6 +72,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -70,6 +84,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 	// map facebook response to api response
@@ -84,6 +101,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -91,6 +111,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 	return events.APIGatewayProxyResponse{
