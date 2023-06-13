@@ -17,28 +17,11 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "lambda/line/get_messages/main.config.handler!: " + err.Error()
+			logMessage := "cmd/lambda/line/get_messages/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	if c.dbClient == nil {
-		c.dbClient, err = mongodb.NewClient(ctx, &mongodb.Target{
-			URI:                c.mongodbURI,
-			Database:           c.mongodbDatabase,
-			CollectionMessages: c.mongodbCollectionLineMessages,
-			CollectionShops:    c.mongodbCollectionShops,
-		})
-		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Internal Server Error (New DB Client)",
-			}, err
-		}
-	}
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
@@ -50,28 +33,28 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Headers: map[string]string{
 					"Access-Control-Allow-Origin": "*",
 				},
-				Body: "Not Found (Query Messages No Documents)",
-			}, nil
+				Body: "Not Found",
+			}, err
 		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error (Query Messages Something Fucked Up)",
-		}, nil
+			Body: "Internal Server Error",
+		}, err
 	}
-	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
+	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID) // TODO remove this UpdateConversationIsRead and do with another api endpoint
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error (Update Conversation Is Read)",
+			Body: "Internal Server Error",
 		}, err
 	}
-	resp := &getmessages.Response{
+	resp := getmessages.Response{
 		Messages: messages,
 	}
 	responseJSON, err := json.Marshal(resp)
@@ -81,8 +64,8 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error (Unmarshal Response)",
-		}, nil
+			Body: "Internal Server Error",
+		}, err
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
@@ -94,13 +77,21 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 }
 
 func main() {
+	ctx := context.Background()
+	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
+		CollectionConversations: "conversations",
+		CollectionMessages:      "messages",
+		CollectionShops:         "shops",
+	})
+	if err != nil {
+		log.Fatalln("cmd/lambda/line/get_messages/main.main: " + err.Error())
+	}
+	defer dbClient.Close(ctx)
 	c := &config{
-		discordWebhookURL:             os.Getenv("DISCORD_WEBHOOK_URL"),
-		mongodbURI:                    os.Getenv("MONGODB_URI"),
-		mongodbDatabase:               os.Getenv("MONGODB_DATABASE"),
-		mongodbCollectionLineMessages: "line_messages",
-		mongodbCollectionShops:        "shops",
-		dbClient:                      nil,
+		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		dbClient:          nil,
 	}
 	lambda.Start(c.handler)
 }
