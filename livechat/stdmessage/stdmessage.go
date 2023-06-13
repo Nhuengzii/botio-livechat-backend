@@ -15,20 +15,30 @@ type StdMessage struct {
 	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
 }
 
-var (
-	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
-)
-
 const (
 	PlatformFacebook  Platform = "facebook"
 	PlatformInstagram Platform = "instagram"
 	PlatformLine      Platform = "line"
 )
 
+type Platform string
+
+type Source struct {
+	UserID   string   `json:"userID" bson:"userID"`
+	UserType UserType `json:"userType" bson:"userType"`
+}
+
 const (
 	UserTypeUser  UserType = "user"
 	UserTypeAdmin UserType = "admin"
 )
+
+type UserType string
+
+type Attachment struct {
+	AttachmentType AttachmentType `json:"attachmentType" bson:"attachmentType"`
+	Payload        Payload        `json:"payload" bson:"payload"`
+}
 
 const (
 	AttachmentTypeImage                     AttachmentType = "image"
@@ -44,20 +54,6 @@ const (
 	AttachmentTypeLineFlex                  AttachmentType = "lineFlex"
 )
 
-type Platform string
-
-type Source struct {
-	UserID   string   `json:"userID" bson:"userID"`
-	UserType UserType `json:"userType" bson:"userType"`
-}
-
-type UserType string
-
-type Attachment struct {
-	AttachmentType AttachmentType `json:"attachmentType" bson:"attachmentType"`
-	Payload        Payload        `json:"payload" bson:"payload"`
-}
-
 type AttachmentType string
 
 type Payload struct {
@@ -67,6 +63,10 @@ type Payload struct {
 type RepliedMessage struct {
 	MessageID string `json:"messageID" bson:"messageID"`
 }
+
+var (
+	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
+)
 
 func (message *StdMessage) ToLastActivityString() (string, error) {
 	if len(message.Attachments) == 0 {
