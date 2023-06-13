@@ -13,7 +13,7 @@ var errInvalidSignature = errors.New("invalid signature")
 func validateSignature(channelSecret string, signature string, body string) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("cmd/lambda/line/validate_webhook/main.validateSignature: %w", err)
+			err = fmt.Errorf("validateSignature: %w", err)
 		}
 	}()
 	decoded, err := base64.StdEncoding.DecodeString(signature)

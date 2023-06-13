@@ -62,7 +62,7 @@ func main() {
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		log.Fatal("cmd/lambda/line/validate_webhook/main.main: " + err.Error())
+		log.Fatalln("cmd/lambda/line/validate_webhook/main.main: " + err.Error())
 	}
 	defer dbClient.Close(ctx)
 	c := &config{

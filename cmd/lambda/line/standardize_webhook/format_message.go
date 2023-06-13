@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -8,10 +9,11 @@ import (
 	"reflect"
 )
 
-func newStdMessage(event *linebot.Event, botUserID string) (*stdmessage.StdMessage, error) {
+func (c *config) newStdMessage(ctx context.Context, event *linebot.Event, botUserID string) (*stdmessage.StdMessage, error) {
 	platform := stdmessage.PlatformLine
 	pageID := botUserID
-	shopID := "1" // TODO get from some db with botUserID?
+	shop, err := c.dbClient.QueryShop(ctx, pageID)
+	shopID := shop.ShopID
 	source, err := toStdMessageSource(event.Source)
 	if err != nil {
 		return nil, fmt.Errorf("newStdMessage: %w", err)
@@ -66,7 +68,7 @@ var errMessageSourceUnsupported = errors.New("message source unsupported")
 
 func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	if s.Type != linebot.EventSourceTypeUser {
-		return nil, errMessageSourceUnsupported
+		return nil, fmt.Errorf("toStdMessageSource: %w", errMessageSourceUnsupported)
 	}
 	return &stdmessage.Source{
 		UserID:   s.UserID,
