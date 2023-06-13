@@ -91,7 +91,7 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 		AttachmentTypeLineTemplateImageCarousel:
 		return "ส่งเทมเพลท", nil
 	case AttachmentTypeLineFlex:
-		return "ส่งเฟลกซ์", nil
+		return "ส่งเฟล็กซ์", nil
 	default:
 		return "", ErrUnknownAttachmentType
 	}

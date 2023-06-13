@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	errNoMessageEntry       = errors.New("Error! no message entry")
-	errUnknownWebhookType   = errors.New("Error! unknown webhook type found!")
-	errUnknownWebhookObject = errors.New("Error! unknown webhook Object found!")
+	errNoMessageEntry       = errors.New("error! no message entry")
+	errUnknownWebhookType   = errors.New("error! unknown webhook type found")
+	errUnknownWebhookObject = errors.New("error! unknown webhook Object found")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -32,15 +32,15 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 
 	discord.Log(c.discordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
-	var recieveWebhook ReceiveWebhook
+	var receiveWebhook ReceiveWebhook
 
 	for _, record := range sqsEvent.Records {
-		err := json.Unmarshal([]byte(record.Body), &recieveWebhook)
+		err := json.Unmarshal([]byte(record.Body), &receiveWebhook)
 		if err != nil {
 			return errUnknownWebhookObject
 		}
-		discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v\n", recieveWebhook))
-		err = c.handleRecieveWebhook(ctx, &recieveWebhook)
+		discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v\n", receiveWebhook))
+		err = c.handleReceiveWebhook(ctx, &receiveWebhook)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func main() {
 		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		discord.Log(c.discordWebhookURL, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 	lambda.Start(c.handler)

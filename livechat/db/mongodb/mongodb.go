@@ -257,14 +257,14 @@ func (c *Client) QueryFacebookPage(ctx context.Context, pageID string) (_ *shops
 		}
 		return nil, err
 	}
-	var facebookPage shops.FacebookPage
+	var facebookPage *shops.FacebookPage
 	for _, page := range shop.FacebookPages {
 		if pageID == page.PageID {
 			facebookPage = page
 			break
 		}
 	}
-	return &facebookPage, nil
+	return facebookPage, nil
 }
 
 func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
@@ -289,14 +289,14 @@ func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.Lin
 		}
 		return nil, err
 	}
-	var linePage shops.LinePage
+	var linePage *shops.LinePage
 	for _, page := range shop.LinePages {
 		if pageID == page.PageID {
 			linePage = page
 			break
 		}
 	}
-	return &linePage, nil
+	return linePage, nil
 }
 
 func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
@@ -321,12 +321,12 @@ func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shop
 		}
 		return nil, err
 	}
-	var instagramPage shops.InstagramPage
+	var instagramPage *shops.InstagramPage
 	for _, page := range shop.InstagramPages {
 		if pageID == page.PageID {
 			instagramPage = page
 			break
 		}
 	}
-	return &instagramPage, nil
+	return instagramPage, nil
 }

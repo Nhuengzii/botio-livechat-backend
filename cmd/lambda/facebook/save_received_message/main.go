@@ -23,8 +23,8 @@ type receivedMessage struct {
 }
 
 var (
-	errUnmarshalReceivedBody    = errors.New("Error json unmarshal recieve body")
-	errUnmarshalReceivedMessage = errors.New("Error json unmarshal recieve message")
+	errUnmarshalReceivedBody    = errors.New("error json unmarshal receive body")
+	errUnmarshalReceivedMessage = errors.New("error json unmarshal receive message")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -34,7 +34,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 	}()
 
-	discord.Log(c.discordWebhookUrl, "facebook save recieved message handler")
+	discord.Log(c.discordWebhookUrl, "facebook save received message handler")
 
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
@@ -91,7 +91,7 @@ func main() {
 	}
 
 	defer func() {
-		discord.Log(c.discordWebhookUrl, "defer dbclient close")
+		discord.Log(c.discordWebhookUrl, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 

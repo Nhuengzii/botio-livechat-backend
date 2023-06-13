@@ -1,10 +1,10 @@
 package shops
 
 type Shop struct {
-	ShopID         string          `bson:"shopID"`
-	FacebookPages  []FacebookPage  `bson:"facebookPages"`
-	LinePages      []LinePage      `bson:"linePages"`
-	InstagramPages []InstagramPage `bson:"instagramPages"`
+	ShopID         string           `bson:"shopID"`
+	FacebookPages  []*FacebookPage  `bson:"facebookPages"`
+	LinePages      []*LinePage      `bson:"linePages"`
+	InstagramPages []*InstagramPage `bson:"instagramPages"`
 }
 
 type FacebookPage struct {

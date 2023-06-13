@@ -15,15 +15,15 @@ const (
 
 // errors
 var (
-	errNoXSignHeaders     = errors.New("There is no x-sign-header")
-	errInvalidXSignHeader = errors.New("Invalid x-sign header")
-	errHexDecodeString    = errors.New("Error decoding recieveSignature")
+	errNoXSignHeaders     = errors.New("there is no x-sign-header")
+	errInvalidXSignHeader = errors.New("invalid x-sign header")
+	errHexDecodeString    = errors.New("error decoding receiveSignature")
 )
 
 func VerifyMessageSignature(header map[string]string, bodyByte []byte, appSecret string) error {
 	// use for facebook post request
-	recieveSignature := header["X-Hub-Signature-256"]
-	if !strings.HasPrefix(recieveSignature, signaturePrefix) {
+	receiveSignature := header["X-Hub-Signature-256"]
+	if !strings.HasPrefix(receiveSignature, signaturePrefix) {
 		return errNoXSignHeaders
 	}
 
@@ -34,15 +34,15 @@ func VerifyMessageSignature(header map[string]string, bodyByte []byte, appSecret
 	}
 	expectedSignatureByte := appSecretHmac.Sum(nil)
 
-	err = compareSignature(recieveSignature, expectedSignatureByte)
+	err = compareSignature(receiveSignature, expectedSignatureByte)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func compareSignature(recieveSignature string, expectedSignatureByte []byte) error {
-	actualSignature, err := hex.DecodeString(strings.Split(recieveSignature, "=")[1])
+func compareSignature(receiveSignature string, expectedSignatureByte []byte) error {
+	actualSignature, err := hex.DecodeString(strings.Split(receiveSignature, "=")[1])
 	if err != nil {
 		return errHexDecodeString
 	}
@@ -60,7 +60,7 @@ func VerifyConnection(queryStringParameters map[string]string, verificationStrin
 	if verificationString != token {
 		return errors.New("verify_token : token does not match")
 	} else if mode != "subscribe" {
-		return errors.New("mode : mode is not subscibe")
+		return errors.New("mode : mode is not subscribe")
 	}
 
 	return nil

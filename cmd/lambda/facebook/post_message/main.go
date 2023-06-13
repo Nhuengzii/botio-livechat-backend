@@ -120,7 +120,7 @@ func main() {
 		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		discord.Log(c.discordWebhookURL, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 
