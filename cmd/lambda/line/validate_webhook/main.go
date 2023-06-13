@@ -108,7 +108,7 @@ func main() {
 	defer dbClient.Close(ctx)
 	c := &config{
 		discordWebhookURL: discordWebhookURL,
-		sqsQueueURL:       os.Getenv(sqsQueueURL),
+		sqsQueueURL:       sqsQueueURL,
 		sqsClient:         sqswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
 	}
