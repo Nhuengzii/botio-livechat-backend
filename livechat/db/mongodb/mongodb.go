@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -185,24 +186,24 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.M{
 		"$or": []bson.D{
-			bson.D{
-				{"facebookPages", bson.D{
-					{"$elemMatch", bson.D{
-						{"pageID", pageID},
+			{
+				{Key: "facebookPages", Value: bson.D{
+					{Key: "$elemMatch", Value: bson.D{
+						{Key: "pageID", Value: pageID},
 					}},
 				}},
 			},
-			bson.D{
-				{"linePages", bson.D{
-					{"$elemMatch", bson.D{
-						{"pageID", pageID},
+			{
+				{Key: "linePages", Value: bson.D{
+					{Key: "$elemMatch", Value: bson.D{
+						{Key: "pageID", Value: pageID},
 					}},
 				}},
 			},
-			bson.D{
-				{"instagramPages", bson.D{
-					{"$elemMatch", bson.D{
-						{"pageID", pageID},
+			{
+				{Key: "instagramPages", Value: bson.D{
+					{Key: "$elemMatch", Value: bson.D{
+						{Key: "pageID", Value: pageID},
 					}},
 				}},
 			},
@@ -227,9 +228,9 @@ func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{"facebookPages", bson.D{
-			{"$elemMatch", bson.D{
-				{"pageID", pageID},
+		{Key: "facebookPages", Value: bson.D{
+			{Key: "$elemMatch", Value: bson.D{
+				{Key: "pageID", Value: pageID},
 			}},
 		}},
 	}
@@ -259,9 +260,9 @@ func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{"linePages", bson.D{
-			{"$elemMatch", bson.D{
-				{"pageID", pageID},
+		{Key: "linePages", Value: bson.D{
+			{Key: "$elemMatch", Value: bson.D{
+				{Key: "pageID", Value: pageID},
 			}},
 		}},
 	}
@@ -291,9 +292,9 @@ func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID strin
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{"instagramPages", bson.D{
-			{"$elemMatch", bson.D{
-				{"pageID", pageID},
+		{Key: "instagramPages", Value: bson.D{
+			{Key: "$elemMatch", Value: bson.D{
+				{Key: "pageID", Value: pageID},
 			}},
 		}},
 	}
