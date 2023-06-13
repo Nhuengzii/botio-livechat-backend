@@ -220,10 +220,10 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	return &shop, nil
 }
 
-func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
+func (c *Client) QueryFacebookPage(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryFacebookPageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryFacebookPage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -252,10 +252,10 @@ func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string
 	return &facebookPage, nil
 }
 
-func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
+func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryLinePageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryLinePage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -284,10 +284,10 @@ func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_
 	return &linePage, nil
 }
 
-func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
+func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryInstagramPageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryInstagramPage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)

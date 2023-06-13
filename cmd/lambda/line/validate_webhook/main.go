@@ -22,7 +22,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
-	shop, err := c.dbClient.QueryLinePageCredentials(ctx, pageID)
+	shop, err := c.dbClient.QueryLinePage(ctx, pageID)
 	lineChannelSecret := shop.Secret
 	lineSignature := req.Headers["x-line-signature"]
 	webhookBodyString := req.Body
