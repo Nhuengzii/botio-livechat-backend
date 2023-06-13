@@ -34,7 +34,7 @@ func NewClient(ctx context.Context, target Target) (*Client, error) {
 	opts := options.Client().ApplyURI(target.URI).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return nil, fmt.Errorf("db.NewClient: %w", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %w", err)
 	}
 	return &Client{
 		client: client,
@@ -45,7 +45,7 @@ func NewClient(ctx context.Context, target Target) (*Client, error) {
 func (c *Client) Close(ctx context.Context) error {
 	err := c.client.Disconnect(ctx)
 	if err != nil {
-		return fmt.Errorf("db.Client.Close: %w", err)
+		return fmt.Errorf("mongodb.Client.Close: %w", err)
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func (c *Client) InsertConversation(ctx context.Context, conversation *stdconver
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	_, err := coll.InsertOne(ctx, conversation)
 	if err != nil {
-		return fmt.Errorf("db.Client.InsertConversation: %w", err)
+		return fmt.Errorf("mongodb.Client.InsertConversation: %w", err)
 	}
 	return nil
 }
@@ -79,12 +79,16 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 		return err
 	}
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: message.ConversationID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "lastActivity", Value: lastActivity},
-		{Key: "updatedTime", Value: message.Timestamp},
-		{Key: "isRead", Value: false},
-	}}}
+	filter := bson.D{
+		{Key: "conversationID", Value: message.ConversationID},
+	}
+	update := bson.M{
+		"$set": bson.D{
+			{Key: "lastActivity", Value: lastActivity},
+			{Key: "updatedTime", Value: message.Timestamp},
+			{Key: "isRead", Value: false},
+		},
+	}
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -97,10 +101,14 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 
 func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: conversationID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "isRead", Value: true},
-	}}}
+	filter := bson.D{
+		{Key: "conversationID", Value: conversationID},
+	}
+	update := bson.M{
+		"$set": bson.D{
+			{Key: "isRead", Value: true},
+		},
+	}
 	err := coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -113,7 +121,9 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 
 func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: conversationID}}
+	filter := bson.D{
+		{Key: "conversationID", Value: conversationID},
+	}
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -124,6 +134,11 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	return nil
 }
 
+func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
+	// TODO implement
+	return nil
+}
+
 func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
@@ -131,7 +146,10 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
-	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
+	filter := bson.D{
+		{Key: "pageID", Value: pageID},
+		{Key: "conversationID", Value: conversationID},
+	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -155,7 +173,9 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "pageID", Value: pageID}}
+	filter := bson.D{
+		{Key: "pageID", Value: pageID},
+	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -170,11 +190,6 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 		return nil, err
 	}
 	return conversations, nil
-}
-
-func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
-	// TODO implement
-	return nil
 }
 
 func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
