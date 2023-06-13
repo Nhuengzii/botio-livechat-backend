@@ -8,6 +8,8 @@ terraform {
 }
 
 locals {
+  redis_addr     = var.redis_addr
+  redis_password = var.redis_password
   routes_with_handler = {
     connect = {
       route_key    = "$connect"
@@ -72,11 +74,14 @@ resource "aws_lambda_permission" "allow_execution_from_api_websocket" {
 module "routes_handler" {
   source = "../lambda_handler"
 
-  for_each              = local.routes_with_handler
-  handler_name          = each.value.handler_name
-  handler_path          = each.value.handler_path
-  environment_variables = each.value.environment_variables
-  role_arn              = aws_iam_role.assume_role_lambda.arn
+  for_each     = local.routes_with_handler
+  handler_name = each.value.handler_name
+  handler_path = each.value.handler_path
+  environment_variables = {
+    REDIS_ADDR     = local.redis_addr
+    REDIS_PASSWORD = local.redis_password
+  }
+  role_arn = aws_iam_role.assume_role_lambda.arn
 
 }
 
