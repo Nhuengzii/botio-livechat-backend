@@ -34,7 +34,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Headers: map[string]string{
 					"Access-Control-Allow-Origin": "*",
 				},
-				Body: "Internal Server Error",
+				Body: "Internal Server Error (New DB Client)",
 			}, err
 		}
 	}
@@ -49,7 +49,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Headers: map[string]string{
 					"Access-Control-Allow-Origin": "*",
 				},
-				Body: "Not Found",
+				Body: "Not Found (Query Messages No Documents)",
 			}, nil
 		}
 		return events.APIGatewayProxyResponse{
@@ -57,7 +57,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error",
+			Body: "Internal Server Error (Query Messages Something Fucked Up)",
 		}, nil
 	}
 	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
@@ -67,7 +67,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error",
+			Body: "Internal Server Error (Update Conversation Is Read)",
 		}, err
 	}
 	resp := &getmessages.Response{
@@ -80,7 +80,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
-			Body: "Internal Server Error",
+			Body: "Internal Server Error (Unmarshal Response)",
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{

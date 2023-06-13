@@ -25,7 +25,6 @@ type Target struct {
 	Database                string
 	CollectionConversations string
 	CollectionMessages      string
-	CollectionCredentials   string
 	CollectionShops         string
 }
 
