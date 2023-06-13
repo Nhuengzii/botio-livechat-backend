@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -55,10 +56,10 @@ func main() {
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
 		CollectionConversations: "facebook_conversations",
-		CollectionCredentials:   "facebook_credentials",
 		CollectionShops:         "shops",
 	})
 	if err != nil {
+		log.Println(err)
 		return
 	}
 	c := config{
