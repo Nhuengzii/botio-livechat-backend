@@ -5,8 +5,6 @@ import (
 )
 
 type config struct {
-	discordWebhookURL      string
-	lineChannelSecret      string // TODO remove and get from some db
-	lineChannelAccessToken string // TODO remove and get from some db
-	dbClient               livechat.DBClient
+	discordWebhookURL string
+	dbClient          livechat.DBClient
 }
