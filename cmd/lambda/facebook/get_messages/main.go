@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -35,6 +36,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoPageIDPath
 	}
 	conversationID, ok := pathParams["conversation_id"]
@@ -42,6 +46,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, errNoConversationIDPath
 	}
 
@@ -50,6 +57,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -58,6 +68,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -66,6 +79,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
 		}, err
 	}
 
@@ -81,18 +97,25 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
+
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
-		CollectionMessages:      "facebook_messages",
-		CollectionConversations: "facebook_conversations",
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
+		CollectionMessages:      "messages",
+		CollectionConversations: "conversations",
 	})
-	if err != nil {
-		return
-	}
 	c := config{
-		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		discordWebhookURL: discordWebhookURL,
 		dbClient:          dbClient,
+	}
+	if err != nil {
+		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		log.Fatalln(err)
 	}
 	defer func() {
 		discord.Log(c.discordWebhookURL, "defer dbClient close")

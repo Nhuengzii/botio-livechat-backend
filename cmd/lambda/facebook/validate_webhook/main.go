@@ -75,12 +75,19 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 }
 
 func main() {
+	var (
+		discordWebhookURL                 = os.Getenv("DISCORD_WEBHOOK_URL")
+		sqsQueueURL                       = os.Getenv("SQS_QUEUE_URL")
+		appSecret                         = os.Getenv("APP_SECRET")
+		facebookWebhookVerificationString = os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING")
+		awsRegion                         = os.Getenv("AWS_REGION")
+	)
 	c := config{
-		discordWebhookURL:                 os.Getenv("DISCORD_WEBHOOK_URL"),
-		sqsQueueURL:                       os.Getenv("SQS_QUEUE_URL"),
-		facebookAppSecret:                 os.Getenv("APP_SECRET"), // TODO to be removed and get from some db instead
-		facebookWebhookVerificationString: os.Getenv("FACEBOOK_WEBHOOK_VERIFICATION_STRING"),
-		sqsClient:                         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
+		discordWebhookURL:                 discordWebhookURL,
+		sqsQueueURL:                       sqsQueueURL,
+		facebookAppSecret:                 appSecret, // TODO to be removed and get from some db instead
+		facebookWebhookVerificationString: facebookWebhookVerificationString,
+		sqsClient:                         sqswrapper.NewClient(awsRegion),
 	}
 	lambda.Start(c.handler)
 }
