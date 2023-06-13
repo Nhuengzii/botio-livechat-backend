@@ -136,12 +136,13 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
-	if err != nil {
-		return
-	}
 	c := config{
 		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
 		dbClient:          dbClient,
+	}
+	if err != nil {
+		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		return
 	}
 	defer func() {
 		discord.Log(c.discordWebhookURL, "defer dbClient close")

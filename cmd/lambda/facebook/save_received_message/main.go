@@ -30,11 +30,11 @@ var (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.discordWebhookUrl, fmt.Sprint(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprint(err))
 		}
 	}()
 
-	discord.Log(c.discordWebhookUrl, "facebook save received message handler")
+	discord.Log(c.discordWebhookURL, "facebook save received message handler")
 
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
@@ -81,17 +81,18 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
-	if err != nil {
-		return
-	}
 	c := config{
-		discordWebhookUrl:   os.Getenv("DISCORD_WEBHOOK_URL"),
+		discordWebhookURL:   os.Getenv("DISCORD_WEBHOOK_URL"),
 		dbClient:            dbClient,
 		facebookAccessToken: os.Getenv("ACCESS_TOKEN"),
 	}
+	if err != nil {
+		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		return
+	}
 
 	defer func() {
-		discord.Log(c.discordWebhookUrl, "defer dbClient close")
+		discord.Log(c.discordWebhookURL, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -59,15 +58,15 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
-	if err != nil {
-		log.Println(err)
-		return
-	}
 	c := config{
 		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
 		snsTopicARN:       os.Getenv("SNS_TOPIC_ARN"),
 		snsClient:         snswrapper.NewClient(os.Getenv("AWS_REGION")),
 		dbClient:          dbClient,
+	}
+	if err != nil {
+		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		return
 	}
 	defer func() {
 		discord.Log(c.discordWebhookURL, "defer dbClient close")
