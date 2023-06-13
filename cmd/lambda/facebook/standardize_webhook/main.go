@@ -51,6 +51,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
+
 	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),

@@ -26,7 +26,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	discord.Log(c.discordWebhookURL, "Facebook webhook verify lambda handler")
 
 	if request.HTTPMethod == "GET" {
-		discord.Log(c.discordWebhookURL, "GET method called")
 		err := VerifyConnection(request.QueryStringParameters, c.facebookWebhookVerificationString)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
@@ -39,7 +38,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       request.QueryStringParameters["hub.challenge"],
 		}, err
 	} else if request.HTTPMethod == "POST" {
-		discord.Log(c.discordWebhookURL, "POST method called")
 		start := time.Now()
 		// new session
 
