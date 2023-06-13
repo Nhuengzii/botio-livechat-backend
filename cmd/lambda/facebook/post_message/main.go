@@ -19,6 +19,7 @@ import (
 
 var (
 	errNoPSIDParam          = errors.New("err query string parameter psid not given")
+	errNoShopIDPath         = errors.New("err path parameter shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
 )
@@ -30,12 +31,20 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
+	discord.Log(c.discordWebhookURL, "facebook POST messages handler")
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 			Body:       "Bad Request",
 		}, errNoPSIDParam
+	}
+	shopID, ok := request.PathParameters["shop_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+		}, errNoShopIDPath
 	}
 	pageID, ok := request.PathParameters["page_id"]
 	if !ok {
@@ -92,7 +101,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	err = c.updateDB(ctx, requestMessage, *facebookResponse, pageID, conversationID, psid)
+	err = c.updateDB(ctx, requestMessage, *facebookResponse, shopID, pageID, conversationID, psid)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,

@@ -10,8 +10,8 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 )
 
-func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) error {
-	stdMessage := fmtStdMessage(apiRequestMessage, fbResponseMessage, pageID, conversationID, psid)
+func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, shopID string, pageID string, conversationID string, psid string) error {
+	stdMessage := fmtStdMessage(apiRequestMessage, fbResponseMessage, shopID, pageID, conversationID, psid)
 	err := c.dbClient.UpdateConversationOnNewMessage(ctx, stdMessage)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func (c *config) updateDB(ctx context.Context, apiRequestMessage postmessage.Req
 	return nil
 }
 
-func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
+func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage postfbmessage.SendingMessageResponse, shopID string, pageID string, conversationID string, psid string) *stdmessage.StdMessage {
 	log.Println(apiRequestMessage.Attachment.AttachmentType)
 	log.Println(apiRequestMessage.Attachment.Payload)
 	var attachments []*stdmessage.Attachment
@@ -35,7 +35,7 @@ func fmtStdMessage(apiRequestMessage postmessage.Request, fbResponseMessage post
 		})
 	}
 	stdMessage := stdmessage.StdMessage{
-		ShopID:         "1",
+		ShopID:         shopID,
 		Platform:       stdmessage.PlatformFacebook,
 		PageID:         pageID,
 		ConversationID: conversationID,
