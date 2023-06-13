@@ -37,7 +37,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 
 func main() {
 	ctx := context.Background()
-	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionConversations: "conversations",

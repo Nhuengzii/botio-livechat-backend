@@ -29,7 +29,7 @@ type Target struct {
 	CollectionShops         string
 }
 
-func NewClient(ctx context.Context, target *Target) (*Client, error) {
+func NewClient(ctx context.Context, target Target) (*Client, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(target.URI).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(ctx, opts)
@@ -38,7 +38,7 @@ func NewClient(ctx context.Context, target *Target) (*Client, error) {
 	}
 	return &Client{
 		client: client,
-		Target: *target,
+		Target: target,
 	}, nil
 }
 

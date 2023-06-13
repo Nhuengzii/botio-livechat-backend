@@ -63,7 +63,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
 	defer cancel()
-	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",

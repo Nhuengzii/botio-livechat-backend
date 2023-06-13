@@ -67,7 +67,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 func main() {
 	ctx := context.Background()
-	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionConversations: "conversations",
