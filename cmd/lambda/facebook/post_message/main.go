@@ -132,8 +132,8 @@ func main() {
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
-		CollectionMessages:      "facebook_messages",
-		CollectionConversations: "facebook_conversations",
+		CollectionMessages:      "messages",
+		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
 	if err != nil {
