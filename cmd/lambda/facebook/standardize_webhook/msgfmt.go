@@ -68,12 +68,12 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
-				jsonString, err := json.Marshal(attachment.Payload)
+				jsonByte, err := json.Marshal(attachment.Payload)
 				if err != nil {
 					return nil, err
 				}
 				var basicPayload BasicPayload
-				err = json.Unmarshal([]byte(jsonString), &basicPayload)
+				err = json.Unmarshal([]byte(jsonByte), &basicPayload)
 				if err != nil {
 					return nil, err
 				}
