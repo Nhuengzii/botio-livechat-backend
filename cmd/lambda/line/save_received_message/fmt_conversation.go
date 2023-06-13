@@ -23,8 +23,8 @@ func newStdConversation(lineChannelAccessToken string, message *stdmessage.StdMe
 	}
 	return &stdconversation.StdConversation{
 		ShopID:          message.ShopID,
-		PageID:          message.PageID,
 		Platform:        stdconversation.PlatformLine,
+		PageID:          message.PageID,
 		ConversationID:  message.ConversationID,
 		ConversationPic: stdconversation.Payload{Src: userProfile.PictureURL},
 		UpdatedTime:     message.Timestamp,
