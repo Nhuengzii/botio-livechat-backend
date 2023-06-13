@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -30,11 +31,11 @@ var (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			discord.Log(c.discordWebhookUrl, fmt.Sprint(err))
+			discord.Log(c.discordWebhookURL, fmt.Sprint(err))
 		}
 	}()
 
-	discord.Log(c.discordWebhookUrl, "facebook save received message handler")
+	discord.Log(c.discordWebhookURL, "facebook save received message handler")
 
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
@@ -74,24 +75,31 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
+
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+	)
+
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
-		CollectionMessages:      "facebook_messages",
-		CollectionConversations: "facebook_conversations",
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
+		CollectionMessages:      "messages",
+		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
-	if err != nil {
-		return
-	}
 	c := config{
-		discordWebhookUrl:   os.Getenv("DISCORD_WEBHOOK_URL"),
-		dbClient:            dbClient,
-		facebookAccessToken: os.Getenv("ACCESS_TOKEN"),
+		discordWebhookURL: discordWebhookURL,
+		dbClient:          dbClient,
+	}
+	if err != nil {
+		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		log.Fatalln(err)
 	}
 
 	defer func() {
-		discord.Log(c.discordWebhookUrl, "defer dbClient close")
+		discord.Log(c.discordWebhookURL, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 

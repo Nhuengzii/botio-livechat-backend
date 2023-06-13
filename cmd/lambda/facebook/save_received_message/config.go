@@ -5,7 +5,7 @@ import (
 )
 
 type config struct {
-	discordWebhookUrl   string
+	discordWebhookURL   string
 	dbClient            livechat.DBClient
 	facebookAccessToken string
 }
