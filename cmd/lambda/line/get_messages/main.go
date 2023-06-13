@@ -38,6 +38,11 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			}, err
 		}
 	}
+	// debug
+	discord.Log(c.discordWebhookURL, c.mongodbURI)
+	discord.Log(c.discordWebhookURL, c.mongodbDatabase)
+	discord.Log(c.discordWebhookURL, c.mongodbCollectionLineMessages)
+	// end debug
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
