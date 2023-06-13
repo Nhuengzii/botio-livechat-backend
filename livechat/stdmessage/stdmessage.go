@@ -41,17 +41,25 @@ type Attachment struct {
 }
 
 const (
-	AttachmentTypeImage                     AttachmentType = "image"
-	AttachmentTypeVideo                     AttachmentType = "video"
-	AttachmentTypeAudio                     AttachmentType = "audio"
-	AttachmentTypeFile                      AttachmentType = "file"
-	AttachmentTypeSticker                   AttachmentType = "sticker"
-	AttachmentTypeLineEmoji                 AttachmentType = "lineEmoji"
-	AttachmentTypeLineTemplateButtons       AttachmentType = "lineTemplateButtons"
-	AttachmentTypeLineTemplateConfirm       AttachmentType = "lineTemplateConfirm"
-	AttachmentTypeLineTemplateCarousel      AttachmentType = "lineTemplateCarousel"
-	AttachmentTypeLineTemplateImageCarousel AttachmentType = "lineTemplateImageCarousel"
-	AttachmentTypeLineFlex                  AttachmentType = "lineFlex"
+	AttachmentTypeImage                           AttachmentType = "image"
+	AttachmentTypeVideo                           AttachmentType = "video"
+	AttachmentTypeAudio                           AttachmentType = "audio"
+	AttachmentTypeFile                            AttachmentType = "file"
+	AttachmentTypeSticker                         AttachmentType = "sticker"
+	AttachmentTypeLineEmoji                       AttachmentType = "lineEmoji"
+	AttachmentTypeLineTemplateButtons             AttachmentType = "lineTemplateButtons"
+	AttachmentTypeLineTemplateConfirm             AttachmentType = "lineTemplateConfirm"
+	AttachmentTypeLineTemplateCarousel            AttachmentType = "lineTemplateCarousel"
+	AttachmentTypeLineTemplateImageCarousel       AttachmentType = "lineTemplateImageCarousel"
+	AttachmentTypeLineFlex                        AttachmentType = "lineFlex"
+	AttachmentTypeFBTemplateButton                AttachmentType = "facebook-template-button"
+	AttachmentTypeFBTemplateCoupon                AttachmentType = "facebook-template-coupon"
+	AttachmentTypeFBTemplateCustomerFeedback      AttachmentType = "facebook-template-customerfeedback"
+	AttachmentTypeFBTemplateGeneric               AttachmentType = "facebook-template-generic"
+	AttachmentTypeFBTemplateMedia                 AttachmentType = "facebook-template-media"
+	AttachmentTypeFBTemplateProduct               AttachmentType = "facebook-template-product"
+	AttachmentTypeFBTemplateReceipt               AttachmentType = "facebook-template-receipt"
+	AttachmentTypeFBTemplateStructuredInformation AttachmentType = "facebook-template-structuredinformation"
 )
 
 type AttachmentType string
@@ -64,9 +72,7 @@ type RepliedMessage struct {
 	MessageID string `json:"messageID" bson:"messageID"`
 }
 
-var (
-	ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
-)
+var ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
 
 func (message *StdMessage) ToLastActivityString() (string, error) {
 	if len(message.Attachments) == 0 {
