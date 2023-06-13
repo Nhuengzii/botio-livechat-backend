@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -49,20 +50,28 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 }
 
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
+	defer cancel()
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
 		CollectionConversations: "conversations",
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		log.Fatalln("cmd/lambda/line/save_received_message/main.main: " + err.Error())
+		logMessage := "cmd/lambda/line/save_received_message/main.main: " + err.Error()
+		discord.Log(discordWebhookURL, logMessage)
+		log.Fatalln(logMessage)
 	}
 	defer dbClient.Close(ctx)
 	c := &config{
-		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		discordWebhookURL: discordWebhookURL,
 		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)

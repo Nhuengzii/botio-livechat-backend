@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
 	"os"
+	"time"
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -23,6 +24,24 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
 	shop, err := c.dbClient.QueryLinePage(ctx, pageID)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 404,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Not Found",
+			}, err
+		}
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
 	lineChannelSecret := shop.Secret
 	lineSignature := req.Headers["x-line-signature"]
 	webhookBodyString := req.Body
@@ -65,22 +84,32 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 }
 
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
+	defer cancel()
+	var (
+		mongodbURI        = os.Getenv("MONGODB_URI")
+		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
+		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+		sqsQueueURL       = os.Getenv("SQS_QUEUE_URL")
+		awsRegion         = os.Getenv("AWS_REGION")
+	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
-		URI:                     os.Getenv("MONGODB_URI"),
-		Database:                os.Getenv("MONGODB_DATABASE"),
+		URI:                     mongodbURI,
+		Database:                mongodbDatabase,
 		CollectionConversations: "conversations",
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		log.Fatalln("cmd/lambda/line/validate_webhook/main.main: " + err.Error())
+		logMessage := "cmd/lambda/line/validate_webhook/main.main: " + err.Error()
+		discord.Log(os.Getenv(discordWebhookURL), logMessage)
+		log.Fatalln(logMessage)
 	}
 	defer dbClient.Close(ctx)
 	c := &config{
-		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
-		sqsQueueURL:       os.Getenv("SQS_QUEUE_URL"),
-		sqsClient:         sqswrapper.NewClient(os.Getenv("AWS_REGION")),
+		discordWebhookURL: discordWebhookURL,
+		sqsQueueURL:       os.Getenv(sqsQueueURL),
+		sqsClient:         sqswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)
