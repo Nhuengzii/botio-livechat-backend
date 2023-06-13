@@ -102,19 +102,10 @@ resource "aws_apigatewayv2_integration" "route_handlers" {
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
-resource "aws_sqs_queue" "relay_received_message" {
-  name = "relay_received_message"
-}
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_role_lambda" {
   role       = aws_iam_role.assume_role_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
-}
-
-resource "aws_lambda_event_source_mapping" "relay_received_message" {
-  event_source_arn = aws_sqs_queue.relay_received_message.arn
-  function_name    = module.relay_received_message.lambda.function_name
-  batch_size       = 1
 }
 
 module "relay_received_message" {
@@ -129,6 +120,6 @@ module "relay_received_message" {
   }
 }
 
-output "relay_received_message_queue" {
-  value = aws_sqs_queue.relay_received_message
+output "relay_received_message_handler" {
+  value = module.relay_received_message.lambda
 }

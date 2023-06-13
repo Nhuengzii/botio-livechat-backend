@@ -42,9 +42,8 @@ variable "parent_id" {
   type = string
 }
 
-variable "relay_received_message_queue" {
+variable "relay_received_message_handler" {
   type = object({
-    arn = string
-    id  = string
+    function_name = string
   })
 }

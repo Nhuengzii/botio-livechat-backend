@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
     effect = "Allow"
     resources = [
       aws_sqs_queue.save_received_message.arn,
-      var.relay_received_message_queue.arn
+      aws_sqs_queue.relay_received_message.arn
     ]
     principals {
       type        = "Service"
@@ -246,7 +246,7 @@ resource "aws_sqs_queue_policy" "save_received_message" {
   policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_sns.json
 }
 resource "aws_sqs_queue_policy" "relay_received_message" {
-  queue_url = var.relay_received_message_queue.id
+  queue_url = aws_sqs_queue.relay_received_message.id
   policy    = data.aws_iam_policy_document.sqs_allow_send_message_from_sns.json
 }
 
@@ -263,9 +263,19 @@ resource "aws_sqs_queue" "save_received_message" {
   name = "line_save_received_message"
 }
 
+resource "aws_sqs_queue" "relay_received_message" {
+  name = "line_relay_received_message"
+}
+
 resource "aws_lambda_event_source_mapping" "save_received_message" {
   event_source_arn = aws_sqs_queue.save_received_message.arn
   function_name    = module.save_received_message.lambda.function_name
+  batch_size       = 1
+}
+
+resource "aws_lambda_event_source_mapping" "relay_received_message" {
+  event_source_arn = aws_sqs_queue.relay_received_message.arn
+  function_name    = var.relay_received_message_handler.function_name
   batch_size       = 1
 }
 
@@ -277,7 +287,7 @@ resource "aws_sns_topic_subscription" "save_received_message" {
 resource "aws_sns_topic_subscription" "relay_received_message" {
   topic_arn = aws_sns_topic.save_and_relay_message.arn
   protocol  = "sqs"
-  endpoint  = var.relay_received_message_queue.arn
+  endpoint  = aws_sqs_queue.relay_received_message.arn
 }
 
 module "save_received_message" {
