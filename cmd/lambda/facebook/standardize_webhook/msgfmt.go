@@ -13,21 +13,28 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		return nil, err
 	}
 
-	facebookCredentials, err := c.dbClient.QueryFacebookPageCredentials(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookPage(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}
 	accessToken := facebookCredentials.AccessToken
-	conversationID, err := getfbconversationid.GetConversationID(accessToken, messaging.Sender.ID, pageID)
-	if err != nil {
-		return nil, err
-	}
 
 	var sender stdmessage.UserType
 	if messaging.Message.IsEcho {
 		sender = stdmessage.UserTypeAdmin
 	} else {
 		sender = stdmessage.UserTypeUser
+	}
+
+	var conversationID string
+	if sender == stdmessage.UserTypeUser {
+		conversationID, err = getfbconversationid.GetConversationID(accessToken, messaging.Sender.ID, pageID)
+	} else if sender == stdmessage.UserTypeAdmin {
+		conversationID, err = getfbconversationid.GetConversationID(accessToken, messaging.Recipient.ID, pageID)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 	attachments := fmtAttachment(messaging)
 

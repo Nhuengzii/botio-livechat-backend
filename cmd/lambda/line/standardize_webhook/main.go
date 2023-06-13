@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 	"github.com/aws/aws-lambda-go/events"
@@ -13,7 +14,7 @@ import (
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "lambda/line/standardize_webhook/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/line/standardize_webhook/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
@@ -23,7 +24,10 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		err = handleEvents(c, hookBody)
+		pageID := hookBody.Destination
+		shop, err := c.dbClient.QueryShop(ctx, pageID)
+		shopID := shop.ShopID
+		err = c.handleEvents(ctx, shopID, pageID, hookBody)
 		if err != nil {
 			return err
 		}
@@ -32,10 +36,23 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 }
 
 func main() {
+	ctx := context.Background()
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
+		URI:                     os.Getenv("MONGODB_URI"),
+		Database:                os.Getenv("MONGODB_DATABASE"),
+		CollectionConversations: "conversations",
+		CollectionMessages:      "messages",
+		CollectionShops:         "shops",
+	})
+	if err != nil {
+		log.Fatalln("cmd/lambda/line/standardize_webhook/main.main: " + err.Error())
+	}
+	defer dbClient.Close(ctx)
 	c := &config{
 		discordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
 		snsTopicARN:       os.Getenv("SNS_TOPIC_ARN"),
 		snsClient:         snswrapper.NewClient(os.Getenv("AWS_REGION")),
+		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)
 }

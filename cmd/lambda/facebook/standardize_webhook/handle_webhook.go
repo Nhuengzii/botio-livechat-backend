@@ -10,11 +10,11 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 )
 
-func (c *config) handleRecieveWebhook(ctx context.Context, recieveWebhook *ReceiveWebhook) error {
-	if recieveWebhook.Object != "page" {
+func (c *config) handleReceiveWebhook(ctx context.Context, receiveWebhook *ReceiveWebhook) error {
+	if receiveWebhook.Object != "page" {
 		return errUnknownWebhookObject
 	}
-	for _, entry := range recieveWebhook.Entries {
+	for _, entry := range receiveWebhook.Entries {
 		err := c.handleWebhookEntry(ctx, &entry)
 		if err != nil {
 			discord.Log(c.discordWebhookURL, fmt.Sprintf("error handling webhook entry : %v", err))

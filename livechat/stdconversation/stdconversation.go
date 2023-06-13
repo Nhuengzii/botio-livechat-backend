@@ -12,6 +12,14 @@ type StdConversation struct {
 	IsRead          bool           `json:"isRead" bson:"isRead"`
 }
 
+const (
+	PlatformFacebook  Platform = "facebook"
+	PlatformInstagram Platform = "instagram"
+	PlatformLine      Platform = "line"
+)
+
+type Platform string
+
 type Participant struct {
 	UserID     string  `json:"userID" bson:"userID"`
 	Username   string  `json:"username" bson:"username"`
@@ -21,11 +29,3 @@ type Participant struct {
 type Payload struct {
 	Src string `json:"src" bson:"src"`
 }
-
-const (
-	PlatformFacebook  Platform = "facebook"
-	PlatformInstagram Platform = "instagram"
-	PlatformLine      Platform = "line"
-)
-
-type Platform string

@@ -29,23 +29,23 @@ type Target struct {
 	CollectionShops         string
 }
 
-func NewClient(ctx context.Context, target *Target) (*Client, error) {
+func NewClient(ctx context.Context, target Target) (*Client, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(target.URI).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return nil, fmt.Errorf("db.NewClient: %w", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %w", err)
 	}
 	return &Client{
 		client: client,
-		Target: *target,
+		Target: target,
 	}, nil
 }
 
 func (c *Client) Close(ctx context.Context) error {
 	err := c.client.Disconnect(ctx)
 	if err != nil {
-		return fmt.Errorf("db.Client.Close: %w", err)
+		return fmt.Errorf("mongodb.Client.Close: %w", err)
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func (c *Client) InsertConversation(ctx context.Context, conversation *stdconver
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	_, err := coll.InsertOne(ctx, conversation)
 	if err != nil {
-		return fmt.Errorf("db.Client.InsertConversation: %w", err)
+		return fmt.Errorf("mongodb.Client.InsertConversation: %w", err)
 	}
 	return nil
 }
@@ -79,12 +79,16 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 		return err
 	}
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: message.ConversationID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "lastActivity", Value: lastActivity},
-		{Key: "updatedTime", Value: message.Timestamp},
-		{Key: "isRead", Value: false},
-	}}}
+	filter := bson.D{
+		{Key: "conversationID", Value: message.ConversationID},
+	}
+	update := bson.M{
+		"$set": bson.D{
+			{Key: "lastActivity", Value: lastActivity},
+			{Key: "updatedTime", Value: message.Timestamp},
+			{Key: "isRead", Value: false},
+		},
+	}
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -97,10 +101,14 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 
 func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: conversationID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "isRead", Value: true},
-	}}}
+	filter := bson.D{
+		{Key: "conversationID", Value: conversationID},
+	}
+	update := bson.M{
+		"$set": bson.D{
+			{Key: "isRead", Value: true},
+		},
+	}
 	err := coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -113,7 +121,9 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 
 func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "conversationID", Value: conversationID}}
+	filter := bson.D{
+		{Key: "conversationID", Value: conversationID},
+	}
 	err := coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -124,6 +134,11 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	return nil
 }
 
+func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
+	// TODO implement
+	return nil
+}
+
 func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
@@ -131,7 +146,10 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
-	filter := bson.D{{Key: "pageID", Value: pageID}, {Key: "conversationID", Value: conversationID}}
+	filter := bson.D{
+		{Key: "pageID", Value: pageID},
+		{Key: "conversationID", Value: conversationID},
+	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -155,7 +173,9 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "pageID", Value: pageID}}
+	filter := bson.D{
+		{Key: "pageID", Value: pageID},
+	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -170,11 +190,6 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 		return nil, err
 	}
 	return conversations, nil
-}
-
-func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
-	// TODO implement
-	return nil
 }
 
 func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
@@ -220,10 +235,10 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	return &shop, nil
 }
 
-func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
+func (c *Client) QueryFacebookPage(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryFacebookPageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryFacebookPage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -242,20 +257,20 @@ func (c *Client) QueryFacebookPageCredentials(ctx context.Context, pageID string
 		}
 		return nil, err
 	}
-	var facebookPage shops.FacebookPage
+	var facebookPage *shops.FacebookPage
 	for _, page := range shop.FacebookPages {
 		if pageID == page.PageID {
 			facebookPage = page
 			break
 		}
 	}
-	return &facebookPage, nil
+	return facebookPage, nil
 }
 
-func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
+func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryLinePageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryLinePage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -274,20 +289,20 @@ func (c *Client) QueryLinePageCredentials(ctx context.Context, pageID string) (_
 		}
 		return nil, err
 	}
-	var linePage shops.LinePage
+	var linePage *shops.LinePage
 	for _, page := range shop.LinePages {
 		if pageID == page.PageID {
 			linePage = page
 			break
 		}
 	}
-	return &linePage, nil
+	return linePage, nil
 }
 
-func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
+func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryInstagramPageCredentials: %w", err)
+			err = fmt.Errorf("mongodb.QueryInstagramPage: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -306,12 +321,12 @@ func (c *Client) QueryInstagramPageCredentials(ctx context.Context, pageID strin
 		}
 		return nil, err
 	}
-	var instagramPage shops.InstagramPage
+	var instagramPage *shops.InstagramPage
 	for _, page := range shop.InstagramPages {
 		if pageID == page.PageID {
 			instagramPage = page
 			break
 		}
 	}
-	return &instagramPage, nil
+	return instagramPage, nil
 }

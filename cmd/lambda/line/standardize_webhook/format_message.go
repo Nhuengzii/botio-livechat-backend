@@ -8,10 +8,8 @@ import (
 	"reflect"
 )
 
-func newStdMessage(event *linebot.Event, botUserID string) (*stdmessage.StdMessage, error) {
+func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Event) (*stdmessage.StdMessage, error) {
 	platform := stdmessage.PlatformLine
-	pageID := botUserID
-	shopID := "1" // TODO get from some db with botUserID?
 	source, err := toStdMessageSource(event.Source)
 	if err != nil {
 		return nil, fmt.Errorf("newStdMessage: %w", err)
@@ -66,7 +64,7 @@ var errMessageSourceUnsupported = errors.New("message source unsupported")
 
 func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	if s.Type != linebot.EventSourceTypeUser {
-		return nil, errMessageSourceUnsupported
+		return nil, fmt.Errorf("toStdMessageSource: %w", errMessageSourceUnsupported)
 	}
 	return &stdmessage.Source{
 		UserID:   s.UserID,

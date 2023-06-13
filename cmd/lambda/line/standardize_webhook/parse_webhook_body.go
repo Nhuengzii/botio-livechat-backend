@@ -15,7 +15,7 @@ func parseWebhookBody(body string) (*webhookBody, error) {
 	var hookBody webhookBody
 	err := json.Unmarshal([]byte(body), &hookBody)
 	if err != nil {
-		return nil, fmt.Errorf("lambda/line/standardize_webhook/main.parseWebhookBody: %w", err)
+		return nil, fmt.Errorf("parseWebhookBody: %w", err)
 	}
 	return &hookBody, nil
 }

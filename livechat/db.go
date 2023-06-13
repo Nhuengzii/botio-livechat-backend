@@ -15,10 +15,11 @@ type DBClient interface {
 	UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) error
 	UpdateConversationIsRead(ctx context.Context, conversationID string) error
 	CheckConversationExists(ctx context.Context, conversationID string) error
+	UpdateConversationParticipants(ctx context.Context, conversationID string) error
 	QueryMessages(ctx context.Context, pageID string, conversationID string) ([]*stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, pageID string) ([]*stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
-	QueryFacebookPageCredentials(ctx context.Context, pageID string) (*shops.FacebookPage, error)
-	QueryLinePageCredentials(ctx context.Context, pageID string) (*shops.LinePage, error)
-	QueryInstagramPageCredentials(ctx context.Context, pageID string) (*shops.InstagramPage, error)
+	QueryFacebookPage(ctx context.Context, pageID string) (*shops.FacebookPage, error)
+	QueryLinePage(ctx context.Context, pageID string) (*shops.LinePage, error)
+	QueryInstagramPage(ctx context.Context, pageID string) (*shops.InstagramPage, error)
 }

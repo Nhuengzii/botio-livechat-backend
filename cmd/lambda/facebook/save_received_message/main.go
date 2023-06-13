@@ -23,8 +23,8 @@ type receivedMessage struct {
 }
 
 var (
-	errUnmarshalReceivedBody    = errors.New("Error json unmarshal recieve body")
-	errUnmarshalReceivedMessage = errors.New("Error json unmarshal recieve message")
+	errUnmarshalReceivedBody    = errors.New("error json unmarshal receive body")
+	errUnmarshalReceivedMessage = errors.New("error json unmarshal receive message")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -33,6 +33,8 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			discord.Log(c.discordWebhookUrl, fmt.Sprint(err))
 		}
 	}()
+
+	discord.Log(c.discordWebhookUrl, "facebook save received message handler")
 
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage
@@ -72,11 +74,12 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
-	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
 		CollectionConversations: "facebook_conversations",
+		CollectionShops:         "shops",
 	})
 	if err != nil {
 		return
@@ -88,7 +91,7 @@ func main() {
 	}
 
 	defer func() {
-		discord.Log(c.discordWebhookUrl, "defer dbclient close")
+		discord.Log(c.discordWebhookUrl, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 

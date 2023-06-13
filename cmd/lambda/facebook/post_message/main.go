@@ -19,6 +19,7 @@ import (
 
 var (
 	errNoPSIDParam          = errors.New("err query string parameter psid not given")
+	errNoShopIDPath         = errors.New("err path parameter shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
 )
@@ -30,6 +31,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
+	discord.Log(c.discordWebhookURL, "facebook POST messages handler")
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
@@ -44,13 +46,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       "Bad Request",
 		}, errNoPageIDPath
 	}
-	conversationID, ok := request.PathParameters["conversation_id"]
-	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-		}, errNoConversationIDPath
-	}
 
 	var requestMessage postmessage.Request
 	err = json.Unmarshal([]byte(request.Body), &requestMessage)
@@ -61,7 +56,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookCredentials, err := c.dbClient.QueryFacebookPageCredentials(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookPage(ctx, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -92,7 +87,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	err = c.updateDB(ctx, requestMessage, *facebookResponse, pageID, conversationID, psid)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -111,7 +105,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*2500)
 	defer cancel()
-	dbClient, err := mongodb.NewClient(ctx, &mongodb.Target{
+	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     os.Getenv("MONGODB_URI"),
 		Database:                os.Getenv("MONGODB_DATABASE"),
 		CollectionMessages:      "facebook_messages",
@@ -126,7 +120,7 @@ func main() {
 		dbClient:          dbClient,
 	}
 	defer func() {
-		discord.Log(c.discordWebhookURL, "defer dbclient close")
+		discord.Log(c.discordWebhookURL, "defer dbClient close")
 		c.dbClient.Close(ctx)
 	}()
 

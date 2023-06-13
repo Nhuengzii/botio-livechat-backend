@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,18 +9,17 @@ import (
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func handleEvents(c *config, hookBody *webhookBody) (err error) {
+func (c *config) handleEvents(ctx context.Context, shopID string, pageID string, hookBody *webhookBody) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("lambda/line/standardize_webhook/main.handleEvents: %w", err)
+			err = fmt.Errorf("handleEvents: %w", err)
 		}
 	}()
-	botUserID := hookBody.Destination
 	var stdMessages []*stdmessage.StdMessage
 	for _, event := range hookBody.Events {
 		switch event.Type {
 		case linebot.EventTypeMessage:
-			stdMessage, err := newStdMessage(event, botUserID)
+			stdMessage, err := c.newStdMessage(shopID, pageID, event)
 			if err != nil {
 				if errors.Is(err, errMessageSourceUnsupported) {
 					continue
@@ -28,9 +28,9 @@ func handleEvents(c *config, hookBody *webhookBody) (err error) {
 			}
 			stdMessages = append(stdMessages, stdMessage)
 		default:
-			// TODO implement user join/leave events -> updateConversationParticipants
-			// info to be updated: group pic, group name, group members, and each member's name and profile pic
-			// TODO implement user unsend events -> delete message from db and notify frontend
+			// TODO implement user join/leave events -> UpdateConversationParticipants
+			// info to be updated: name and profile pic
+			// ctx is to be passed to db operations here
 		}
 	}
 	for _, stdMessage := range stdMessages {

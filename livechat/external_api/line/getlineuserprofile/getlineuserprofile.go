@@ -1,4 +1,4 @@
-package main
+package getlineuserprofile
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type userProfile struct {
+type UserProfile struct {
 	DisplayName   string `json:"displayName"`
 	UserID        string `json:"userId"`
 	PictureURL    string `json:"pictureUrl"`    // not included when user has no profile pic
@@ -15,14 +15,14 @@ type userProfile struct {
 	Message       string `json:"message"`       // only included in case of error
 }
 
-func getUserProfile(channelAccessToken string, userID string) (_ *userProfile, err error) {
+func GetUserProfile(channelAccessToken string, userID string) (_ *UserProfile, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("lambda/line/save_received_message/main.getUserProfile: %w", err)
+			err = fmt.Errorf("getlineuserprofile.getUserProfile: %w", err)
 		}
 	}()
 	url := "https://api.line.me/v2/bot/profile/" + userID
-	client := &http.Client{}
+	client := http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func getUserProfile(channelAccessToken string, userID string) (_ *userProfile, e
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var profile userProfile
+	var profile UserProfile
 	err = json.NewDecoder(resp.Body).Decode(&profile)
 	if err != nil {
 		return nil, err
