@@ -67,6 +67,10 @@ module "facebook_rest_api" {
   mongo_uri                            = var.mongo_uri
   mongo_database                       = var.mongo_database
   discord_webhook_url                  = var.discord_webhook_url
+  relay_received_message_queue = {
+    arn = module.websocket_api.relay_received_message_queue.arn
+    id  = module.websocket_api.relay_received_message_queue.id
+  }
 }
 
 module "line_rest_api" {
@@ -82,6 +86,10 @@ module "line_rest_api" {
   mongo_collection_line_messages      = var.mongo_collection_line_messages
   mongo_collection_line_conversations = var.mongo_collection_line_conversations
   discord_webhook_url                 = var.discord_webhook_url
+  relay_received_message_queue = {
+    arn = module.websocket_api.relay_received_message_queue.arn
+    id  = module.websocket_api.relay_received_message_queue.id
+  }
 }
 
 resource "aws_apigatewayv2_api" "botio_livechat_websocket" {

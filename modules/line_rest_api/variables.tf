@@ -41,3 +41,10 @@ variable "mongo_collection_line_messages" {
 variable "parent_id" {
   type = string
 }
+
+variable "relay_received_message_queue" {
+  type = object({
+    arn = string
+    id  = string
+  })
+}
