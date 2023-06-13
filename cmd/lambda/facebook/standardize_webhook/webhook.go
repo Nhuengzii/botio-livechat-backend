@@ -31,12 +31,15 @@ type User struct {
 }
 
 type Attachment struct {
-	AttachmentType string      `json:"type"`
-	Payload        PayloadType `json:"payload"`
+	AttachmentType string `json:"type"`
+	Payload        any    `json:"payload"`
 }
 
-type PayloadType struct {
+type BasicPayload struct {
 	Src string `json:"url"`
+}
+type TemplatePayload struct {
+	TemplateType string `json:"template_type"`
 }
 
 type ReplyMessage struct {
