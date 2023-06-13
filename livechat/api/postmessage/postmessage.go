@@ -2,7 +2,7 @@ package postmessage
 
 type Request struct {
 	Message    string     `json:"message"`
-	Attachment Attachment `json:"attachment"`
+	Attachment Attachment `json:"attachment"` // why is this not []*Attachment like in stdmessage or *Attachment to support nil or maybe change in stdmessage to *Attachment?
 }
 
 type Attachment struct {
