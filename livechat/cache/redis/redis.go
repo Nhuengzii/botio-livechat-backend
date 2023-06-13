@@ -27,11 +27,19 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) Set(ctx context.Context, key string, value string) error {
+	err := c.client.Set(ctx, key, value, 0).Err()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (c *Client) Get(ctx context.Context, key string) (string, error) {
-	return "", nil
+	val, err := c.client.Get(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+	return val, nil
 }
 
 func (c *Client) GetShopConnections(ctx context.Context, shopID string) ([]string, error) {
@@ -46,8 +54,26 @@ func (c *Client) GetShopConnections(ctx context.Context, shopID string) ([]strin
 	return connectionIDs, nil
 }
 
-func (c *Client) DeleteConnectionID(ctx context.Context, shopID string, connectionID string) error {
-	err := c.client.Del(ctx, shopID+":"+connectionID).Err()
+func (c *Client) SetShopConnection(ctx context.Context, shopID string, connectionID string) error {
+	err := c.client.Set(ctx, shopID+":"+connectionID, shopID, 0).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) DeleteConnectionID(ctx context.Context, connectionID string) error {
+	allKeys, err := c.client.Keys(ctx, "*").Result()
+	for _, key := range allKeys {
+		if key[len(key)-len(connectionID):] == connectionID {
+			err = c.client.Del(ctx, key).Err()
+			if err != nil {
+				return err
+			}
+			break
+		}
+	}
+
 	if err != nil {
 		return err
 	}
