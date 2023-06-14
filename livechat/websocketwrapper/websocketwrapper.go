@@ -12,30 +12,18 @@ type Client struct {
 	client *apigatewaymanagementapi.Client
 }
 
-func NewClient(enpoint string) *Client {
+func NewClient(endpoint string) *Client {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
 	if err != nil {
-		panic(err)
+		return nil
 	}
-	client := apigatewaymanagementapi.NewFromConfig(cfg, func(o *apigatewaymanagementapi.Options) {
+	svc := apigatewaymanagementapi.NewFromConfig(cfg, func(o *apigatewaymanagementapi.Options) {
 		o.EndpointResolver = apigatewaymanagementapi.EndpointResolverFunc(func(region string, options apigatewaymanagementapi.EndpointResolverOptions) (aws.Endpoint, error) {
 			return aws.Endpoint{
-				URL:           enpoint,
+				URL:           endpoint,
 				SigningRegion: region,
 			}, nil
 		})
 	})
-	return &Client{client}
-}
-
-func (c *Client) Send(ctx context.Context, connectionID string, message string) error {
-	input := &apigatewaymanagementapi.PostToConnectionInput{
-		ConnectionId: aws.String(connectionID),
-		Data:         []byte(message),
-	}
-	_, err := c.client.PostToConnection(ctx, input)
-	if err != nil {
-		return err
-	}
-	return nil
+	return &Client{client: svc}
 }
