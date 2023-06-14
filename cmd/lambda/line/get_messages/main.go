@@ -32,11 +32,22 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	messages := []stdmessage.StdMessage{}
 
 	queryStringParameters := req.QueryStringParameters
-	message, ok := queryStringParameters["filter"]
+	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, message)
-	} else {
 		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+	} else {
+		filter := getmessages.Filter{}
+		err = json.Unmarshal([]byte(filterString), &filter)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Internal Server Error",
+			}, err
+		}
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, conversationID, filter.Message)
 	}
 	if err != nil {
 		return events.APIGatewayProxyResponse{

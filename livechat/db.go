@@ -17,7 +17,7 @@ type DBClient interface {
 	CheckConversationExists(ctx context.Context, conversationID string) error
 	UpdateConversationParticipants(ctx context.Context, conversationID string) error
 	QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) ([]stdmessage.StdMessage, error)
-	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, message string) ([]stdmessage.StdMessage, error)
+	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) ([]stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, shopID string, pageID string) ([]stdconversation.StdConversation, error)
 	QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) ([]stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
