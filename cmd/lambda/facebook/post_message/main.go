@@ -19,10 +19,11 @@ import (
 )
 
 var (
-	errNoPSIDParam          = errors.New("err query string parameter psid not given")
-	errNoShopIDPath         = errors.New("err path parameter shop_id not given")
-	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
-	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
+	errNoPSIDParam                = errors.New("err query string parameter psid not given")
+	errNoShopIDPath               = errors.New("err path parameter shop_id not given")
+	errNoPageIDPath               = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath       = errors.New("err path parameter conversation_id not given")
+	errAttachmentTypeNotSupported = errors.New("err attachment type given is not supported")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -80,7 +81,16 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookRequest := fmtFbRequest(&requestMessage, pageID, psid)
+	facebookRequest, err := fmtFbRequest(&requestMessage, pageID, psid)
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, err
+	}
 	facebookResponse, err := postfbmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
