@@ -1,6 +1,8 @@
 package stdmessage
 
-import "errors"
+import (
+	"fmt"
+)
 
 const (
 	PlatformFacebook  Platform = "facebook"
@@ -72,8 +74,6 @@ type RepliedMessage struct {
 	MessageID string `json:"messageID" bson:"messageID"`
 }
 
-var ErrUnknownAttachmentType = errors.New("stdmessage.ToLastActivityString: unknown attachment type")
-
 func (message *StdMessage) ToLastActivityString() (string, error) {
 	if len(message.Attachments) == 0 {
 		return message.Message, nil
@@ -107,6 +107,6 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 	case AttachmentTypeLineFlex:
 		return "ส่งเฟล็กซ์", nil
 	default:
-		return "", ErrUnknownAttachmentType
+		return "", fmt.Errorf("stdmessage.ToLastActivityString: unknown attachment type: %v", message.Attachments[0].AttachmentType)
 	}
 }

@@ -2,10 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
+	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -20,6 +25,81 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
+	pathParameters := req.PathParameters
+	shopID := pathParameters["shop_id"]
+	pageID := pathParameters["page_id"]
+	conversationID := pathParameters["conversation_id"]
+	page, err := c.dbClient.QueryLinePage(ctx, pageID)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 404,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Not Found",
+			}, err
+		}
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
+	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Not Found",
+		}, err
+	}
+	lineChannelAccessToken := page.AccessToken
+	lineChannelSecret := page.Secret
+	bot, err := linebot.New(lineChannelSecret, lineChannelAccessToken)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
+	var postMessageRequestBody postmessage.Request
+	err = json.Unmarshal([]byte(req.Body), &postMessageRequestBody)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
+	err = c.handlePostMessageRequest(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
+	if err != nil {
+		if errors.Is(err, errUnsupportedAttachmentType) {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Bad Request",
+			}, err
+		}
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Headers: map[string]string{

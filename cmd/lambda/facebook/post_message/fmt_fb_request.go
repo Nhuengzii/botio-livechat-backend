@@ -3,9 +3,10 @@ package main
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func fmtFbRequest(req *postmessage.Request, pageID string, psid string) *postfbmessage.SendingMessage {
+func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (*postfbmessage.SendingMessage, error) {
 	var fbRequest postfbmessage.SendingMessage
 
 	if req.Message != "" {
@@ -19,6 +20,16 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) *postfbm
 			},
 		}
 	} else {
+		stdAttachment := stdmessage.AttachmentType(req.Attachment.AttachmentType)
+		switch stdAttachment { // supported post type
+		case stdmessage.AttachmentTypeImage:
+		case stdmessage.AttachmentTypeVideo:
+		case stdmessage.AttachmentTypeAudio:
+		case stdmessage.AttachmentTypeFile:
+			// add more supported type here
+		default:
+			return nil, errAttachmentTypeNotSupported
+		}
 		fbRequest = postfbmessage.SendingMessage{
 			Recipient: postfbmessage.Recipient{
 				Id: psid,
@@ -36,5 +47,5 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) *postfbm
 		}
 	}
 
-	return &fbRequest
+	return &fbRequest, nil
 }

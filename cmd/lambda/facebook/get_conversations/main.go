@@ -41,19 +41,17 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 
 	stdConversations, err := c.dbClient.QueryConversations(ctx, shopID, pageID)
-
-	getConversationsResponse := getconversations.Response{
-		Conversations: stdConversations,
-	}
-
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
+			StatusCode: 500,
+			Body:       "Internal Server Error",
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
 		}, err
+	}
+	getConversationsResponse := getconversations.Response{
+		Conversations: stdConversations,
 	}
 
 	jsonBodyByte, err := json.Marshal(getConversationsResponse)
