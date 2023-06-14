@@ -147,6 +147,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
 	}
@@ -174,6 +175,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 	}
 	cur, err := coll.Find(ctx, filter)
