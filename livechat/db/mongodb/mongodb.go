@@ -195,6 +195,8 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 		return nil, cur.Err()
 	}
 	return messages, nil
+}
+
 func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {

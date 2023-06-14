@@ -18,8 +18,9 @@ import (
 )
 
 var (
-	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
-	errNoShopIDPath = errors.New("err path parameter parameters shop_id not given")errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
+	errNoPageIDPath                = errors.New("err path parameter parameters page_id not given")
+	errNoShopIDPath                = errors.New("err path parameter parameters shop_id not given")
+	errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
