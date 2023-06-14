@@ -108,6 +108,8 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 					attachmentType = stdmessage.AttachmentTypeFBTemplateReceipt
 				} else if templatePayload.TemplateType == "customer_information" {
 					attachmentType = stdmessage.AttachmentTypeFBTemplateStructuredInformation
+				} else {
+					return nil, errUnknownTemplateType
 				}
 				attachments = append(attachments, &stdmessage.Attachment{
 					AttachmentType: attachmentType,
