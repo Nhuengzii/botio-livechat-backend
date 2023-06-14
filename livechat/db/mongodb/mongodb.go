@@ -139,30 +139,30 @@ func (c *Client) UpdateConversationParticipants(ctx context.Context, conversatio
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
-	filter := bson.D{
-		{Key: "shopID", Value: shopID},
-		{Key: "pageID", Value: pageID},
-		{Key: "conversationID", Value: conversationID},
+	filter := bson.M{
+		"shopID":         shopID,
+		"pageID":         pageID,
+		"conversationID": conversationID,
 	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrNoDocuments
-		}
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var messages []*stdmessage.StdMessage
+	messages := []stdmessage.StdMessage{}
 	err = cur.All(ctx, &messages)
 	if err != nil {
 		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
 	}
 	return messages, nil
 }
@@ -180,9 +180,6 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrNoDocuments
-		}
 		return nil, err
 	}
 	defer cur.Close(ctx)
@@ -190,6 +187,9 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	err = cur.All(ctx, &conversations)
 	if err != nil {
 		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
 	}
 	return conversations, nil
 }
