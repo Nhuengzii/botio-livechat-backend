@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -29,6 +31,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
 
+	//**path params checking//
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
@@ -60,9 +63,34 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, errNoConversationIDPath
 	}
+	//**end path params checking//
+	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 502,
+			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, err
+	}
+	getConversationResponse := getconversation.Response{
+		Conversation: stdConversation,
+	}
+
+	jsonBodyByte, err := json.Marshal(getConversationResponse)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, err
+	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       "OK",
+		Body:       string(jsonBodyByte),
 	}, nil
 }
 
