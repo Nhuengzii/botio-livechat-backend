@@ -1,15 +1,15 @@
 package stdconversation
 
 type StdConversation struct {
-	ShopID          string         `json:"shopID" bson:"shopID"`
-	Platform        Platform       `json:"platform" bson:"platform"`
-	PageID          string         `json:"pageID" bson:"pageID"`
-	ConversationID  string         `json:"conversationID" bson:"conversationID"`
-	ConversationPic Payload        `json:"conversationPic" bson:"conversationPic"`
-	UpdatedTime     int64          `json:"updatedTime" bson:"updatedTime"`
-	Participants    []*Participant `json:"participants" bson:"participants"`
-	LastActivity    string         `json:"lastActivity" bson:"lastActivity"`
-	IsRead          bool           `json:"isRead" bson:"isRead"`
+	ShopID          string        `json:"shopID" bson:"shopID"`
+	Platform        Platform      `json:"platform" bson:"platform"`
+	PageID          string        `json:"pageID" bson:"pageID"`
+	ConversationID  string        `json:"conversationID" bson:"conversationID"`
+	ConversationPic Payload       `json:"conversationPic" bson:"conversationPic"`
+	UpdatedTime     int64         `json:"updatedTime" bson:"updatedTime"`
+	Participants    []Participant `json:"participants" bson:"participants"`
+	LastActivity    string        `json:"lastActivity" bson:"lastActivity"`
+	IsRead          bool          `json:"isRead" bson:"isRead"`
 }
 
 const (

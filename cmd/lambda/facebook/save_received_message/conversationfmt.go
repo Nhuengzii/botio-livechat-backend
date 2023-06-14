@@ -36,7 +36,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 			Src: userProfile.ProfilePic,
 		},
 		UpdatedTime: message.Timestamp,
-		Participants: []*stdconversation.Participant{
+		Participants: []stdconversation.Participant{
 			{
 				UserID:   message.Source.UserID,
 				Username: userProfile.Name,
