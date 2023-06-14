@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
@@ -178,6 +179,32 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	conversations := []stdconversation.StdConversation{}
+	err = cur.All(ctx, &conversations)
+	if err != nil {
+		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return conversations, nil
+}
+
+func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
+		}
+	}()
+
+	name = strings.Trim(name, " ")
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	filter := bson.D{{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}}}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		return nil, err
