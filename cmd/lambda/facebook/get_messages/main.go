@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -52,7 +53,13 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
+
 	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+
+	getMessagesResponse := getmessages.Response{
+		Messages: stdMessages,
+	}
+
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
@@ -63,7 +70,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	jsonBodyByte, err := json.Marshal(stdMessages)
+	jsonBodyByte, err := json.Marshal(getMessagesResponse)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
