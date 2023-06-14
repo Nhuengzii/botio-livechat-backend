@@ -7,3 +7,7 @@ import (
 type Response struct {
 	Messages []stdmessage.StdMessage `json:"messages"`
 }
+
+type Filter struct {
+	Message string `json:"with_message"`
+}

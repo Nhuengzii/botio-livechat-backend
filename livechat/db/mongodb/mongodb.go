@@ -168,6 +168,35 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, message string) (_ []stdmessage.StdMessage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "message", Value: "/" + message + "/"},
+	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	messages := []stdmessage.StdMessage{}
+	err = cur.All(ctx, &messages)
+	if err != nil {
+		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return messages, nil
+}
+
 func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
