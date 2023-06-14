@@ -5,5 +5,5 @@ import (
 )
 
 type Response struct {
-	Conversations []*stdconversation.StdConversation `json:"conversations"`
+	Conversations []stdconversation.StdConversation `json:"conversations"`
 }

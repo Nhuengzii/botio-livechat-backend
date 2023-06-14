@@ -167,7 +167,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []*stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -183,7 +183,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var conversations []*stdconversation.StdConversation
+	conversations := []stdconversation.StdConversation{}
 	err = cur.All(ctx, &conversations)
 	if err != nil {
 		return nil, err
