@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/line/getlineuserprofile"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -29,7 +30,7 @@ func newStdConversation(lineChannelAccessToken string, message *stdmessage.StdMe
 		ConversationID:  message.ConversationID,
 		ConversationPic: stdconversation.Payload{Src: userProfile.PictureURL},
 		UpdatedTime:     message.Timestamp,
-		Participants: []*stdconversation.Participant{
+		Participants: []stdconversation.Participant{
 			{
 				UserID:     message.Source.UserID,
 				Username:   userProfile.DisplayName,

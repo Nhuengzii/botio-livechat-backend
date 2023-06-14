@@ -41,6 +41,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 	if err != nil {
 		return nil, err
 	}
+	replyMessage := fmtReplyTo(messaging)
 
 	newMessage := stdmessage.StdMessage{
 		ShopID:         shop.ShopID,
@@ -55,16 +56,14 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		},
 		Message:     messaging.Message.Text,
 		Attachments: attachments,
-		ReplyTo: &stdmessage.RepliedMessage{
-			MessageID: messaging.Message.ReplyTo.MessageId,
-		},
+		ReplyTo:     replyMessage,
 	}
 
 	return &newMessage, nil
 }
 
-func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
-	var attachments []*stdmessage.Attachment
+func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
+	attachments := []stdmessage.Attachment{}
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
@@ -77,7 +76,7 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 				if err != nil {
 					return nil, err
 				}
-				attachments = append(attachments, &stdmessage.Attachment{
+				attachments = append(attachments, stdmessage.Attachment{
 					AttachmentType: stdmessage.AttachmentType(attachment.AttachmentType),
 					Payload:        stdmessage.Payload{Src: basicPayload.Src},
 				})
@@ -111,16 +110,22 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 				} else {
 					return nil, errUnknownTemplateType
 				}
-				attachments = append(attachments, &stdmessage.Attachment{
+				attachments = append(attachments, stdmessage.Attachment{
 					AttachmentType: attachmentType,
 					Payload:        stdmessage.Payload{Src: string(jsonByte)},
 				})
 
 			}
 		}
-	} else {
-		attachments = nil
 	}
 
 	return attachments, nil
+}
+
+func fmtReplyTo(messaging Messaging) *stdmessage.RepliedMessage {
+	if messaging.Message.ReplyTo.MessageId == "" {
+		return nil
+	} else {
+		return &stdmessage.RepliedMessage{MessageID: messaging.Message.MessageID}
+	}
 }
