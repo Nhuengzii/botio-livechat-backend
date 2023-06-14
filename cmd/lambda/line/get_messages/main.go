@@ -25,14 +25,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	shopID := pathParameters["shop_id"]
-	platform := pathParameters["platform"]
+	platform := "line"
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
 
 	messages := []stdmessage.StdMessage{}
 
 	queryStringParameters := req.QueryStringParameters
-	message, ok := queryStringParameters["message"]
+	message, ok := queryStringParameters["filter"]
 	if !ok {
 		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, message)
 	} else {
