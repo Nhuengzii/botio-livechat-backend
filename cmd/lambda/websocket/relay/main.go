@@ -6,76 +6,81 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/cache/redis"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/websocketwrapper"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type receivedMessage struct {
+func main() {
+	fmt.Println("Hello Me")
+	addr := os.Getenv("REDIS_ADDR")
+	password := os.Getenv("REDIS_PASSWORD")
+	webhookURL := os.Getenv("DISCORD_WEBHOOK_URL")
+	websocket_api_id := os.Getenv("WEBSOCKET_API_ID")
+	cacheClient := redis.NewClient(addr, password)
+	websocketClient := websocketwrapper.NewClient(fmt.Sprintf("https://%s.execute-api.ap-southeast-1.amazonaws.com/dev", websocket_api_id))
+	if websocketClient == nil {
+		fmt.Println("websocketClient is nil")
+	}
+	c := Config{
+		cacheClient:       cacheClient,
+		webSocketClient:   websocketClient,
+		discordWebhookURL: webhookURL,
+	}
+	lambda.Start(c.Handler)
+}
+
+type ReceivedMessage struct {
 	Message string `json:"Message"`
 }
 
+type WebsocketMessage struct {
+	Action string                `json:"action"`
+	Data   stdmessage.StdMessage `json:"data"`
+}
+
 var (
-	errUnmarshalReceivedBody    = errors.New("Error json unmarshal recieve body")
-	errUnmarshalReceivedMessage = errors.New("Error json unmarshal recieve message")
+	errUnmarshalReceivedBody    = errors.New("error json unmarshal receive body")
+	errUnmarshalReceivedMessage = errors.New("error json unmarshal receive message")
 )
 
-func main() {
-	fmt.Println("relay handler")
-
-	ADDR := os.Getenv("REDIS_ADDR")
-	PASSWORD := os.Getenv("REDIS_PASSWORD")
-	WEBSOCKET_API_ENDPOINT := os.Getenv("WEBSOCKET_API_ENDPOINT")
-	cacheClient := redis.NewClient(ADDR, PASSWORD)
-	websocketClient := websocketwrapper.NewClient(WEBSOCKET_API_ENDPOINT)
-	c := config{
-		cacheClient:     cacheClient,
-		websocketClient: websocketClient,
-	}
-	lambda.Start(c.handler)
-}
-
-type output struct {
-	Action  string                `json:"action"`
-	Message stdmessage.StdMessage `json:"message"`
-}
-
-func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) {
-	fmt.Println("Start relay handler")
+func (c *Config) Handler(ctx context.Context, sqsEvent events.SQSEvent) (events.APIGatewayProxyResponse, error) {
+	var receiveBody ReceivedMessage
 	var receiveMessage stdmessage.StdMessage
-	var shopID string
-	var keys []string
-	var connectionID string
-	var jsonMessage []byte
 	for _, record := range sqsEvent.Records {
-		err := json.Unmarshal([]byte(record.Body), &receiveMessage)
+		err := json.Unmarshal([]byte(record.Body), &receiveBody)
 		if err != nil {
-			fmt.Println(errUnmarshalReceivedBody)
-			return
+			return events.APIGatewayProxyResponse{}, errUnmarshalReceivedBody
 		}
-		fmt.Printf("Receive message: %v\n", receiveMessage)
-		shopID = receiveMessage.ShopID
-		keys, err = c.cacheClient.GetShopConnections(ctx, shopID)
+		err = json.Unmarshal([]byte(receiveBody.Message), &receiveMessage)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return events.APIGatewayProxyResponse{}, errUnmarshalReceivedMessage
 		}
-		for _, key := range keys {
-			connectionID = strings.Split(key, ":")[1]
-			jsonMessage, err = json.Marshal(output{Action: "relay", Message: receiveMessage})
+
+		webscoketMessage := WebsocketMessage{
+			Action: "relay",
+			Data:   receiveMessage,
+		}
+
+		jsonMessage, err := json.Marshal(webscoketMessage)
+		if err != nil {
+			return events.APIGatewayProxyResponse{}, err
+		}
+		connections, err := c.cacheClient.GetShopConnections(ctx, receiveMessage.ShopID)
+		if err != nil {
+			return events.APIGatewayProxyResponse{}, err
+		}
+		for _, connectionID := range connections {
+			err = c.webSocketClient.Send(ctx, connectionID, string(jsonMessage))
 			if err != nil {
-				fmt.Println(err)
-			}
-			err = c.websocketClient.Send(ctx, connectionID, string(jsonMessage))
-			if err != nil {
-				fmt.Println(err)
-				return
+				discord.Log(c.discordWebhookURL, fmt.Sprintf("Error send message to connectionID: %s", connectionID))
 			}
 		}
 
 	}
+	return events.APIGatewayProxyResponse{StatusCode: 200}, nil
 }

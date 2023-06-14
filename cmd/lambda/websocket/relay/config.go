@@ -2,7 +2,8 @@ package main
 
 import "github.com/Nhuengzii/botio-livechat-backend/livechat"
 
-type config struct {
-	cacheClient     livechat.CacheClient
-	websocketClient livechat.WebsocketClient
+type Config struct {
+	cacheClient       livechat.CacheClient
+	webSocketClient   livechat.WebsocketClient
+	discordWebhookURL string
 }
