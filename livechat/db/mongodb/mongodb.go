@@ -256,7 +256,12 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 
 	name = strings.Trim(name, " ")
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
-	filter := bson.D{{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}}}
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}},
+	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -281,7 +286,11 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 
 	message = strings.Trim(message, " ")
 	collMessage := c.client.Database(c.Database).Collection(c.CollectionMessages)
-	filterMessage := bson.D{{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}}}
+	filterMessage := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}}}
 	cur, err := collMessage.Find(ctx, filterMessage)
 	if err != nil {
 		return nil, err
