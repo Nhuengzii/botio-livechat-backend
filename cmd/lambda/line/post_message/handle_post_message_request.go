@@ -23,7 +23,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			return err
 		}
 	} else {
-		switch requestBody.Attachment.AttachmentType {
+		switch stdmessage.AttachmentType(requestBody.Attachment.AttachmentType) {
 		case stdmessage.AttachmentTypeImage:
 			_, err = bot.PushMessage(conversationID, linebot.NewImageMessage(requestBody.Attachment.Payload.Src, requestBody.Attachment.Payload.Src)).Do()
 			if err != nil {
@@ -46,7 +46,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 	attachment := stdmessage.Attachment{}
 	if requestBody.Message == "" {
 		attachment = stdmessage.Attachment{
-			AttachmentType: requestBody.Attachment.AttachmentType,
+			AttachmentType: stdmessage.AttachmentType(requestBody.Attachment.AttachmentType),
 			Payload:        stdmessage.Payload{Src: requestBody.Attachment.Payload.Src},
 		}
 	}
