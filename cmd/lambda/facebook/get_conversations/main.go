@@ -17,8 +17,8 @@ import (
 )
 
 var (
-	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
 	errNoShopIDPath = errors.New("err path parameter parameters shop_id not given")
+	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {

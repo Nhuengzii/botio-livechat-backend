@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +14,52 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+var (
+	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
+	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath = errors.New("err path parameter parameters conversation_id not given")
+)
+
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
+	defer func() {
+		if err != nil {
+			discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
+		}
+	}()
+
+	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
+
+	pathParams := request.PathParameters
+	shopID, ok := pathParams["shop_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoShopIDPath
+	}
+	pageID, ok := pathParams["page_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoPageIDPath
+	}
+	conversationID, ok := pathParams["conversation_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoConversationIDPath
+	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       "OK",
