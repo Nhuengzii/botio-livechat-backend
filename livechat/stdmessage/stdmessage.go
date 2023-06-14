@@ -11,7 +11,7 @@ type StdMessage struct {
 	Timestamp      int64           `json:"timestamp" bson:"timestamp"`
 	Source         Source          `json:"source" bson:"source"`
 	Message        string          `json:"message" bson:"message"`
-	Attachments    []*Attachment   `json:"attachments,omitempty" bson:"attachments,omitempty"`
+	Attachments    []Attachment    `json:"attachments" bson:"attachments"`
 	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
 }
 

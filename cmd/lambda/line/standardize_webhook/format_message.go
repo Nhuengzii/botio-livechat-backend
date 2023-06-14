@@ -3,9 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"reflect"
 )
 
 func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Event) (*stdmessage.StdMessage, error) {
@@ -20,7 +21,7 @@ func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Even
 	// message-type-specific fields
 	var messageID string
 	var message string
-	var attachments []*stdmessage.Attachment
+	var attachments []stdmessage.Attachment
 	var replyTo *stdmessage.RepliedMessage
 
 	switch msg := event.Message.(type) {
@@ -72,39 +73,43 @@ func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	}, nil
 }
 
-func toImageAttachment(m *linebot.ImageMessage) *stdmessage.Attachment {
+func toImageAttachment(m *linebot.ImageMessage) stdmessage.Attachment {
 	// TODO get image file from m.ID and save it to some db
-	return &stdmessage.Attachment{
+	return stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeImage,
 		Payload: stdmessage.Payload{
 			Src: "", // TODO get url of the image stored in some db
-		}}
+		},
+	}
 }
 
-func toVideoAttachment(m *linebot.VideoMessage) *stdmessage.Attachment {
+func toVideoAttachment(m *linebot.VideoMessage) stdmessage.Attachment {
 	// TODO get video file from m.ID and save it to some db
-	return &stdmessage.Attachment{
+	return stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeVideo,
 		Payload: stdmessage.Payload{
 			Src: "", // TODO get url of the video stored in some db
-		}}
+		},
+	}
 }
 
-func toAudioAttachment(m *linebot.AudioMessage) *stdmessage.Attachment {
+func toAudioAttachment(m *linebot.AudioMessage) stdmessage.Attachment {
 	// TODO get audio file from m.ID and save it to some db
-	return &stdmessage.Attachment{
+	return stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeAudio,
 		Payload: stdmessage.Payload{
 			Src: "", // TODO get url of the audio stored in some db
-		}}
+		},
+	}
 }
 
-func toStickerAttachment(m *linebot.StickerMessage) *stdmessage.Attachment {
-	return &stdmessage.Attachment{
+func toStickerAttachment(m *linebot.StickerMessage) stdmessage.Attachment {
+	return stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentTypeSticker,
 		Payload: stdmessage.Payload{
 			Src: toStickerURL(m),
-		}}
+		},
+	}
 }
 
 func toStickerURL(m *linebot.StickerMessage) string {
@@ -116,8 +121,8 @@ func hasLineEmojis(m *linebot.TextMessage) bool {
 	return v != reflect.Value{}
 }
 
-func toLineEmojiAttachments(m *linebot.TextMessage) []*stdmessage.Attachment {
-	var attachments []*stdmessage.Attachment
+func toLineEmojiAttachments(m *linebot.TextMessage) []stdmessage.Attachment {
+	var attachments []stdmessage.Attachment
 	// TODO implement me
 	return attachments
 }

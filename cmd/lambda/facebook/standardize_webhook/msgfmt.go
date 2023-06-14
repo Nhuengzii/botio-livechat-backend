@@ -63,8 +63,8 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 	return &newMessage, nil
 }
 
-func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
-	var attachments []*stdmessage.Attachment
+func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
+	var attachments []stdmessage.Attachment
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
@@ -77,7 +77,7 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 				if err != nil {
 					return nil, err
 				}
-				attachments = append(attachments, &stdmessage.Attachment{
+				attachments = append(attachments, stdmessage.Attachment{
 					AttachmentType: stdmessage.AttachmentType(attachment.AttachmentType),
 					Payload:        stdmessage.Payload{Src: basicPayload.Src},
 				})
@@ -109,7 +109,7 @@ func fmtAttachment(messaging Messaging) ([]*stdmessage.Attachment, error) {
 				} else if templatePayload.TemplateType == "customer_information" {
 					attachmentType = stdmessage.AttachmentTypeFBTemplateStructuredInformation
 				}
-				attachments = append(attachments, &stdmessage.Attachment{
+				attachments = append(attachments, stdmessage.Attachment{
 					AttachmentType: attachmentType,
 					Payload:        stdmessage.Payload{Src: string(jsonByte)},
 				})
