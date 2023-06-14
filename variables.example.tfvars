@@ -10,6 +10,8 @@
 mongo_uri           = "mongodb_uri"
 mongo_database      = "mongodb_database"
 discord_webhook_url = "discord_webhook_url"
+redis_addr          = "redis_addr"
+redis_password      = "redis_password"
 
 #=====================================================================
 
