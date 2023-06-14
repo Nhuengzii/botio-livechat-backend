@@ -79,7 +79,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, err
 	}
-	discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v", string(jsonBodyByte)))
 
 	if len(getMessagesResponse.Messages) != 0 {
 		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
