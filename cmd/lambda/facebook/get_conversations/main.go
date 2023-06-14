@@ -101,6 +101,18 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 					},
 				}, err
 			}
+		} else if filter.Message != "" { // query with message
+			discord.Log(c.discordWebhookURL, "query with message")
+			stdConversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.Message)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					StatusCode: 500,
+					Body:       "Internal Server Error",
+					Headers: map[string]string{
+						"Access-Control-Allow-Origin": "*",
+					},
+				}, err
+			}
 		}
 	}
 	getConversationsResponse := getconversations.Response{

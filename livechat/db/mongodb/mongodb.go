@@ -214,10 +214,60 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	err = cur.All(ctx, &conversations)
 	if err != nil {
 		return nil, err
-	}
-	if cur.Err() != nil {
+	} else if cur.Err() != nil {
 		return nil, cur.Err()
 	}
+	return conversations, nil
+}
+
+func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
+		}
+	}()
+
+	message = strings.Trim(message, " ")
+	collMessage := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	filterMessage := bson.D{{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}}}
+	cur, err := collMessage.Find(ctx, filterMessage)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	conversations := []stdconversation.StdConversation{}
+
+	uniqueConversationIDSet := map[string]struct{}{} // using map to implement set
+
+	for cur.Next(ctx) {
+		var message stdmessage.StdMessage
+		err := cur.Decode(&message)
+		if err != nil {
+			return nil, err
+		}
+		uniqueConversationIDSet[message.ConversationID] = struct{}{} // add conversationID to set
+	}
+
+	var uniqueConversationIDFilter []string
+
+	for conversationID := range uniqueConversationIDSet {
+		uniqueConversationIDFilter = append(uniqueConversationIDFilter, conversationID)
+	}
+
+	if len(uniqueConversationIDFilter) != 0 {
+		collConversation := c.client.Database(c.Database).Collection(c.CollectionConversations)
+		filterConversation := bson.M{"conversationID": bson.M{"$in": uniqueConversationIDFilter}}
+		cur, err = collConversation.Find(ctx, filterConversation)
+		if err != nil {
+			return nil, err
+		}
+		err = cur.All(ctx, &conversations)
+		if err := cur.Err(); err != nil {
+			return nil, err
+		}
+	}
+
 	return conversations, nil
 }
 
