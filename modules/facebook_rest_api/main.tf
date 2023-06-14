@@ -149,6 +149,20 @@ locals {
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
     }
+    get_conversation = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.conversation_id.id
+      resource_path = aws_api_gateway_resource.conversation_id.path
+      handler_name  = format("%s_get_conversation_handler", var.platform)
+      handler_path  = format("%s/cmd/lambda/facebook/get_conversation", path.root)
+      role_arn      = aws_iam_role.assume_role_lambda.arn
+      environment_variables = {
+        ACCESS_TOKEN        = var.facebook_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+    }
   }
 }
 
