@@ -41,6 +41,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 	if err != nil {
 		return nil, err
 	}
+	replyMessage := fmtReplyTo(messaging)
 
 	newMessage := stdmessage.StdMessage{
 		ShopID:         shop.ShopID,
@@ -55,9 +56,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		},
 		Message:     messaging.Message.Text,
 		Attachments: attachments,
-		ReplyTo: &stdmessage.RepliedMessage{
-			MessageID: messaging.Message.ReplyTo.MessageId,
-		},
+		ReplyTo:     replyMessage,
 	}
 
 	return &newMessage, nil
@@ -119,4 +118,12 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 	}
 
 	return attachments, nil
+}
+
+func fmtReplyTo(messaging Messaging) *stdmessage.RepliedMessage {
+	if messaging.Message.ReplyTo.MessageId == "" {
+		return nil
+	} else {
+		return &stdmessage.RepliedMessage{MessageID: messaging.Message.MessageID}
+	}
 }

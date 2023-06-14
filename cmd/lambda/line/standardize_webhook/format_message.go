@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -21,7 +20,7 @@ func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Even
 	// message-type-specific fields
 	var messageID string
 	var message string
-	var attachments []stdmessage.Attachment
+	attachments := []stdmessage.Attachment{}
 	var replyTo *stdmessage.RepliedMessage
 
 	switch msg := event.Message.(type) {
@@ -56,7 +55,7 @@ func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Even
 		Timestamp:      timestamp,
 		Source:         *source,
 		Message:        message,
-		Attachments:    attachments, // always nil for pure texts and locations, currently nil for texts with line emoji(s) and pure line emojis
+		Attachments:    attachments, // always empty for pure texts and locations, currently empty for texts with line emoji(s) and pure line emojis
 		ReplyTo:        replyTo,     // always nil
 	}, nil
 }
@@ -117,12 +116,11 @@ func toStickerURL(m *linebot.StickerMessage) string {
 }
 
 func hasLineEmojis(m *linebot.TextMessage) bool {
-	v := reflect.ValueOf(m).Elem().FieldByName("Emojis")
-	return v != reflect.Value{}
+	return m.Emojis != nil
 }
 
 func toLineEmojiAttachments(m *linebot.TextMessage) []stdmessage.Attachment {
-	var attachments []stdmessage.Attachment
+	attachments := []stdmessage.Attachment{}
 	// TODO implement me
 	return attachments
 }
