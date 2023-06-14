@@ -110,11 +110,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_r
 
 resource "aws_iam_role_policy_attachment" "allow_execute_api" {
   role       = aws_iam_role.assume_role_lambda.name
-  policy_arn = aws_iam_policy.example.arn
+  policy_arn = aws_iam_policy.allow_execute_api.arn
 }
 
 resource "aws_iam_policy" "allow_execute_api" {
-  name        = "example"
+  name        = "allow_execute_api"
   description = "An example policy"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -136,8 +136,10 @@ module "relay_received_message" {
   handler_path = format("%s/cmd/lambda/websocket/relay", path.root)
   role_arn     = aws_iam_role.assume_role_lambda.arn
   environment_variables = {
-    REDIS_ADDR     = local.redis_addr
-    REDIS_PASSWORD = local.redis_password
+    REDIS_ADDR          = local.redis_addr
+    REDIS_PASSWORD      = local.redis_password
+    DISCORD_WEBHOOK_URL = var.discord_webhook_url
+    WEBSOCKET_API_ID    = var.websocket_api_id
   }
 }
 

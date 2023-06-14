@@ -13,3 +13,7 @@ variable "redis_addr" {
 variable "redis_password" {
   type = string
 }
+
+variable "discord_webhook_url" {
+  type = string
+}

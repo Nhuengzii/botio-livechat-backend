@@ -119,6 +119,7 @@ module "websocket_api" {
   websocket_api_execution_arn = aws_apigatewayv2_api.botio_livechat_websocket.execution_arn
   redis_password              = var.redis_password
   redis_addr                  = var.redis_addr
+  discord_webhook_url         = var.discord_webhook_url
 }
 
 resource "aws_api_gateway_deployment" "rest_api" {
