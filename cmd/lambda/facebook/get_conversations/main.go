@@ -28,7 +28,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
 
 	pathParams := request.PathParameters
-	// shopID := pathParams["shop_id"]
+	shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
@@ -40,10 +40,12 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoPageIDPath
 	}
 
-	stdConversations, err := c.dbClient.QueryConversations(ctx, pageID)
+	stdConversations, err := c.dbClient.QueryConversations(ctx, shopID, pageID)
+
 	getConversationsResponse := getconversations.Response{
 		Conversations: stdConversations,
 	}
+
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,

@@ -24,8 +24,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}
 	}()
 	pathParameters := req.PathParameters
+	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
-	conversations, err := c.dbClient.QueryConversations(ctx, pageID)
+	conversations, err := c.dbClient.QueryConversations(ctx, shopID, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return events.APIGatewayProxyResponse{

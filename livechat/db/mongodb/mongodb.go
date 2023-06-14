@@ -139,7 +139,7 @@ func (c *Client) UpdateConversationParticipants(ctx context.Context, conversatio
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []*stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
@@ -147,6 +147,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
 	}
@@ -166,7 +167,7 @@ func (c *Client) QueryMessages(ctx context.Context, pageID string, conversationI
 	return messages, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []*stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -174,6 +175,7 @@ func (c *Client) QueryConversations(ctx context.Context, pageID string) (_ []*st
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 	}
 	cur, err := coll.Find(ctx, filter)
