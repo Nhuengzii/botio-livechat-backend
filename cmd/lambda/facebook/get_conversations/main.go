@@ -66,10 +66,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		Conversations: stdConversations,
 	}
 
-	getConversationsResponse := getconversations.Response{
-		Conversations: stdConversations,
-	}
-
 	jsonBodyByte, err := json.Marshal(getConversationsResponse)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
