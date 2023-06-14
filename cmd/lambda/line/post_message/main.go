@@ -32,7 +32,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	page, err := c.dbClient.QueryLinePage(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			discord.Log(c.discordWebhookURL, "fuckup 1")
 			return events.APIGatewayProxyResponse{
 				StatusCode: 404,
 				Headers: map[string]string{
@@ -41,7 +40,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Body: "Not Found",
 			}, err
 		}
-		discord.Log(c.discordWebhookURL, "fuckup 2")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
@@ -52,7 +50,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 	err = c.dbClient.CheckConversationExists(ctx, conversationID)
 	if err != nil {
-		discord.Log(c.discordWebhookURL, "fuckup 3")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 			Headers: map[string]string{
@@ -65,7 +62,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	lineChannelSecret := page.Secret
 	bot, err := linebot.New(lineChannelSecret, lineChannelAccessToken)
 	if err != nil {
-		discord.Log(c.discordWebhookURL, "fuckup 4")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
@@ -77,7 +73,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	var postMessageRequestBody postmessage.Request
 	err = json.Unmarshal([]byte(req.Body), &postMessageRequestBody)
 	if err != nil {
-		discord.Log(c.discordWebhookURL, "fuckup 5")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
@@ -89,7 +84,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	err = c.handlePostMessageRequest(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
 	if err != nil {
 		if errors.Is(err, errUnsupportedAttachmentType) {
-			discord.Log(c.discordWebhookURL, "fuckup 6")
 			return events.APIGatewayProxyResponse{
 				StatusCode: 400,
 				Headers: map[string]string{
@@ -98,7 +92,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Body: "Bad Request",
 			}, err
 		}
-		discord.Log(c.discordWebhookURL, "fuckup 7")
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
@@ -107,7 +100,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
-	discord.Log(c.discordWebhookURL, "works fine")
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Headers: map[string]string{

@@ -46,13 +46,15 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			return fmt.Errorf("%w: %v", errUnsupportedAttachmentType, requestBody.Attachment.AttachmentType)
 		}
 	}
-	attachment := stdmessage.Attachment{}
+	attachments := []stdmessage.Attachment{}
 	if requestBody.Message == "" {
-		attachment = stdmessage.Attachment{
+		attachment := stdmessage.Attachment{
 			AttachmentType: stdmessage.AttachmentType(requestBody.Attachment.AttachmentType),
 			Payload:        stdmessage.Payload{Src: requestBody.Attachment.Payload.Src},
 		}
+		attachments = append(attachments, attachment)
 	}
+
 	stdMessage := stdmessage.StdMessage{
 		ShopID:         shopID,
 		Platform:       stdmessage.PlatformLine,
@@ -65,7 +67,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			UserType: stdmessage.UserTypeAdmin,
 		},
 		Message:     requestBody.Message,
-		Attachments: []stdmessage.Attachment{attachment},
+		Attachments: attachments,
 		ReplyTo:     nil,
 	}
 	err = c.dbClient.UpdateConversationOnNewMessage(ctx, &stdMessage)
