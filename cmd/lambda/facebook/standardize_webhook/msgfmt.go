@@ -64,7 +64,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 }
 
 func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
-	var attachments []stdmessage.Attachment
+	attachments := []stdmessage.Attachment{}
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
@@ -116,8 +116,6 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 
 			}
 		}
-	} else {
-		attachments = nil
 	}
 
 	return attachments, nil
