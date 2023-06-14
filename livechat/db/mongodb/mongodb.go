@@ -168,7 +168,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, message string) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
@@ -179,7 +179,10 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
-		{Key: "message", Value: "/" + message + "/"},
+		{Key: "conversationID", Value: conversationID},
+		{Key: "message", Value: bson.D{
+			{Key: "$regex", Value: message},
+		}},
 	}
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
