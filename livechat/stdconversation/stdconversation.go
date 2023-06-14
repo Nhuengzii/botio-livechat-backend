@@ -1,5 +1,11 @@
 package stdconversation
 
+const (
+	PlatformFacebook  Platform = "facebook"
+	PlatformInstagram Platform = "instagram"
+	PlatformLine      Platform = "line"
+)
+
 type StdConversation struct {
 	ShopID          string        `json:"shopID" bson:"shopID"`
 	Platform        Platform      `json:"platform" bson:"platform"`
@@ -11,12 +17,6 @@ type StdConversation struct {
 	LastActivity    string        `json:"lastActivity" bson:"lastActivity"`
 	IsRead          bool          `json:"isRead" bson:"isRead"`
 }
-
-const (
-	PlatformFacebook  Platform = "facebook"
-	PlatformInstagram Platform = "instagram"
-	PlatformLine      Platform = "line"
-)
 
 type Platform string
 
