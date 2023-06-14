@@ -108,6 +108,27 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_sqsexecution_to_assume_r
   policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "allow_execute_api" {
+  role       = aws_iam_role.assume_role_lambda.name
+  policy_arn = aws_iam_policy.example.arn
+}
+
+resource "aws_iam_policy" "allow_execute_api" {
+  name        = "example"
+  description = "An example policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "execute-api:*"
+        Effect   = "Allow"
+        Resource = format("%s/*", var.websocket_api_execution_arn)
+      }
+    ]
+  })
+}
+
+
 module "relay_received_message" {
   source = "../lambda_handler"
 
