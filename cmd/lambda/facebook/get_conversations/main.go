@@ -16,7 +16,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
+var (
+	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
+	errNoShopIDPath = errors.New("err path parameter parameters shop_id not given")
+)
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
@@ -28,7 +31,16 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
 
 	pathParams := request.PathParameters
-	shopID := pathParams["shop_id"]
+	shopID, ok := pathParams["shop_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoShopIDPath
+	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
