@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"log"
 	"os"
 	"time"
@@ -25,29 +25,19 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	shopID := pathParameters["shop_id"]
+	platform := "line"
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	messages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
-	if err != nil {
-		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 404,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Not Found",
-			}, err
-		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
-	}
-	if len(messages) != 0 {
-		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID) // TODO remove this UpdateConversationIsRead and do with another api endpoint
+
+	messages := []stdmessage.StdMessage{}
+
+	queryStringParameters := req.QueryStringParameters
+	filterString, ok := queryStringParameters["filter"]
+	if !ok {
+		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+	} else {
+		filter := getmessages.Filter{}
+		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 500,
@@ -57,7 +47,18 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Body: "Internal Server Error",
 			}, err
 		}
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, conversationID, filter.Message)
 	}
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Internal Server Error",
+		}, err
+	}
+
 	resp := getmessages.Response{
 		Messages: messages,
 	}
@@ -71,6 +72,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Headers: map[string]string{
