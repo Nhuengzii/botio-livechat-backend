@@ -54,9 +54,10 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoPageIDPath
 	}
 
-	filterQueryString, ok := request.QueryStringParameters["filter"]
 	stdConversations := []stdconversation.StdConversation{}
-	if !ok { // no need to query
+
+	filterQueryString, ok := request.QueryStringParameters["filter"]
+	if !ok { // no need to query with filter
 		discord.Log(c.discordWebhookURL, "no need to query")
 		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
 		if err != nil {
@@ -68,11 +69,10 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 				},
 			}, err
 		}
-	} else { // need to query
+	} else { // need to query with filter
 		var filter getconversations.Filter
-		discord.Log(c.discordWebhookURL, filterQueryString)
+
 		err := json.Unmarshal([]byte(filterQueryString), &filter)
-		discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v", filter))
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 500,
