@@ -82,6 +82,15 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 	err = c.handlePostMessageRequest(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
 	if err != nil {
+		if errors.Is(err, errUnsupportedAttachmentType) {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Bad Request",
+			}, err
+		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
+
+var errUnsupportedAttachmentType = errors.New("unsupported attachment type")
 
 func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, requestBody postmessage.Request) (err error) {
 	defer func() {
@@ -40,7 +43,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 				return err
 			}
 		default:
-			return fmt.Errorf("handlePostMessageRequest: unsuported attachment type: %v", requestBody.Attachment.AttachmentType)
+			return fmt.Errorf("%w: %v", errUnsupportedAttachmentType, requestBody.Attachment.AttachmentType)
 		}
 	}
 	attachment := stdmessage.Attachment{}
