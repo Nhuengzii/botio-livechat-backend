@@ -25,7 +25,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	shopID := pathParameters["shop_id"]
-	platform := "line"
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
 
@@ -47,7 +46,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				Body: "Internal Server Error",
 			}, err
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, conversationID, filter.Message)
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message)
 	}
 	if err != nil {
 		return events.APIGatewayProxyResponse{
