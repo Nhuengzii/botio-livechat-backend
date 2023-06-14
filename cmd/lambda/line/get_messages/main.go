@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"log"
 	"os"
 	"time"
@@ -25,19 +25,20 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	shopID := pathParameters["shop_id"]
+	platform := pathParameters["platform"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	messages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+
+	messages := []stdmessage.StdMessage{}
+
+	queryStringParameters := req.QueryStringParameters
+	message, ok := queryStringParameters["message"]
+	if !ok {
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.Platform(platform), pageID, message)
+	} else {
+		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+	}
 	if err != nil {
-		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 404,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Not Found",
-			}, err
-		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
@@ -46,18 +47,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
-	if len(messages) != 0 {
-		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID) // TODO remove this UpdateConversationIsRead and do with another api endpoint
-		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Internal Server Error",
-			}, err
-		}
-	}
+
 	resp := getmessages.Response{
 		Messages: messages,
 	}
@@ -71,6 +61,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Headers: map[string]string{
