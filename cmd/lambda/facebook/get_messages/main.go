@@ -53,7 +53,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-
 	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
 
 	getMessagesResponse := getmessages.Response{
@@ -80,16 +79,19 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, err
 	}
+	discord.Log(c.discordWebhookURL, fmt.Sprintf("%+v", string(jsonBodyByte)))
 
-	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+	if len(getMessagesResponse.Messages) != 0 {
+		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 502,
+				Body:       "Bad Gateway",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, err
+		}
 	}
 
 	return events.APIGatewayProxyResponse{

@@ -46,15 +46,17 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Internal Server Error",
 		}, err
 	}
-	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID) // TODO remove this UpdateConversationIsRead and do with another api endpoint
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+	if len(messages) != 0 {
+		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID) // TODO remove this UpdateConversationIsRead and do with another api endpoint
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: "Internal Server Error",
+			}, err
+		}
 	}
 	resp := getmessages.Response{
 		Messages: messages,
