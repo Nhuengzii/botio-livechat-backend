@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"strconv"
-	"time"
 )
 
 func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, requestBody postmessage.Request) (err error) {
