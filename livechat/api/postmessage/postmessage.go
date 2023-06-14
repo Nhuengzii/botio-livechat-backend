@@ -1,13 +1,15 @@
 package postmessage
 
+import "github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
+
 type Request struct {
 	Message    string     `json:"message"`
 	Attachment Attachment `json:"attachment"`
 }
 
 type Attachment struct {
-	AttachmentType string  `json:"type"`
-	Payload        Payload `json:"payload"`
+	AttachmentType stdmessage.AttachmentType `json:"type"`
+	Payload        Payload                   `json:"payload"`
 }
 
 type Payload struct {
