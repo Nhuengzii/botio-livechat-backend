@@ -66,6 +66,28 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	//**end path params checking//
 	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			resp := getconversation.Response{
+				Conversation: nil,
+			}
+			responseJSON, err := json.Marshal(resp)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					StatusCode: 500,
+					Headers: map[string]string{
+						"Access-Control-Allow-Origin": "*",
+					},
+					Body: "Internal Server Error",
+				}, err
+			}
+			return events.APIGatewayProxyResponse{
+				StatusCode: 200,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: string(responseJSON),
+			}, err
+		}
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
 			Body:       "Bad Gateway",
