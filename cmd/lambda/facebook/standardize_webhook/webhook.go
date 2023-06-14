@@ -43,5 +43,5 @@ type TemplatePayload struct {
 }
 
 type ReplyMessage struct {
-	MessageId string `json:"messageID"`
+	MessageId string `json:"mid"`
 }
