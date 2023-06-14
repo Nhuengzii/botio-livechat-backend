@@ -30,7 +30,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}()
 
 	pathParams := request.PathParameters
-	// shopID := pathParams["shop_id"]
+	shopID := pathParams["shop_id"]
 	pageID, ok := pathParams["page_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
@@ -52,7 +52,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	stdMessages, err := c.dbClient.QueryMessages(ctx, pageID, conversationID)
+	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 502,
