@@ -54,11 +54,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 
 	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
-
-	getMessagesResponse := getmessages.Response{
-		Messages: stdMessages,
-	}
-
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -67,6 +62,10 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 				"Access-Control-Allow-Origin": "*",
 			},
 		}, err
+	}
+
+	getMessagesResponse := getmessages.Response{
+		Messages: stdMessages,
 	}
 
 	jsonBodyByte, err := json.Marshal(getMessagesResponse)

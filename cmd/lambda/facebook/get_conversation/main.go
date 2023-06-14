@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	errNoShopIDPath = errors.New("err path parameter parameters shop_id not given")
-	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
+	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
+	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath = errors.New("err path parameter parameters conversation_id not given")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -30,6 +31,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
 
+	//**path params checking//
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
@@ -51,8 +53,54 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, errNoPageIDPath
 	}
+	conversationID, ok := pathParams["conversation_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoConversationIDPath
+	}
+	//**end path params checking//
+	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			resp := getconversation.Response{
+				Conversation: nil,
+			}
+			responseJSON, err := json.Marshal(resp)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					StatusCode: 500,
+					Headers: map[string]string{
+						"Access-Control-Allow-Origin": "*",
+					},
+					Body: "Internal Server Error",
+				}, err
+			}
+			return events.APIGatewayProxyResponse{
+				StatusCode: 200,
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+				Body: string(responseJSON),
+			}, err
+		}
+		return events.APIGatewayProxyResponse{
+			StatusCode: 502,
+			Body:       "Bad Gateway",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, err
+	}
+	getConversationResponse := getconversation.Response{
+		Conversation: stdConversation,
+	}
 
-	stdConversations, err := c.dbClient.QueryConversations(ctx, shopID, pageID)
+	jsonBodyByte, err := json.Marshal(getConversationResponse)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -62,31 +110,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, err
 	}
-	getConversationsResponse := getconversations.Response{
-		Conversations: stdConversations,
-	}
-
-	getConversationsResponse := getconversations.Response{
-		Conversations: stdConversations,
-	}
-
-	jsonBodyByte, err := json.Marshal(getConversationsResponse)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
-	}
-
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(jsonBodyByte),
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
 	}, nil
 }
 
