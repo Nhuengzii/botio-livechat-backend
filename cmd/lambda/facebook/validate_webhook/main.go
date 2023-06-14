@@ -55,8 +55,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		err = c.sqsClient.SendMessage(c.sqsQueueURL, msg)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
-				StatusCode: 502,
-				Body:       "Bad Gateway",
+				StatusCode: 500,
+				Body:       "Internal Server Error",
 			}, err
 		}
 		elapsed := time.Since(start)
@@ -69,7 +69,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	} else {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 405,
-			Body:       "Method",
+			Body:       "Method Not Allowed",
 		}, errMethodNotAllowed
 	}
 }

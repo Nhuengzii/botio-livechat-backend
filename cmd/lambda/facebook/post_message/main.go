@@ -94,8 +94,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	facebookResponse, err := postfbmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
+			StatusCode: 503,
+			Body:       "Service Unavailable",
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
@@ -119,15 +119,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
-	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(jsonBodyByte),

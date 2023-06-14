@@ -53,7 +53,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-
 	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
 
 	getMessagesResponse := getmessages.Response{
@@ -62,8 +61,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
+			StatusCode: 500,
+			Body:       "Internal Server Error",
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
@@ -84,8 +83,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Gateway",
+			StatusCode: 500,
+			Body:       "Internal Server Error",
 			Headers: map[string]string{
 				"Access-Control-Allow-Origin": "*",
 			},
