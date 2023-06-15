@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbuserprofile"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbuserpsid"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
@@ -19,10 +20,35 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 	if err != nil {
 		return nil, err
 	}
-	userProfile, err := getfbuserprofile.GetUserProfile(facebookCredentials.AccessToken, message.Source.UserID)
-	if err != nil {
-		return nil, err
+
+	var userProfile *getfbuserprofile.UserProfile
+	var userID string
+	if message.Source.UserType == stdmessage.UserTypeUser {
+		// no need to query user's psid
+		userProfile, err = getfbuserprofile.GetUserProfile(facebookCredentials.AccessToken, message.Source.UserID)
+		if err != nil {
+			return nil, err
+		}
+		userID = message.Source.UserID
+	} else if message.Source.UserType == stdmessage.UserTypeAdmin {
+		// query for user's psid from pageID
+		psid, err := getfbuserpsid.GetUserPSID(facebookCredentials.AccessToken, message.PageID, message.ConversationID)
+		if err != nil {
+			return nil, err
+		} else if psid == "" {
+			return nil, errCannotGetUserPSID
+		}
+
+		userProfile, err = getfbuserprofile.GetUserProfile(facebookCredentials.AccessToken, psid)
+		if err != nil {
+			return nil, err
+		}
+
+		userID = psid
+	} else {
+		return nil, errUnsupportedUserType
 	}
+
 	lastActivity, err := message.ToLastActivityString()
 	if err != nil {
 		return nil, err
@@ -38,7 +64,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 		UpdatedTime: message.Timestamp,
 		Participants: []stdconversation.Participant{
 			{
-				UserID:   message.Source.UserID,
+				UserID:   userID,
 				Username: userProfile.Name,
 				ProfilePic: stdconversation.Payload{
 					Src: userProfile.ProfilePic,

@@ -27,6 +27,7 @@ var (
 	errUnmarshalReceivedBody    = errors.New("error json unmarshal receive body")
 	errUnmarshalReceivedMessage = errors.New("error json unmarshal receive message")
 	errUnsupportedUserType      = errors.New("error unsupported user type")
+	errCannotGetUserPSID        = errors.New("error cannot get fb user's PSID")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
