@@ -12,13 +12,15 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 var (
-	errNoShopIDPath = errors.New("err path parameter parameters shop_id not given")
-	errNoPageIDPath = errors.New("err path parameter parameters page_id not given")
+	errNoPageIDPath                = errors.New("err path parameter parameters page_id not given")
+	errNoShopIDPath                = errors.New("err path parameter parameters shop_id not given")
+	errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -52,15 +54,66 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoPageIDPath
 	}
 
-	stdConversations, err := c.dbClient.QueryConversations(ctx, shopID, pageID)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+	stdConversations := []stdconversation.StdConversation{}
+
+	filterQueryString, ok := request.QueryStringParameters["filter"]
+	if !ok { // no need to query with filter
+		discord.Log(c.discordWebhookURL, "no need to query")
+		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       "Internal Server Error",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, err
+		}
+	} else { // need to query with filter
+		var filter getconversations.Filter
+
+		err := json.Unmarshal([]byte(filterQueryString), &filter)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       "Internal Server Error",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, err
+		}
+		if filter.Message != "" && filter.ParticipantsUsername != "" {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Body:       "Bad Request",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, errTwoFilterParamsInOneRequest
+		} else if filter.ParticipantsUsername != "" { // query with ParticipantsUsername
+			stdConversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.ParticipantsUsername)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					StatusCode: 500,
+					Body:       "Internal Server Error",
+					Headers: map[string]string{
+						"Access-Control-Allow-Origin": "*",
+					},
+				}, err
+			}
+		} else if filter.Message != "" { // query with message
+			discord.Log(c.discordWebhookURL, "query with message")
+			stdConversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.Message)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					StatusCode: 500,
+					Body:       "Internal Server Error",
+					Headers: map[string]string{
+						"Access-Control-Allow-Origin": "*",
+					},
+				}, err
+			}
+		}
 	}
 	getConversationsResponse := getconversations.Response{
 		Conversations: stdConversations,

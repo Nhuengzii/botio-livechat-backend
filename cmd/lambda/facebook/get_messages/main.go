@@ -12,11 +12,13 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 var (
+	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
 )
@@ -31,7 +33,16 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}()
 
 	pathParams := request.PathParameters
-	shopID := pathParams["shop_id"]
+	shopID, ok := pathParams["shop_id"]
+	if !ok {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Bad Request",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errNoShopIDPath
+	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
 		return events.APIGatewayProxyResponse{
@@ -53,17 +64,35 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, errNoConversationIDPath
 	}
 
-	stdMessages, err := c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
-	}
+	stdMessages := []stdmessage.StdMessage{}
 
+	filterQueryString, ok := request.QueryStringParameters["filter"]
+	if !ok {
+		stdMessages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       "Internal Server Error",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, err
+		}
+	} else {
+		var filter getmessages.Filter
+		err := json.Unmarshal([]byte(filterQueryString), &filter)
+
+		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformFacebook, pageID, conversationID, filter.Message)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       "Internal Server Error",
+				Headers: map[string]string{
+					"Access-Control-Allow-Origin": "*",
+				},
+			}, err
+		}
+	}
 	getMessagesResponse := getmessages.Response{
 		Messages: stdMessages,
 	}

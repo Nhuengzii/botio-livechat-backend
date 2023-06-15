@@ -18,7 +18,10 @@ type DBClient interface {
 	UpdateConversationParticipants(ctx context.Context, conversationID string) error
 	QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (*stdconversation.StdConversation, error)
 	QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) ([]stdmessage.StdMessage, error)
+	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) ([]stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, shopID string, pageID string) ([]stdconversation.StdConversation, error)
+	QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) ([]stdconversation.StdConversation, error)
+	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) ([]stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
 	QueryFacebookPage(ctx context.Context, pageID string) (*shops.FacebookPage, error)
 	QueryLinePage(ctx context.Context, pageID string) (*shops.LinePage, error)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
@@ -167,6 +168,38 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) (_ []stdmessage.StdMessage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "conversationID", Value: conversationID},
+		{Key: "message", Value: bson.D{
+			{Key: "$regex", Value: message},
+		}},
+	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	messages := []stdmessage.StdMessage{}
+	err = cur.All(ctx, &messages)
+	if err != nil {
+		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return messages, nil
+}
+
 func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -214,6 +247,91 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	if cur.Err() != nil {
 		return nil, cur.Err()
 	}
+	return conversations, nil
+}
+
+func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
+		}
+	}()
+
+	name = strings.Trim(name, " ")
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}},
+	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	conversations := []stdconversation.StdConversation{}
+	err = cur.All(ctx, &conversations)
+	if err != nil {
+		return nil, err
+	} else if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return conversations, nil
+}
+
+func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
+		}
+	}()
+
+	message = strings.Trim(message, " ")
+	collMessage := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	filterMessage := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
+		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}}}
+	cur, err := collMessage.Find(ctx, filterMessage)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	conversations := []stdconversation.StdConversation{}
+
+	uniqueConversationIDSet := map[string]struct{}{} // using map to implement set
+
+	for cur.Next(ctx) {
+		var message stdmessage.StdMessage
+		err := cur.Decode(&message)
+		if err != nil {
+			return nil, err
+		}
+		uniqueConversationIDSet[message.ConversationID] = struct{}{} // add conversationID to set
+	}
+
+	var uniqueConversationIDFilter []string
+
+	for conversationID := range uniqueConversationIDSet {
+		uniqueConversationIDFilter = append(uniqueConversationIDFilter, conversationID)
+	}
+
+	if len(uniqueConversationIDFilter) != 0 {
+		collConversation := c.client.Database(c.Database).Collection(c.CollectionConversations)
+		filterConversation := bson.M{"conversationID": bson.M{"$in": uniqueConversationIDFilter}}
+		cur, err = collConversation.Find(ctx, filterConversation)
+		if err != nil {
+			return nil, err
+		}
+		err = cur.All(ctx, &conversations)
+		if err := cur.Err(); err != nil {
+			return nil, err
+		}
+	}
+
 	return conversations, nil
 }
 
