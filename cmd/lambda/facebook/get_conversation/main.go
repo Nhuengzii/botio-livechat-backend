@@ -29,8 +29,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
-	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
-
 	//**path params checking//
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
