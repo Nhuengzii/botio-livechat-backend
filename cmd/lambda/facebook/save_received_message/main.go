@@ -26,6 +26,7 @@ type receivedMessage struct {
 var (
 	errUnmarshalReceivedBody    = errors.New("error json unmarshal receive body")
 	errUnmarshalReceivedMessage = errors.New("error json unmarshal receive message")
+	errUnsupportedUserType      = errors.New("error unsupported user type")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -34,8 +35,6 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			discord.Log(c.discordWebhookURL, fmt.Sprint(err))
 		}
 	}()
-
-	discord.Log(c.discordWebhookURL, "facebook save received message handler")
 
 	var receiveBody receivedMessage
 	var receiveMessage stdmessage.StdMessage

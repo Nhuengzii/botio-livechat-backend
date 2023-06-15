@@ -33,8 +33,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
-	discord.Log(c.discordWebhookURL, "facebook POST messages handler")
-
 	//**check parameters**//
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {

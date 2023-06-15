@@ -23,8 +23,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
-	discord.Log(c.discordWebhookURL, "Facebook webhook verify lambda handler")
-
 	if request.HTTPMethod == "GET" {
 		err := VerifyConnection(request.QueryStringParameters, c.facebookWebhookVerificationString)
 		if err != nil {

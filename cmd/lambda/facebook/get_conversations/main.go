@@ -30,8 +30,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}
 	}()
 
-	discord.Log(c.discordWebhookURL, "facebook get conversations handler")
-
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
@@ -58,7 +56,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok { // no need to query with filter
-		discord.Log(c.discordWebhookURL, "no need to query")
 		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
@@ -102,7 +99,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 				}, err
 			}
 		} else if filter.Message != "" { // query with message
-			discord.Log(c.discordWebhookURL, "query with message")
 			stdConversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.Message)
 			if err != nil {
 				return events.APIGatewayProxyResponse{

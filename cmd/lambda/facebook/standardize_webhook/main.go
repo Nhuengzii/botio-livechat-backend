@@ -31,7 +31,6 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 	}()
 
-	discord.Log(c.discordWebhookURL, "facebook standardize webhook handler")
 	start := time.Now()
 	var receiveWebhook ReceiveWebhook
 
