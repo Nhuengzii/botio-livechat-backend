@@ -24,8 +24,6 @@ var (
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
-	discord.Log(c.discordWebhookURL, "facebook get messages handler")
-
 	defer func() {
 		if err != nil {
 			discord.Log(c.discordWebhookURL, fmt.Sprintln(err))
