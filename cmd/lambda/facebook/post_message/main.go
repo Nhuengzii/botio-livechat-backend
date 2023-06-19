@@ -19,11 +19,13 @@ import (
 )
 
 var (
-	errNoPSIDParam                = errors.New("err query string parameter psid not given")
-	errNoShopIDPath               = errors.New("err path parameter shop_id not given")
-	errNoPageIDPath               = errors.New("err path parameter parameters page_id not given")
-	errNoConversationIDPath       = errors.New("err path parameter conversation_id not given")
-	errAttachmentTypeNotSupported = errors.New("err attachment type given is not supported")
+	errNoPSIDParam                      = errors.New("err query string parameter psid not given")
+	errNoShopIDPath                     = errors.New("err path parameter shop_id not given")
+	errNoPageIDPath                     = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath             = errors.New("err path parameter conversation_id not given")
+	errAttachmentTypeNotSupported       = errors.New("err attachment type given is not supported")
+	errNoSrcFoundForBasicPayload        = errors.New("err this attachment type should not have an empty url")
+	errNoPayloadFoundForTemplatePayload = errors.New("err this template attachment type should not have empty elements ")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {

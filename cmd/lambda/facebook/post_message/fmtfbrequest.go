@@ -6,7 +6,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (*postfbmessage.SendingMessage, error) {
+func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *postfbmessage.SendingMessage, err error) {
 	var fbRequest postfbmessage.SendingMessage
 
 	if req.Message != "" {
@@ -21,15 +21,23 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (*postfb
 		}
 	} else {
 		stdAttachment := stdmessage.AttachmentType(req.Attachment.AttachmentType)
+		var payload *postfbmessage.AttachmentFacebookPayload
 		switch stdAttachment { // supported post type
 		case stdmessage.AttachmentTypeImage:
+			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeVideo:
+			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeAudio:
+			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeFile:
+			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeFBTemplateGeneric:
 			// add more supported type here
 		default:
 			return nil, errAttachmentTypeNotSupported
+		}
+		if err != nil {
+			return nil, err
 		}
 		fbRequest = postfbmessage.SendingMessage{
 			Recipient: postfbmessage.Recipient{
@@ -39,10 +47,7 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (*postfb
 			Message: postfbmessage.MessageAttachment{
 				Attachment: postfbmessage.AttachmentFacebookRequest{
 					AttachmentType: req.Attachment.AttachmentType,
-					Payload: postfbmessage.AttachmentFacebookPayload{
-						Src:        req.Attachment.Payload.Src,
-						IsReusable: true,
-					},
+					Payload:        *payload,
 				},
 			},
 		}
