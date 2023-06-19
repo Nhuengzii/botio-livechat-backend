@@ -5,8 +5,10 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"log"
 	"os"
 	"time"
@@ -26,9 +28,23 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		pageID := hookBody.Destination
+		page, err := c.dbClient.QueryLinePage(ctx, pageID)
+		if err != nil {
+			return err
+		}
+		lineChannelSecret := page.Secret
+		lineChannelAccessToken := page.AccessToken
+		bot, err := linebot.New(lineChannelSecret, lineChannelAccessToken)
+		if err != nil {
+			return err
+		}
+		uploader := amazons3.NewUploader(os.Getenv("AWS_REGION"))
 		shop, err := c.dbClient.QueryShop(ctx, pageID)
+		if err != nil {
+			return err
+		}
 		shopID := shop.ShopID
-		err = c.handleEvents(ctx, shopID, pageID, hookBody)
+		err = c.handleEvents(ctx, shopID, pageID, bot, *uploader, hookBody)
 		if err != nil {
 			return err
 		}
