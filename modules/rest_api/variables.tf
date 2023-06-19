@@ -19,6 +19,7 @@ variable "handlers" {
     handler_name          = string
     handler_path          = string
     environment_variables = map(string)
+    dependencies          = string
   }))
 }
 

@@ -17,3 +17,7 @@ variable "environment_variables" {
   }
 }
 
+variable "dependencies" {
+  type    = string
+  default = ""
+}

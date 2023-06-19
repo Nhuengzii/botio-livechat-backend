@@ -13,8 +13,8 @@ resource "null_resource" "build_handler" {
       for f in fileset(format("%s/%s", path.root, var.handler_path), "*.go") :
       filesha1(format("%s/%s/%s", path.root, var.handler_path, f))
     ]))
-    livechat_source_code_hash = sha1(join("", [
-      for f in fileset(format("%s/livechat/", path.root), "**/*.go") : filesha1(format("%s/livechat/%s", path.root, f))
+    dependencies_source_code_hash = sha1(join("", [
+      for f in fileset(format("%s/livechat/", path.root), var.dependencies) : filesha1(format("%s/livechat/%s", path.root, f))
     ]))
   }
   provisioner "local-exec" {

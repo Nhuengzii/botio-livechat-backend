@@ -190,6 +190,7 @@ module "handlers" {
   handler_path          = each.value.handler_path
   role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = merge(each.value.environment_variables, local.environment_variables_mapping[each.key])
+  dependencies          = each.value.dependencies
 }
 
 # Define Method
