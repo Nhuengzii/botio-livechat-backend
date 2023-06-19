@@ -209,7 +209,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,sqswrapper}/**/*.go"
     }
     get_conversations = {
       handler_name = "line_get_conversations"
@@ -219,7 +219,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,api,stdconversation}/**/*.go"
     }
     get_conversation = {
       handler_name = "line_get_conversation"
@@ -229,7 +229,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,api}/**/*.go"
     }
     get_messages = {
       handler_name = "line_get_messages"
@@ -239,7 +239,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,api,stdmessage}/**/*.go"
     }
     post_message = {
       handler_name = "line_post_message"
@@ -249,7 +249,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,api,stdmessage}/**/*.go"
     }
     standardize_webhook = {
       handler_name = "line_standardize_webhook"
@@ -259,7 +259,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,snswrapper,storage,stdmessage}/**/*.go"
     }
     save_received_message = {
       handler_name = "line_save_received_message"
@@ -269,7 +269,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,snswrapper,stdmessage,stdconversation,external_api}/**/*.go"
     }
   }
   method_integrations = {
