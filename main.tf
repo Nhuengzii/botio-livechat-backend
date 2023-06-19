@@ -27,41 +27,6 @@ resource "aws_api_gateway_resource" "shop_id" {
   path_part   = "{shop_id}"
 }
 
-# module "facebook_rest_api" {
-#   source                               = "./modules/facebook_rest_api"
-#   platform                             = "facebook"
-#   rest_api_id                          = aws_api_gateway_rest_api.rest_api.id
-#   rest_api_execution_arn               = aws_api_gateway_rest_api.rest_api.execution_arn
-#   parent_id                            = aws_api_gateway_resource.shop_id.id
-#   facebook_access_token                = var.facebook_access_token
-#   facebook_app_secret                  = var.facebook_app_secret
-#   facebook_webhook_verification_string = var.facebook_webhook_verification_string
-#   mongo_uri                            = var.mongo_uri
-#   mongo_database                       = var.mongo_database
-#   discord_webhook_url                  = var.discord_webhook_url
-#   relay_received_message_handler = {
-#     function_name = module.websocket_api.relay_received_message_handler.function_name
-#   }
-# }
-
-# module "line_rest_api" {
-#   source                              = "./modules/line_rest_api"
-#   platform                            = "line"
-#   rest_api_id                         = aws_api_gateway_rest_api.rest_api.id
-#   rest_api_execution_arn              = aws_api_gateway_rest_api.rest_api.execution_arn
-#   parent_id                           = aws_api_gateway_resource.shop_id.id
-#   line_channel_access_token           = var.line_channel_access_token
-#   line_channel_secret                 = var.line_channel_secret
-#   mongo_uri                           = var.mongo_uri
-#   mongo_database                      = var.mongo_database
-#   mongo_collection_line_messages      = var.mongo_collection_line_messages
-#   mongo_collection_line_conversations = var.mongo_collection_line_conversations
-#   discord_webhook_url                 = var.discord_webhook_url
-#   relay_received_message_handler = {
-#     function_name = module.websocket_api.relay_received_message_handler.function_name
-#   }
-# }
-
 # resource "aws_apigatewayv2_api" "botio_livechat_websocket" {
 #   name                       = "botio_livechat_websocket"
 #   protocol_type              = "WEBSOCKET"
@@ -231,42 +196,63 @@ module "line" {
       handler_name = "line_validate_webhook"
       handler_path = format("%s/cmd/lambda/line/validate_webhook", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     get_conversations = {
       handler_name = "line_get_conversations"
       handler_path = format("%s/cmd/lambda/line/get_conversations", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     get_conversation = {
       handler_name = "line_get_conversation"
       handler_path = format("%s/cmd/lambda/line/get_conversation", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     get_messages = {
       handler_name = "line_get_messages"
       handler_path = format("%s/cmd/lambda/line/get_messages", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     post_message = {
       handler_name = "line_post_message"
       handler_path = format("%s/cmd/lambda/line/post_message", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     standardize_webhook = {
       handler_name = "line_standardize_webhook"
       handler_path = format("%s/cmd/lambda/line/standardize_webhook", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     save_received_message = {
       handler_name = "line_save_received_message"
       handler_path = format("%s/cmd/lambda/line/save_received_message", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
   }
