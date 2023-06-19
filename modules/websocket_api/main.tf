@@ -78,8 +78,9 @@ module "routes_handler" {
   handler_name = each.value.handler_name
   handler_path = each.value.handler_path
   environment_variables = {
-    REDIS_ADDR     = local.redis_addr
-    REDIS_PASSWORD = local.redis_password
+    REDIS_ADDR       = local.redis_addr
+    REDIS_PASSWORD   = local.redis_password
+    WEBSOCKET_API_ID = var.websocket_api_id
   }
   role_arn = aws_iam_role.assume_role_lambda.arn
 
