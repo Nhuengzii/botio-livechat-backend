@@ -22,16 +22,23 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *post
 	} else {
 		stdAttachment := stdmessage.AttachmentType(req.Attachment.AttachmentType)
 		var payload *postfbmessage.AttachmentFacebookPayload
+		var attachmentType string
 		switch stdAttachment { // supported post type
 		case stdmessage.AttachmentTypeImage:
+			attachmentType = req.Attachment.AttachmentType
 			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeVideo:
+			attachmentType = req.Attachment.AttachmentType
 			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeAudio:
+			attachmentType = req.Attachment.AttachmentType
 			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeFile:
+			attachmentType = req.Attachment.AttachmentType
 			payload, err = fmtBasicPayload(req.Attachment.Payload)
 		case stdmessage.AttachmentTypeFBTemplateGeneric:
+			attachmentType = attachmentTypeTemplate
+			payload, err = fmtGenericTemplatePayload(req.Attachment.Payload)
 			// add more supported type here
 		default:
 			return nil, errAttachmentTypeNotSupported
@@ -46,7 +53,7 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *post
 			MessagingType: "RESPONSE",
 			Message: postfbmessage.MessageAttachment{
 				Attachment: postfbmessage.AttachmentFacebookRequest{
-					AttachmentType: req.Attachment.AttachmentType,
+					AttachmentType: attachmentType,
 					Payload:        *payload,
 				},
 			},
