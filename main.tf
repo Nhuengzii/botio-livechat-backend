@@ -81,6 +81,13 @@ output "rest_api" {
     id = aws_api_gateway_rest_api.rest_api.id
   }
 }
+
+output "websocket_api" {
+  value = {
+    id = aws_apigatewayv2_api.botio_livechat_websocket.id
+  }
+}
+
 module "facebook" {
   source                         = "./modules/rest_api"
   platform                       = "facebook"
