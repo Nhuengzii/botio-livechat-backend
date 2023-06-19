@@ -257,8 +257,8 @@ module "line" {
     }
   }
   method_integrations = {
-    get_validate_webhook = {
-      method  = "GET"
+    post_validate_webhook = {
+      method  = "POST"
       handler = "validate_webhook"
     }
     get_conversations = {
