@@ -30,5 +30,9 @@ variable "method_integrations" {
   }))
 }
 
+variable "relay_received_message_handler" {
+  type = string
+}
+
 
 
