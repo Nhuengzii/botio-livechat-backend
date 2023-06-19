@@ -200,6 +200,118 @@ module "facebook" {
   }
 }
 
+module "instagram" {
+  source                         = "./modules/rest_api"
+  platform                       = "instagram"
+  rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
+  rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
+  parent_id                      = aws_api_gateway_resource.shop_id.id
+  relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
+  handlers = {
+    validate_webhook = {
+      handler_name = "instagram_validate_webhook"
+      handler_path = format("%s/cmd/lambda/instagram/validate_webhook", path.root)
+      environment_variables = {
+        APP_SECRET                            = var.instagram_app_secret
+        ACCESS_TOKEN                          = var.instagram_access_token
+        INSTAGRAM_WEBHOOK_VERIFICATION_STRING = var.instagram_webhook_verification_string
+        DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
+      }
+      dependencies = "{discord,db,sqswrapper}/**/*.go"
+    }
+    get_conversations = {
+      handler_name = "instagram_get_conversations"
+      handler_path = format("%s/cmd/lambda/instagram/get_conversations", path.root)
+      environment_variables = {
+        ACCESS_TOKEN        = var.instagram_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+    }
+    get_conversation = {
+      handler_name = "instagram_get_conversation"
+      handler_path = format("%s/cmd/lambda/instagram/get_conversation", path.root)
+      environment_variables = {
+        ACCESS_TOKEN        = var.instagram_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+    }
+    get_messages = {
+      handler_name = "instagram_get_messages"
+      handler_path = format("%s/cmd/lambda/instagram/get_messages", path.root)
+      environment_variables = {
+        ACCESS_TOKEN        = var.instagram_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,api,db,stdmessage}/**/*.go"
+    }
+    post_message = {
+      handler_name = "instagram_post_message"
+      handler_path = format("%s/cmd/lambda/instagram/post_message", path.root)
+      environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,api,db,external_api,stdmessage}/**/*.go"
+    }
+    standardize_webhook = {
+      handler_name = "instagram_standardize_webhook"
+      handler_path = format("%s/cmd/lambda/instagram/standardize_webhook", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+      dependencies = "{discord,db,snswrapper,stdmessage,external_api}/**/*.go"
+    }
+    save_received_message = {
+      handler_name = "instagram_save_received_message"
+      handler_path = format("%s/cmd/lambda/instagram/save_received_message", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        ACCESS_TOKEN        = var.instagram_access_token
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+      dependencies = "{discord,external_api,stdconversation,stdmessage,db}/**/*.go"
+    }
+  }
+  method_integrations = {
+    get_validate_webhook = {
+      method  = "GET"
+      handler = "validate_webhook"
+    }
+    post_validate_webhook = {
+      method  = "POST"
+      handler = "validate_webhook"
+    }
+    get_conversations = {
+      method  = "GET"
+      handler = "get_conversations"
+    }
+    get_conversation = {
+      method  = "GET"
+      handler = "get_conversation"
+    }
+    get_messages = {
+      method  = "GET"
+      handler = "get_messages"
+    }
+    post_message = {
+      method  = "POST"
+      handler = "post_message"
+    }
+  }
+}
+
 module "line" {
   source                         = "./modules/rest_api"
   platform                       = "line"
