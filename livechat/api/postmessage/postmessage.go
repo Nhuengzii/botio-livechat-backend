@@ -13,14 +13,14 @@ type Attachment struct {
 type Payload struct {
 	Src string `json:"src"`
 
-	FBTemplateButton                []FBTemplateButton                `json:"fbTemplateButton"`
-	FBTemplateCoupon                []FBTemplateCoupon                `json:"fbTemplateCoupon"`
-	FBTemplateCustomerFeedback      []FBTemplateCustomerFeedback      `json:"fbTemplateCustomerFeedback"`
-	FBTemplateGeneric               []FBTemplateGeneric               `json:"fbTemplateGeneric"`
-	FBTemplateMedia                 []FBTemplateMedia                 `json:"fbTemplateMedia"`
-	FBTemplateProduct               []FBTemplateProduct               `json:"fbTemplateProduct"`
-	FBTemplateReceipt               []FBTemplateReceipt               `json:"fbTemplateReceipt"`
-	FBTemplateStructuredInformation []FBTemplateStructuredInformation `json:"fbTemplateStructuredInformation"`
+	FBTemplateButton                []FBTemplateButton                `json:"fb_template_button"`
+	FBTemplateCoupon                []FBTemplateCoupon                `json:"fb_template_coupon"`
+	FBTemplateCustomerFeedback      []FBTemplateCustomerFeedback      `json:"fb_template_customer_feedback"`
+	FBTemplateGeneric               []FBTemplateGeneric               `json:"fb_template_generic"`
+	FBTemplateMedia                 []FBTemplateMedia                 `json:"fb_template_media"`
+	FBTemplateProduct               []FBTemplateProduct               `json:"fb_template_product"`
+	FBTemplateReceipt               []FBTemplateReceipt               `json:"fb_template_receipt"`
+	FBTemplateStructuredInformation []FBTemplateStructuredInformation `json:"fb_template_structured_information"`
 }
 
 type Response struct {
