@@ -26,6 +26,7 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (*postfb
 		case stdmessage.AttachmentTypeVideo:
 		case stdmessage.AttachmentTypeAudio:
 		case stdmessage.AttachmentTypeFile:
+		case stdmessage.AttachmentTypeFBTemplateGeneric:
 			// add more supported type here
 		default:
 			return nil, errAttachmentTypeNotSupported
