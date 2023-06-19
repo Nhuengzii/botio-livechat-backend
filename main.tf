@@ -220,3 +220,77 @@ module "facebook" {
   }
 }
 
+module "line" {
+  source                 = "./modules/rest_api"
+  platform               = "line"
+  rest_api_id            = aws_api_gateway_rest_api.rest_api.id
+  rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
+  parent_id              = aws_api_gateway_resource.shop_id.id
+  handlers = {
+    validate_webhook = {
+      handler_name = "line_validate_webhook"
+      handler_path = format("%s/cmd/lambda/line/validate_webhook", path.root)
+      environment_variables = {
+      }
+    }
+    get_conversations = {
+      handler_name = "line_get_conversations"
+      handler_path = format("%s/cmd/lambda/line/get_conversations", path.root)
+      environment_variables = {
+      }
+    }
+    get_conversation = {
+      handler_name = "line_get_conversation"
+      handler_path = format("%s/cmd/lambda/line/get_conversation", path.root)
+      environment_variables = {
+      }
+    }
+    get_messages = {
+      handler_name = "line_get_messages"
+      handler_path = format("%s/cmd/lambda/line/get_messages", path.root)
+      environment_variables = {
+      }
+    }
+    post_message = {
+      handler_name = "line_post_message"
+      handler_path = format("%s/cmd/lambda/line/post_message", path.root)
+      environment_variables = {
+      }
+    }
+    standardize_webhook = {
+      handler_name = "line_standardize_webhook"
+      handler_path = format("%s/cmd/lambda/line/standardize_webhook", path.root)
+      environment_variables = {
+      }
+    }
+    save_received_message = {
+      handler_name = "line_save_received_message"
+      handler_path = format("%s/cmd/lambda/line/save_received_message", path.root)
+      environment_variables = {
+      }
+    }
+  }
+  method_integrations = {
+    get_validate_webhook = {
+      method  = "GET"
+      handler = "validate_webhook"
+    }
+    get_conversations = {
+      method  = "GET"
+      handler = "get_conversations"
+    }
+    get_conversation = {
+      method  = "GET"
+      handler = "get_conversation"
+    }
+    get_messages = {
+      method  = "GET"
+      handler = "get_messages"
+    }
+    post_message = {
+      method  = "POST"
+      handler = "post_message"
+    }
+  }
+}
+
