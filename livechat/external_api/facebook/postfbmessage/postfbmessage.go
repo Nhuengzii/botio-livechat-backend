@@ -58,9 +58,12 @@ type AttachmentFacebookRequest struct {
 	Payload        AttachmentFacebookPayload `json:"payload"`
 }
 type AttachmentFacebookPayload struct {
-	Src        string `json:"url"`
-	IsReusable bool   `json:"is_reusable"`
+	Src          string `json:"url"`
+	IsReusable   bool   `json:"is_reusable"`
+	TemplateType string `json:"template_type"`
+	Elements     []any  `json:"elements"` // each element must match the template type
 }
+
 type Recipient struct {
 	Id string `json:"id"`
 }
