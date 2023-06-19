@@ -5,5 +5,5 @@ import (
 )
 
 type StorageUploader interface {
-	UploadFile(string, io.Reader) (string, error)
+	UploadFile(bucketName string, file io.Reader) (string, error)
 }
