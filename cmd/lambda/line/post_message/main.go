@@ -10,9 +10,9 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )

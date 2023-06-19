@@ -109,7 +109,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = ""
+      dependencies = "{discord,api,db,stdconversation}/**/*.go"
     }
     get_conversation = {
       handler_name = "facebook_get_conversation"
@@ -120,7 +120,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = ""
+      dependencies = "{discord,api,db,stdconversation}/**/*.go"
     }
     get_messages = {
       handler_name = "facebook_get_messages"
@@ -131,7 +131,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = ""
+      dependencies = "{discord,api,db,stdmessage}/**/*.go"
     }
     post_message = {
       handler_name = "facebook_post_message"
@@ -141,7 +141,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = ""
+      dependencies = "{discord,api,db,external_api,stdmessage}/**/*.go"
     }
     standardize_webhook = {
       handler_name = "facebook_standardize_webhook"
@@ -151,7 +151,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,db,snswrapper,stdmessage,external_api}/**/*.go"
     }
     save_received_message = {
       handler_name = "facebook_save_received_message"
@@ -162,7 +162,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = ""
+      dependencies = "{discord,external_api,stdconversation,stdmessage,db}/**/*.go"
     }
   }
   method_integrations = {
