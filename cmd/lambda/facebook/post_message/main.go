@@ -26,6 +26,13 @@ var (
 	errAttachmentTypeNotSupported       = errors.New("err attachment type given is not supported")
 	errNoSrcFoundForBasicPayload        = errors.New("err this attachment type should not have an empty url")
 	errNoPayloadFoundForTemplatePayload = errors.New("err this template attachment type should not have empty elements ")
+	errSendingFacebookMessage           = errors.New("err sending facebook message check the body of the request")
+)
+
+const (
+	templateButtonURLType  = "web_url"
+	templateTypeGeneric    = "generic"
+	attachmentTypeTemplate = "template"
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -91,6 +98,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, err
 	}
+
 	facebookResponse, err := postfbmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -106,6 +114,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		RecipientID: facebookResponse.RecipientID,
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,
+	}
+	if resp.MessageID == "" || resp.RecipientID == "" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errSendingFacebookMessage
 	}
 
 	jsonBodyByte, err := json.Marshal(resp)
