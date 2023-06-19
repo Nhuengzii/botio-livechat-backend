@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/aws/aws-sdk-go v1.44.278
 	github.com/aws/aws-sdk-go-v2 v1.18.0
+	github.com/google/uuid v1.3.0
 	github.com/line/line-bot-sdk-go/v7 v7.20.0
 )
 

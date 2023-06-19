@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func (c *config) handleEvents(ctx context.Context, shopID string, pageID string, hookBody *webhookBody) (err error) {
+func (c *config) handleEvents(ctx context.Context, shopID string, pageID string, bot *linebot.Client, uploader amazons3.Uploader, hookBody *webhookBody) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("handleEvents: %w", err)
@@ -20,7 +21,7 @@ func (c *config) handleEvents(ctx context.Context, shopID string, pageID string,
 	for _, event := range hookBody.Events {
 		switch event.Type {
 		case linebot.EventTypeMessage:
-			stdMessage, err := c.newStdMessage(shopID, pageID, event)
+			stdMessage, err := c.newStdMessage(shopID, pageID, bot, uploader, event)
 			if err != nil {
 				if errors.Is(err, errMessageSourceUnsupported) {
 					continue

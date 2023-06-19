@@ -3,16 +3,27 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
+	"os"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Event) (*stdmessage.StdMessage, error) {
+func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client, uploader amazons3.Uploader, event *linebot.Event) (_ *stdmessage.StdMessage, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("newStdMessage: %w", err)
+		}
+	}()
+
 	platform := stdmessage.PlatformLine
-	source, err := toStdMessageSource(event.Source)
-	if err != nil {
-		return nil, fmt.Errorf("newStdMessage: %w", err)
+	if event.Source.Type != linebot.EventSourceTypeUser {
+		return nil, errors.New("event source type unsupported")
+	}
+	source := stdmessage.Source{
+		UserID:   event.Source.UserID,
+		UserType: stdmessage.UserTypeUser,
 	}
 	conversationID := source.UserID
 	timestamp := event.Timestamp.UnixMilli()
@@ -28,20 +39,52 @@ func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Even
 		messageID = msg.ID
 		message = msg.Text
 		if hasLineEmojis(msg) {
-			attachments = toLineEmojiAttachments(msg) // currently nil
+			attachments = toLineEmojiAttachments(msg) // currently empty slice
 		}
 	case *linebot.ImageMessage:
 		messageID = msg.ID
-		attachments = append(attachments, toImageAttachment(msg))
+		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, stdmessage.Attachment{
+			AttachmentType: stdmessage.AttachmentTypeImage,
+			Payload: stdmessage.Payload{
+				Src: location,
+			},
+		})
 	case *linebot.VideoMessage:
 		messageID = msg.ID
-		attachments = append(attachments, toVideoAttachment(msg))
+		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, stdmessage.Attachment{
+			AttachmentType: stdmessage.AttachmentTypeVideo,
+			Payload: stdmessage.Payload{
+				Src: location,
+			},
+		})
 	case *linebot.AudioMessage:
 		messageID = msg.ID
-		attachments = append(attachments, toAudioAttachment(msg))
+		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, stdmessage.Attachment{
+			AttachmentType: stdmessage.AttachmentTypeAudio,
+			Payload: stdmessage.Payload{
+				Src: location,
+			},
+		})
 	case *linebot.StickerMessage:
 		messageID = msg.ID
-		attachments = append(attachments, toStickerAttachment(msg))
+		attachments = append(attachments, stdmessage.Attachment{
+			AttachmentType: stdmessage.AttachmentTypeSticker,
+			Payload: stdmessage.Payload{
+				Src: toStickerURL(msg),
+			},
+		})
 	case *linebot.LocationMessage:
 		messageID = msg.ID
 		message = toLocationString(msg)
@@ -53,7 +96,7 @@ func (c *config) newStdMessage(shopID string, pageID string, event *linebot.Even
 		ConversationID: conversationID,
 		MessageID:      messageID,
 		Timestamp:      timestamp,
-		Source:         *source,
+		Source:         source,
 		Message:        message,
 		Attachments:    attachments, // always empty for pure texts and locations, currently empty for texts with line emoji(s) and pure line emojis
 		ReplyTo:        replyTo,     // always nil
@@ -72,43 +115,22 @@ func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	}, nil
 }
 
-func toImageAttachment(m *linebot.ImageMessage) stdmessage.Attachment {
-	// TODO get image file from m.ID and save it to some db
-	return stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeImage,
-		Payload: stdmessage.Payload{
-			Src: "", // TODO get url of the image stored in some db
-		},
+func getAndUploadMessageContent(bot *linebot.Client, uploader amazons3.Uploader, messageID string) (_ string, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("getAndUploadMessageContent: %w", err)
+		}
+	}()
+	response, err := bot.GetMessageContent(messageID).Do()
+	if err != nil {
+		return "", err
 	}
-}
-
-func toVideoAttachment(m *linebot.VideoMessage) stdmessage.Attachment {
-	// TODO get video file from m.ID and save it to some db
-	return stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeVideo,
-		Payload: stdmessage.Payload{
-			Src: "", // TODO get url of the video stored in some db
-		},
+	file := response.Content
+	location, err := uploader.UploadFile(os.Getenv("S3_BUCKET_NAME"), file)
+	if err != nil {
+		return "", err
 	}
-}
-
-func toAudioAttachment(m *linebot.AudioMessage) stdmessage.Attachment {
-	// TODO get audio file from m.ID and save it to some db
-	return stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeAudio,
-		Payload: stdmessage.Payload{
-			Src: "", // TODO get url of the audio stored in some db
-		},
-	}
-}
-
-func toStickerAttachment(m *linebot.StickerMessage) stdmessage.Attachment {
-	return stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentTypeSticker,
-		Payload: stdmessage.Payload{
-			Src: toStickerURL(m),
-		},
-	}
+	return location, nil
 }
 
 func toStickerURL(m *linebot.StickerMessage) string {
