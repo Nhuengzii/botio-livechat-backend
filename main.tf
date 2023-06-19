@@ -98,7 +98,7 @@ module "facebook" {
         FACEBOOK_WEBHOOK_VERIFICATION_STRING = var.facebook_webhook_verification_string
         DISCORD_WEBHOOK_URL                  = var.discord_webhook_url
       }
-      dependencies = "{discord}/**/*.go"
+      dependencies = "{discord,db,sqswrapper}/**/*.go"
     }
     get_conversations = {
       handler_name = "facebook_get_conversations"
@@ -194,11 +194,12 @@ module "facebook" {
 }
 
 module "line" {
-  source                 = "./modules/rest_api"
-  platform               = "line"
-  rest_api_id            = aws_api_gateway_rest_api.rest_api.id
-  rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
-  parent_id              = aws_api_gateway_resource.shop_id.id
+  source                         = "./modules/rest_api"
+  platform                       = "line"
+  rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
+  rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
+  parent_id                      = aws_api_gateway_resource.shop_id.id
+  relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
     validate_webhook = {
       handler_name = "line_validate_webhook"
