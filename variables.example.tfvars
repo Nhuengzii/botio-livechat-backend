@@ -39,3 +39,16 @@ line_channel_secret                 = "line_channel_secret"
 line_channel_access_token           = "line_channel_access_token"
 mongo_collection_line_conversations = "mongodb_collection_line_conversations"
 mongo_collection_line_messages      = "mongodb_collection_line_messages"
+
+#=====================================================================
+
+#  _____ _   _  _____ _______       _____ _____            __  __ 
+# |_   _| \ | |/ ____|__   __|/\   / ____|  __ \     /\   |  \/  |
+#   | | |  \| | (___    | |  /  \ | |  __| |__) |   /  \  | \  / |
+#   | | | . ` |\___ \   | | / /\ \| | |_ |  _  /   / /\ \ | |\/| |
+#  _| |_| |\  |____) |  | |/ ____ \ |__| | | \ \  / ____ \| |  | |
+# |_____|_| \_|_____/   |_/_/    \_\_____|_|  \_\/_/    \_\_|  |_|
+
+instagram_access_token                = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+instagram_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
+instagram_webhook_verification_string = "ddddddddddddddd"
