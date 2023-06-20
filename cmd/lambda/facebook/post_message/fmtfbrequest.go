@@ -2,26 +2,26 @@ package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/reqfbsendmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *postfbmessage.SendingMessage, err error) {
-	var fbRequest postfbmessage.SendingMessage
+func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *reqfbsendmessage.SendingMessage, err error) {
+	var fbRequest reqfbsendmessage.SendingMessage
 
 	if req.Message != "" {
-		fbRequest = postfbmessage.SendingMessage{
-			Recipient: postfbmessage.Recipient{
+		fbRequest = reqfbsendmessage.SendingMessage{
+			Recipient: reqfbsendmessage.Recipient{
 				Id: psid,
 			},
 			MessagingType: "RESPONSE",
-			Message: postfbmessage.MessageText{
+			Message: reqfbsendmessage.MessageText{
 				Text: req.Message,
 			},
 		}
 	} else {
 		stdAttachment := stdmessage.AttachmentType(req.Attachment.AttachmentType)
-		var payload *postfbmessage.AttachmentFacebookPayload
+		var payload *reqfbsendmessage.AttachmentFacebookPayload
 		var attachmentType string
 		switch stdAttachment { // supported post type
 		case stdmessage.AttachmentTypeImage:
@@ -46,13 +46,13 @@ func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *post
 		if err != nil {
 			return nil, err
 		}
-		fbRequest = postfbmessage.SendingMessage{
-			Recipient: postfbmessage.Recipient{
+		fbRequest = reqfbsendmessage.SendingMessage{
+			Recipient: reqfbsendmessage.Recipient{
 				Id: psid,
 			},
 			MessagingType: "RESPONSE",
-			Message: postfbmessage.MessageAttachment{
-				Attachment: postfbmessage.AttachmentFacebookRequest{
+			Message: reqfbsendmessage.MessageAttachment{
+				Attachment: reqfbsendmessage.AttachmentFacebookRequest{
 					AttachmentType: attachmentType,
 					Payload:        *payload,
 				},

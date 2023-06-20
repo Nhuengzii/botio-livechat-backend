@@ -1,4 +1,4 @@
-package postfbmessage
+package reqfbsendmessage
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *SendingMessageResponse, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("postfbmessage.SendMessage: %w", err)
+			err = fmt.Errorf("reqfbsendmessage.SendMessage: %w", err)
 		}
 	}()
 	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/messages?access_token=%v", pageID, accessToken)

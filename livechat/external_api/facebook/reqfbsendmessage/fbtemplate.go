@@ -1,4 +1,4 @@
-package postfbmessage
+package reqfbsendmessage
 
 type DefaultAction struct {
 	Type string `json:"type"` // web_url,postback

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/getfbconversationid"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/reqfbconversationid"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
@@ -29,9 +29,9 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 
 	var conversationID string
 	if sender == stdmessage.UserTypeUser {
-		conversationID, err = getfbconversationid.GetConversationID(accessToken, messaging.Sender.ID, pageID)
+		conversationID, err = reqfbconversationid.GetConversationID(accessToken, messaging.Sender.ID, pageID)
 	} else if sender == stdmessage.UserTypeAdmin {
-		conversationID, err = getfbconversationid.GetConversationID(accessToken, messaging.Recipient.ID, pageID)
+		conversationID, err = reqfbconversationid.GetConversationID(accessToken, messaging.Recipient.ID, pageID)
 	}
 
 	if err != nil {
