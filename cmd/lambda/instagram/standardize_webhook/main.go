@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -29,7 +30,21 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 	}()
 
-	return
+	start := time.Now()
+	var receiveWebhook ReceiveWebhook
+
+	for _, record := range sqsEvent.Records {
+		err := json.Unmarshal([]byte(record.Body), &receiveWebhook)
+		if err != nil {
+			return err
+		}
+		err = c.handleReceiveWebhook(ctx, &receiveWebhook)
+		if err != nil {
+			return err
+		}
+	}
+	discord.Log(c.discordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
+	return nil
 }
 
 func main() {
