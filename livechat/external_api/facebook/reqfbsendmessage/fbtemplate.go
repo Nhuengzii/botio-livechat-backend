@@ -10,6 +10,10 @@ type Button struct {
 	Title string `json:"title"`
 }
 
+type Template interface {
+	Template()
+}
+
 type GenericTemplate struct {
 	Title         string        `json:"title"`
 	ImageURL      string        `json:"image_url,omitempty"`
@@ -19,3 +23,6 @@ type GenericTemplate struct {
 }
 
 // TODO: define other template here
+
+// implemet generic template
+func (GenericTemplate) Template() {}

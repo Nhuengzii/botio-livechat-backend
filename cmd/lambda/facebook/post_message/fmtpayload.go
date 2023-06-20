@@ -19,7 +19,7 @@ func fmtGenericTemplatePayload(payload postmessage.Payload) (*reqfbsendmessage.A
 	if len(payload.FBTemplateGeneric) == 0 {
 		return nil, errNoPayloadFoundForTemplatePayload
 	}
-	var genericTemplate []any // reqfbsendmessage.GenericTemplate
+	var genericTemplate []reqfbsendmessage.Template // reqfbsendmessage.GenericTemplate
 	for _, element := range payload.FBTemplateGeneric {
 		var buttons []reqfbsendmessage.Button
 		for _, button := range element.Button {
