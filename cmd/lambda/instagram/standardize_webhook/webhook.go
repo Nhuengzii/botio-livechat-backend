@@ -20,6 +20,7 @@ type Messaging struct {
 
 type Message struct {
 	IsEcho      bool         `json:"is_echo"`
+	IsDeleted   bool         `json:"is_deleted"`
 	MessageID   string       `json:"mid"`
 	Text        string       `json:"text"`
 	Attachments []Attachment `json:"attachments"`
