@@ -39,13 +39,6 @@ locals {
       environment_variables = {
       }
     }
-    relay = {
-      route_key    = "relay"
-      handler_name = "relay"
-      handler_path = format("%s/cmd/lambda/websocket/relay", path.root)
-      environment_variables = {
-      }
-    }
   }
 }
 data "aws_iam_policy_document" "assume_role" {
