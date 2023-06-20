@@ -14,7 +14,7 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 		return nil, err
 	}
 
-	instagramCredentials, err := c.dbClient.QueryInstagramPage(ctx, pageID)
+	instagramCredentials, err := c.dbClient.QueryInstagramAuthentication(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}

@@ -29,7 +29,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	page, err := c.dbClient.QueryLinePage(ctx, pageID)
+	page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return events.APIGatewayProxyResponse{
