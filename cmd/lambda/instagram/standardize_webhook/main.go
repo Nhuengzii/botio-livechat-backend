@@ -30,7 +30,6 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		}
 	}()
 
-	start := time.Now()
 	var receiveWebhook ReceiveWebhook
 
 	for _, record := range sqsEvent.Records {
@@ -43,7 +42,6 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 	}
-	discord.Log(c.discordWebhookURL, fmt.Sprintf("Elapsed: %v", time.Since(start)))
 	return nil
 }
 
