@@ -417,7 +417,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{Key: "InstagramPageID", Value: pageID},
+		{Key: "instagramPageID", Value: pageID},
 	}
 	var shop shops.Shop
 	err = coll.FindOne(ctx, filter).Decode(&shop)
