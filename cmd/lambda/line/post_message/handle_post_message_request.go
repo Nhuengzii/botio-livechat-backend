@@ -21,24 +21,44 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		}
 	}()
 	if requestBody.Message != "" {
-		_, err = bot.PushMessage(conversationID, linebot.NewTextMessage(requestBody.Message)).Do()
+		_, err = bot.PushMessage(conversationID, toLineTextMessage(requestBody)).Do()
 		if err != nil {
 			return err
 		}
 	} else {
 		switch stdmessage.AttachmentType(requestBody.Attachment.AttachmentType) {
 		case stdmessage.AttachmentTypeImage:
-			_, err = bot.PushMessage(conversationID, linebot.NewImageMessage(requestBody.Attachment.Payload.Src, requestBody.Attachment.Payload.Src)).Do()
+			_, err = bot.PushMessage(conversationID, toLineImageMessage(requestBody)).Do()
 			if err != nil {
 				return err
 			}
 		case stdmessage.AttachmentTypeVideo:
-			_, err = bot.PushMessage(conversationID, linebot.NewVideoMessage(requestBody.Attachment.Payload.Src, requestBody.Attachment.Payload.Src)).Do()
+			_, err = bot.PushMessage(conversationID, toLineVideoMessage(requestBody)).Do()
 			if err != nil {
 				return err
 			}
 		case stdmessage.AttachmentTypeAudio:
-			_, err = bot.PushMessage(conversationID, linebot.NewAudioMessage(requestBody.Attachment.Payload.Src, 30)).Do() // where to get duration?
+			_, err = bot.PushMessage(conversationID, toLineAudioMessage(requestBody)).Do() // where to get duration?
+			if err != nil {
+				return err
+			}
+		case stdmessage.AttachmentTypeLineTemplateButtons:
+			_, err = bot.PushMessage(conversationID, toLineTemplateMessage(requestBody)).Do()
+			if err != nil {
+				return err
+			}
+		case stdmessage.AttachmentTypeLineTemplateConfirm:
+			_, err = bot.PushMessage(conversationID, toLineTemplateMessage(requestBody)).Do()
+			if err != nil {
+				return err
+			}
+		case stdmessage.AttachmentTypeLineTemplateCarousel:
+			_, err = bot.PushMessage(conversationID, toLineTemplateMessage(requestBody)).Do()
+			if err != nil {
+				return err
+			}
+		case stdmessage.AttachmentTypeLineTemplateImageCarousel:
+			_, err = bot.PushMessage(conversationID, toLineTemplateMessage(requestBody)).Do()
 			if err != nil {
 				return err
 			}
