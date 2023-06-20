@@ -1,7 +1,5 @@
 package postmessage
 
-import "github.com/line/line-bot-sdk-go/v7/linebot"
-
 type Request struct {
 	Message    string     `json:"message"`
 	Attachment Attachment `json:"attachment"`
@@ -24,7 +22,7 @@ type Payload struct {
 	FBTemplateReceipt               []FBTemplateReceipt               `json:"fb_template_receipt"`
 	FBTemplateStructuredInformation []FBTemplateStructuredInformation `json:"fb_template_structured_information"`
 
-	LineTemplateMessage *linebot.TemplateMessage `json:"line_template_message"`
+	LineTemplateMessage LineTemplateMessage `json:"line_template_message"`
 }
 
 type Response struct {
