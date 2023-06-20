@@ -29,9 +29,9 @@ func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID 
 
 	var conversationID string
 	if sender == stdmessage.UserTypeUser {
-		conversationID, err = reqigconversationid.GetConversationID(accessToken, messaging.Sender.ID, pageID)
+		conversationID, err = reqigconversationid.GetConversationID(accessToken, messaging.Sender.ID, shop.FacebookPageID)
 	} else if sender == stdmessage.UserTypeAdmin {
-		conversationID, err = reqigconversationid.GetConversationID(accessToken, messaging.Recipient.ID, pageID)
+		conversationID, err = reqigconversationid.GetConversationID(accessToken, messaging.Recipient.ID, shop.FacebookPageID)
 	}
 
 	if err != nil {
