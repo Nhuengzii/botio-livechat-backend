@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
@@ -36,7 +35,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			Body:       request.QueryStringParameters["hub.challenge"],
 		}, err
 	} else if request.HTTPMethod == "POST" {
-		start := time.Now()
 		// new session
 
 		// verify Signature
@@ -57,8 +55,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 				Body:       "Internal Server Error",
 			}, err
 		}
-		elapsed := time.Since(start)
-		discord.Log(c.discordWebhookURL, fmt.Sprint("elapsed : ", elapsed))
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Body:       "OK",

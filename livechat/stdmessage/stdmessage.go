@@ -35,6 +35,8 @@ const (
 	AttachmentTypeFBTemplateProduct               AttachmentType = "facebook-template-product"
 	AttachmentTypeFBTemplateReceipt               AttachmentType = "facebook-template-receipt"
 	AttachmentTypeFBTemplateStructuredInformation AttachmentType = "facebook-template-structured-information"
+	AttachmentTypeIGTemplateGeneric               AttachmentType = "instagram-template-generic"
+	AttachmentTypeIGTemplateProduct               AttachmentType = "instagram-template-product"
 )
 
 type StdMessage struct {
@@ -48,6 +50,7 @@ type StdMessage struct {
 	Message        string          `json:"message" bson:"message"`
 	Attachments    []Attachment    `json:"attachments" bson:"attachments"`
 	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
+	IsDeleted      bool            `json:"is_deleted" bson:"is_deleted"`
 }
 
 type Platform string

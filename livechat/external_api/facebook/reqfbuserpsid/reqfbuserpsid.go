@@ -1,4 +1,4 @@
-package getfbuserpsid
+package reqfbuserpsid
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ type Participant struct {
 func GetUserPSID(accessToken string, pageID string, conversationID string) (_ string, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("getfbuserprofile.GetUserPSID: %w", err)
+			err = fmt.Errorf("reqfbuserprofile.GetUserPSID: %w", err)
 		}
 	}()
 
