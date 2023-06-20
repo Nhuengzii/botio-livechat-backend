@@ -95,6 +95,11 @@ resource "aws_sns_topic_subscription" "save_received_message" {
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.save_and_relay_received_message["save"].arn
 }
+resource "aws_sns_topic_subscription" "relay_received_message" {
+  topic_arn = aws_sns_topic.save_and_relay_received_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.save_and_relay_received_message["relay"].arn
+}
 
 # Define Topic
 resource "aws_sns_topic" "save_and_relay_received_message" {
