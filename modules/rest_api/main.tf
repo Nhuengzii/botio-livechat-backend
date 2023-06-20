@@ -152,6 +152,13 @@ resource "aws_api_gateway_resource" "messages" {
   path_part   = "messages"
 }
 
+module "aws_api_gateway_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.messages.id
+}
+
 locals {
   resource_id_mapping = {
     validate_webhook  = aws_api_gateway_resource.webhook.id
