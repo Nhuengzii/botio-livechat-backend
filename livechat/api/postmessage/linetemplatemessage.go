@@ -1,13 +1,13 @@
 package postmessage
 
-type LineMessageType string
+type LineTemplateButtons struct {
+}
 
-const (
-	LineMessageTypeTemplate LineMessageType = "template"
-)
+type LineTemplateConfirm struct {
+}
 
-type LineTemplateMessage struct {
-	Type     LineMessageType `json:"type"`
-	AltText  string          `json:"altText"`
-	Template interface{}     `json:"template"`
+type LineTemplateCarousel struct {
+}
+
+type LineTemplateImageCarousel struct {
 }
