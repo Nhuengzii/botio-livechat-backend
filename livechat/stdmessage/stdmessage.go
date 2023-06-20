@@ -105,7 +105,9 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 		AttachmentTypeFBTemplateMedia,
 		AttachmentTypeFBTemplateProduct,
 		AttachmentTypeFBTemplateReceipt,
-		AttachmentTypeFBTemplateStructuredInformation:
+		AttachmentTypeFBTemplateStructuredInformation,
+		AttachmentTypeIGTemplateGeneric,
+		AttachmentTypeIGTemplateProduct:
 		return "ส่งเทมเพลต", nil
 	case AttachmentTypeLineFlex:
 		return "ส่งเฟล็กซ์", nil
