@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
@@ -22,17 +23,20 @@ func toLineAudioMessage(requestBody postmessage.Request) *linebot.AudioMessage {
 }
 
 func toLineTemplateMessage(requestBody postmessage.Request) *linebot.TemplateMessage {
+	discord.Log("https://discord.com/api/webhooks/1109019632339267584/C26EwyFL2Njn7iLX9VDIto4uF_5C7Qqm3aKuUthHKbJYGLoNM_394GddBbW5gqYPP6Ei", "toLineTemplateMessage")
 	templateMap := requestBody.Attachment.Payload.LineTemplateMessage.Template.(map[string]interface{})
 	switch templateMap["type"].(linebot.TemplateType) {
 	case linebot.TemplateTypeButtons:
 		return linebot.NewTemplateMessage(requestBody.Attachment.Payload.LineTemplateMessage.AltText, toLineButtonsTemplate(requestBody))
 	case linebot.TemplateTypeConfirm:
+		discord.Log("https://discord.com/api/webhooks/1109019632339267584/C26EwyFL2Njn7iLX9VDIto4uF_5C7Qqm3aKuUthHKbJYGLoNM_394GddBbW5gqYPP6Ei", "case line confirm template")
 		return linebot.NewTemplateMessage(requestBody.Attachment.Payload.LineTemplateMessage.AltText, toLineConfirmTemplate(requestBody))
 	case linebot.TemplateTypeCarousel:
 		return linebot.NewTemplateMessage(requestBody.Attachment.Payload.LineTemplateMessage.AltText, toLineCarouselTemplate(requestBody))
 	case linebot.TemplateTypeImageCarousel:
 		return linebot.NewTemplateMessage(requestBody.Attachment.Payload.LineTemplateMessage.AltText, toLineImageCarouselTemplate(requestBody))
 	default:
+		discord.Log("https://discord.com/api/webhooks/1109019632339267584/C26EwyFL2Njn7iLX9VDIto4uF_5C7Qqm3aKuUthHKbJYGLoNM_394GddBbW5gqYPP6Ei", "case default")
 		return nil
 	}
 }
@@ -60,6 +64,7 @@ func toLineButtonsTemplate(requestBody postmessage.Request) *linebot.ButtonsTemp
 }
 
 func toLineConfirmTemplate(requestBody postmessage.Request) *linebot.ConfirmTemplate {
+	discord.Log("https://discord.com/api/webhooks/1109019632339267584/C26EwyFL2Njn7iLX9VDIto4uF_5C7Qqm3aKuUthHKbJYGLoNM_394GddBbW5gqYPP6Ei", "toLineConfirmTemplate")
 	templateMap := requestBody.Attachment.Payload.LineTemplateMessage.Template.(map[string]interface{})
 	text := templateMap["text"].(string)
 	actions := templateMap["actions"].([]linebot.TemplateAction)

@@ -29,6 +29,16 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
+	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+			Body: "Not Found",
+		}, err
+	}
 	page, err := c.dbClient.QueryLinePage(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
@@ -46,16 +56,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 				"Access-Control-Allow-Origin": "*",
 			},
 			Body: "Internal Server Error",
-		}, err
-	}
-	err = c.dbClient.CheckConversationExists(ctx, conversationID)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Not Found",
 		}, err
 	}
 	lineChannelAccessToken := page.AccessToken
