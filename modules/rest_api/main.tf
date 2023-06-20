@@ -157,11 +157,18 @@ resource "aws_api_gateway_resource" "messages" {
   path_part   = "messages"
 }
 
-module "aws_api_gateway_enable_cors" {
+module "messages_resource_enable_cors" {
   source          = "squidfunk/api-gateway-enable-cors/aws"
   version         = "0.3.3"
   api_id          = var.rest_api_id
   api_resource_id = aws_api_gateway_resource.messages.id
+}
+
+module "page_id_resource_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.page_id.id
 }
 
 locals {
