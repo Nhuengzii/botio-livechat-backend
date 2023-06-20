@@ -39,7 +39,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			Body: "Not Found",
 		}, err
 	}
-	page, err := c.dbClient.QueryLinePage(ctx, pageID)
+	page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return events.APIGatewayProxyResponse{

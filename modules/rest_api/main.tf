@@ -95,6 +95,11 @@ resource "aws_sns_topic_subscription" "save_received_message" {
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.save_and_relay_received_message["save"].arn
 }
+resource "aws_sns_topic_subscription" "relay_received_message" {
+  topic_arn = aws_sns_topic.save_and_relay_received_message.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.save_and_relay_received_message["relay"].arn
+}
 
 # Define Topic
 resource "aws_sns_topic" "save_and_relay_received_message" {
@@ -150,6 +155,13 @@ resource "aws_api_gateway_resource" "messages" {
   rest_api_id = var.rest_api_id
   parent_id   = aws_api_gateway_resource.conversation_id.id
   path_part   = "messages"
+}
+
+module "aws_api_gateway_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.messages.id
 }
 
 locals {

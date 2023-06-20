@@ -1,4 +1,4 @@
-package reqfbconversationid
+package reqigconversationid
 
 import (
 	"encoding/json"
@@ -17,15 +17,14 @@ type Conversation struct {
 	ID string `json:"id"`
 }
 
-func GetConversationID(accessToken string, psid string, pageID string) (_ string, err error) {
-	// important userID is not pageID psid only
+func GetConversationID(accessToken string, igsid string, pageID string) (_ string, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("reqfbconversationid.GetConversationID: %w", err)
+			err = fmt.Errorf("reqigconversationid.GetConversationID: %w", err)
 		}
 	}()
-	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=messenger&user_id=%v&access_token=%v",
-		pageID, psid, accessToken)
+	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=instagram&user_id=%v&access_token=%v",
+		pageID, igsid, accessToken)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err

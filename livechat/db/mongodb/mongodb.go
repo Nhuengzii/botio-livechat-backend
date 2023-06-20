@@ -293,7 +293,8 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
-		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}}}
+		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}},
+	}
 	cur, err := collMessage.Find(ctx, filterMessage)
 	if err != nil {
 		return nil, err
@@ -345,25 +346,13 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	filter := bson.M{
 		"$or": []bson.D{
 			{
-				{Key: "facebookPages", Value: bson.D{
-					{Key: "$elemMatch", Value: bson.D{
-						{Key: "pageID", Value: pageID},
-					}},
-				}},
+				{Key: "facebookPageID", Value: pageID},
 			},
 			{
-				{Key: "linePages", Value: bson.D{
-					{Key: "$elemMatch", Value: bson.D{
-						{Key: "pageID", Value: pageID},
-					}},
-				}},
+				{Key: "linePageID", Value: pageID},
 			},
 			{
-				{Key: "instagramPages", Value: bson.D{
-					{Key: "$elemMatch", Value: bson.D{
-						{Key: "pageID", Value: pageID},
-					}},
-				}},
+				{Key: "instagramPageID", Value: pageID},
 			},
 		},
 	}
@@ -378,19 +367,15 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	return &shop, nil
 }
 
-func (c *Client) QueryFacebookPage(ctx context.Context, pageID string) (_ *shops.FacebookPage, err error) {
+func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string) (_ *shops.FacebookAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryFacebookPage: %w", err)
+			err = fmt.Errorf("mongodb.QueryFacebookAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{Key: "facebookPages", Value: bson.D{
-			{Key: "$elemMatch", Value: bson.D{
-				{Key: "pageID", Value: pageID},
-			}},
-		}},
+		{Key: "facebookPageID", Value: pageID},
 	}
 	var shop shops.Shop
 	err = coll.FindOne(ctx, filter).Decode(&shop)
@@ -400,29 +385,18 @@ func (c *Client) QueryFacebookPage(ctx context.Context, pageID string) (_ *shops
 		}
 		return nil, err
 	}
-	var facebookPage *shops.FacebookPage
-	for _, page := range shop.FacebookPages {
-		if pageID == page.PageID {
-			facebookPage = page
-			break
-		}
-	}
-	return facebookPage, nil
+	return &shop.FacebookAuthentication, nil
 }
 
-func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.LinePage, err error) {
+func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ *shops.LineAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryLinePage: %w", err)
+			err = fmt.Errorf("mongodb.QueryLineAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{Key: "linePages", Value: bson.D{
-			{Key: "$elemMatch", Value: bson.D{
-				{Key: "pageID", Value: pageID},
-			}},
-		}},
+		{Key: "linePageID", Value: pageID},
 	}
 	var shop shops.Shop
 	err = coll.FindOne(ctx, filter).Decode(&shop)
@@ -432,29 +406,18 @@ func (c *Client) QueryLinePage(ctx context.Context, pageID string) (_ *shops.Lin
 		}
 		return nil, err
 	}
-	var linePage *shops.LinePage
-	for _, page := range shop.LinePages {
-		if pageID == page.PageID {
-			linePage = page
-			break
-		}
-	}
-	return linePage, nil
+	return &shop.LineAuthentication, nil
 }
 
-func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shops.InstagramPage, err error) {
+func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string) (_ *shops.InstagramAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryInstagramPage: %w", err)
+			err = fmt.Errorf("mongodb.QueryInstagramAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
-		{Key: "instagramPages", Value: bson.D{
-			{Key: "$elemMatch", Value: bson.D{
-				{Key: "pageID", Value: pageID},
-			}},
-		}},
+		{Key: "InstagramPageID", Value: pageID},
 	}
 	var shop shops.Shop
 	err = coll.FindOne(ctx, filter).Decode(&shop)
@@ -464,12 +427,5 @@ func (c *Client) QueryInstagramPage(ctx context.Context, pageID string) (_ *shop
 		}
 		return nil, err
 	}
-	var instagramPage *shops.InstagramPage
-	for _, page := range shop.InstagramPages {
-		if pageID == page.PageID {
-			instagramPage = page
-			break
-		}
-	}
-	return instagramPage, nil
+	return &shop.InstagramAuthentication, nil
 }

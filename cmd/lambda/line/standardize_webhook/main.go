@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+	"time"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
@@ -9,9 +13,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"log"
-	"os"
-	"time"
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -28,7 +29,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		pageID := hookBody.Destination
-		page, err := c.dbClient.QueryLinePage(ctx, pageID)
+		page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 		if err != nil {
 			return err
 		}

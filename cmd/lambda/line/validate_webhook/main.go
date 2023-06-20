@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
+	"os"
+	"time"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
-	"os"
-	"time"
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -23,7 +24,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
-	shop, err := c.dbClient.QueryLinePage(ctx, pageID)
+	shop, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return events.APIGatewayProxyResponse{

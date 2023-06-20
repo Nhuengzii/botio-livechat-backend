@@ -77,7 +77,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookCredentials, err := c.dbClient.QueryFacebookPage(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
