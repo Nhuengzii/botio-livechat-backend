@@ -34,29 +34,46 @@ func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *
 	return &response, nil
 }
 
+// facebook api response
 type SendingMessageResponse struct {
 	RecipientID string `json:"recipient_id"`
 	MessageID   string `json:"message_id"`
 	Timestamp   int64  `json:"timestamp"`
 }
 
+// facebook api send message top level struct
 type SendingMessage struct {
 	Recipient     Recipient `json:"recipient"`
-	Message       any       `json:"message"`
+	Message       Message   `json:"message"`
 	MessagingType string    `json:"messaging_type"`
 }
 
+// interface for TextMessage and Message with attachment
+type Message interface {
+	Message()
+}
+
+// text message
 type MessageText struct {
 	Text string `json:"text"`
 }
 
+// message with attachment
 type MessageAttachment struct {
 	Attachment AttachmentFacebookRequest `json:"attachment"`
 }
+
+// implement Message
+func (MessageText) Message()       {}
+func (MessageAttachment) Message() {}
+
+// attachment struct
 type AttachmentFacebookRequest struct {
 	AttachmentType string                    `json:"type"`
 	Payload        AttachmentFacebookPayload `json:"payload"`
 }
+
+// payload struct
 type AttachmentFacebookPayload struct {
 	Src          string `json:"url,omitempty"`
 	IsReusable   bool   `json:"is_reusable,omitempty"`
