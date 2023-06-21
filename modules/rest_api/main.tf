@@ -173,6 +173,7 @@ module "page_id_resource_enable_cors" {
 
 locals {
   resource_id_mapping = {
+    get_page_id       = aws_api_gateway_resource.page_id.id
     validate_webhook  = aws_api_gateway_resource.webhook.id
     get_conversations = aws_api_gateway_resource.conversations.id
     post_conversation = aws_api_gateway_resource.conversations.id
@@ -181,6 +182,7 @@ locals {
     post_message      = aws_api_gateway_resource.messages.id
   }
   resource_path_mapping = {
+    get_page_id       = aws_api_gateway_resource.page_id.path
     validate_webhook  = aws_api_gateway_resource.webhook.path
     get_conversations = aws_api_gateway_resource.conversations.path
     post_conversation = aws_api_gateway_resource.conversations.path
@@ -196,6 +198,7 @@ locals {
     standardize_webhook = {
       SNS_TOPIC_ARN = aws_sns_topic.save_and_relay_received_message.arn
     }
+    get_page_id           = {}
     save_received_message = {}
     get_conversations     = {}
     post_conversation     = {}
