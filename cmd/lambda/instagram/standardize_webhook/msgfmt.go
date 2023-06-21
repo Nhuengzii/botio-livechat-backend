@@ -9,6 +9,10 @@ import (
 )
 
 func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
+	if messaging.Message.IsUnsupported {
+		return nil, errMessageNotSupported
+	}
+
 	shop, err := c.dbClient.QueryShop(ctx, pageID)
 	if err != nil {
 		return nil, err

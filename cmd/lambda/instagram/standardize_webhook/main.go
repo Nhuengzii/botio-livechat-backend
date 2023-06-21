@@ -21,6 +21,7 @@ var (
 	errUnknownWebhookType   = errors.New("error! unknown webhook type found")
 	errUnknownWebhookObject = errors.New("error! unknown webhook Object found")
 	errUnknownTemplateType  = errors.New("error! unknown attachment template type")
+	errMessageNotSupported  = errors.New("error! message not supported")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
