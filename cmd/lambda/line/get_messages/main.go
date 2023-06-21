@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"log"
 	"os"
@@ -38,24 +39,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		filter := getmessages.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Internal Server Error",
-			}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message)
 	}
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	resp := getmessages.Response{
@@ -63,24 +52,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 	responseJSON, err := json.Marshal(resp)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: string(responseJSON),
-	}, nil
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
