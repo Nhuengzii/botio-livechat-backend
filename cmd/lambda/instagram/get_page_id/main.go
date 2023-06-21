@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
 	"log"
 	"os"
 	"time"
@@ -14,7 +16,32 @@ import (
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
-	return events.APIGatewayProxyResponse{}, nil
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("cmd/lambda/instagram/get_page_id/main.config.handler: %w", err)
+		}
+	}()
+
+	pathParameters := request.PathParameters
+	shopID := pathParameters["shop_id"]
+	pageID := pathParameters["page_id"]
+
+	platform := "line"
+
+	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
+	response := getpage.Response{
+		UnreadConversations: unreadConversations,
+		AllMessages:         allMessages,
+	}
+	responseJSON, err := json.Marshal(&response)
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
+		Body: string(responseJSON),
+	}, nil
 }
 
 func main() {
