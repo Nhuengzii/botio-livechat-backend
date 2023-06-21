@@ -38,6 +38,6 @@ func newStdConversation(lineChannelAccessToken string, message *stdmessage.StdMe
 			},
 		},
 		LastActivity: lastActivity,
-		IsRead:       false,
+		Unread:       1,
 	}, nil
 }

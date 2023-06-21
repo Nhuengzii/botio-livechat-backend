@@ -83,11 +83,20 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	filter := bson.D{
 		{Key: "conversationID", Value: message.ConversationID},
 	}
+	var conversation stdconversation.StdConversation
+	err = coll.FindOne(ctx, filter).Decode(&conversation)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return ErrNoDocuments
+		}
+		return err
+	}
+	currentUnread := conversation.Unread
 	update := bson.M{
 		"$set": bson.D{
 			{Key: "lastActivity", Value: lastActivity},
 			{Key: "updatedTime", Value: message.Timestamp},
-			{Key: "isRead", Value: false},
+			{Key: "unread", Value: currentUnread + 1},
 		},
 	}
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
@@ -107,7 +116,7 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID st
 	}
 	update := bson.M{
 		"$set": bson.D{
-			{Key: "isRead", Value: true},
+			{Key: "unread", Value: 0},
 		},
 	}
 	err := coll.FindOneAndUpdate(ctx, filter, update).Err()

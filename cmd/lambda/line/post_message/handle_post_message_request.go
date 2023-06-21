@@ -22,6 +22,12 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		}
 	}()
 
+	// check conversation exists
+	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	if err != nil {
+		return err
+	}
+
 	attachments := []stdmessage.Attachment{}
 	// text message
 	if req.Message != "" {
