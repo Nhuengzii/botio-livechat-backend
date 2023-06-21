@@ -1,4 +1,4 @@
-package getfbuserprofile
+package reqfbuserprofile
 
 import (
 	"encoding/json"
@@ -17,7 +17,7 @@ type UserProfile struct {
 func GetUserProfile(accessToken string, psid string) (_ *UserProfile, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("getfbuserprofile.GetUserProfile: %w", err)
+			err = fmt.Errorf("reqfbuserprofile.GetUserProfile: %w", err)
 		}
 	}()
 	url := fmt.Sprintf("https://graph.facebook.com/%v?fields=name,profile_pic&access_token=%v", psid, accessToken)

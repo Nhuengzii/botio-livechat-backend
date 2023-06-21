@@ -72,6 +72,8 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}, err
 	}
 
+	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Headers: map[string]string{

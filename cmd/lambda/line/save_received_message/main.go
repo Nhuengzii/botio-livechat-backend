@@ -36,7 +36,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		pageID := stdMessage.PageID
-		shop, err := c.dbClient.QueryLinePage(ctx, pageID)
+		shop, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 		if err != nil {
 			return err
 		}
