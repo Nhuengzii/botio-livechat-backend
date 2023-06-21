@@ -75,7 +75,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 			},
 		},
 		LastActivity: lastActivity,
-		IsRead:       false,
+		Unread:       1,
 	}
 	return newConversation, nil
 }
