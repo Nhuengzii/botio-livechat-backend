@@ -157,11 +157,18 @@ resource "aws_api_gateway_resource" "messages" {
   path_part   = "messages"
 }
 
-module "aws_api_gateway_enable_cors" {
+module "messages_resource_enable_cors" {
   source          = "squidfunk/api-gateway-enable-cors/aws"
   version         = "0.3.3"
   api_id          = var.rest_api_id
   api_resource_id = aws_api_gateway_resource.messages.id
+}
+
+module "page_id_resource_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.page_id.id
 }
 
 locals {
@@ -171,6 +178,7 @@ locals {
     post_conversation  = aws_api_gateway_resource.conversations.id
     get_conversation   = aws_api_gateway_resource.conversation_id.id
     patch_conversation = aws_api_gateway_resource.conversation_id.id
+    get_page_id        = aws_api_gateway_resource.page_id.id
     get_messages       = aws_api_gateway_resource.messages.id
     post_message       = aws_api_gateway_resource.messages.id
   }
@@ -182,6 +190,7 @@ locals {
     patch_conversation = aws_api_gateway_resource.conversation_id.path
     get_messages       = aws_api_gateway_resource.messages.path
     post_message       = aws_api_gateway_resource.messages.path
+    get_page_id        = aws_api_gateway_resource.page_id.path
   }
   environment_variables_mapping = {
     validate_webhook = {
@@ -191,6 +200,7 @@ locals {
     standardize_webhook = {
       SNS_TOPIC_ARN = aws_sns_topic.save_and_relay_received_message.arn
     }
+    get_page_id           = {}
     save_received_message = {}
     get_conversations     = {}
     post_conversation     = {}
