@@ -166,20 +166,22 @@ module "aws_api_gateway_enable_cors" {
 
 locals {
   resource_id_mapping = {
-    validate_webhook  = aws_api_gateway_resource.webhook.id
-    get_conversations = aws_api_gateway_resource.conversations.id
-    post_conversation = aws_api_gateway_resource.conversations.id
-    get_conversation  = aws_api_gateway_resource.conversation_id.id
-    get_messages      = aws_api_gateway_resource.messages.id
-    post_message      = aws_api_gateway_resource.messages.id
+    validate_webhook   = aws_api_gateway_resource.webhook.id
+    get_conversations  = aws_api_gateway_resource.conversations.id
+    post_conversation  = aws_api_gateway_resource.conversations.id
+    get_conversation   = aws_api_gateway_resource.conversation_id.id
+    patch_conversation = aws_api_gateway_resource.conversation_id.id
+    get_messages       = aws_api_gateway_resource.messages.id
+    post_message       = aws_api_gateway_resource.messages.id
   }
   resource_path_mapping = {
-    validate_webhook  = aws_api_gateway_resource.webhook.path
-    get_conversations = aws_api_gateway_resource.conversations.path
-    post_conversation = aws_api_gateway_resource.conversations.path
-    get_conversation  = aws_api_gateway_resource.conversation_id.path
-    get_messages      = aws_api_gateway_resource.messages.path
-    post_message      = aws_api_gateway_resource.messages.path
+    validate_webhook   = aws_api_gateway_resource.webhook.path
+    get_conversations  = aws_api_gateway_resource.conversations.path
+    post_conversation  = aws_api_gateway_resource.conversations.path
+    get_conversation   = aws_api_gateway_resource.conversation_id.path
+    patch_conversation = aws_api_gateway_resource.conversation_id.path
+    get_messages       = aws_api_gateway_resource.messages.path
+    post_message       = aws_api_gateway_resource.messages.path
   }
   environment_variables_mapping = {
     validate_webhook = {
@@ -193,6 +195,7 @@ locals {
     get_conversations     = {}
     post_conversation     = {}
     get_conversation      = {}
+    patch_conversation    = {}
     get_messages          = {}
     post_message          = {}
   }
