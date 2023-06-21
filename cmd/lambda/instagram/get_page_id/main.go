@@ -26,7 +26,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 
-	platform := "line"
+	platform := "instagram"
 
 	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
 	response := getpage.Response{
