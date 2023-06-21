@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
+
 	// "time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/cache/redis"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -29,13 +31,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayWebsocket
 	connectionID := request.RequestContext.ConnectionID
 	err = c.cacheClient.SetShopConnection(ctx, shopID, connectionID)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 502,
-			Body:       "Bad Boy",
-		}, err
+		return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-	}, nil
+	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
