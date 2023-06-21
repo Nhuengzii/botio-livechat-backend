@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/sqswrapper"
 	"github.com/aws/aws-lambda-go/events"
@@ -24,46 +25,28 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if request.HTTPMethod == "GET" {
 		err := VerifyConnection(request.QueryStringParameters, c.instagramWebhookVerificationString)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 401,
-				Body:       "Unauthorized",
-			}, err
+			return apigateway.NewProxyResponse(401, "Unauthorized", "*"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Body:       request.QueryStringParameters["hub.challenge"],
-		}, err
+		return apigateway.NewProxyResponse(200, request.QueryStringParameters["hub.challenge"], "*"), nil
 	} else if request.HTTPMethod == "POST" {
 		// new session
 
 		// verify Signature
 		err := VerifyMessageSignature(request.Headers, []byte(request.Body), c.instagramAppSecret)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 401,
-				Body:       "Unauthorized",
-			}, err
+			return apigateway.NewProxyResponse(401, "Unauthorized", "*"), err
 		}
 
 		msg := request.Body
 
 		err = c.sqsClient.SendMessage(c.sqsQueueURL, msg)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Body:       "Internal Server Error",
-			}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Body:       "OK",
-		}, err
+		return apigateway.NewProxyResponse(200, "OK", "*"), nil
 
 	} else {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 405,
-			Body:       "Method Not Allowed",
-		}, errMethodNotAllowed
+		return apigateway.NewProxyResponse(405, "Method Not Allowed", "*"), errMethodNotAllowed
 	}
 }
 
