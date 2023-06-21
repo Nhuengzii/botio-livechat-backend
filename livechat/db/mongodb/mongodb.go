@@ -464,7 +464,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 	return &shop.InstagramAuthentication, nil
 }
 
-func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (_ []stdconversation.StdConversation, _ []stdmessage.StdMessage, err error) {
+func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (_ int64, _ int64, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.GetPage: %w", err)
@@ -472,6 +472,7 @@ func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage
 	}()
 
 	collConversations := c.client.Database(c.Database).Collection(c.CollectionConversations)
+
 	filterUnreadConversations := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
@@ -480,39 +481,20 @@ func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage
 			{Key: "$gt", Value: 0},
 		}},
 	}
-	curUnreadConversations, err := collConversations.Find(ctx, filterUnreadConversations)
+	unreadConversations, err := collConversations.CountDocuments(ctx, filterUnreadConversations)
 	if err != nil {
-		return nil, nil, err
-	}
-	defer curUnreadConversations.Close(ctx)
-	unreadConversations := []stdconversation.StdConversation{}
-	err = curUnreadConversations.All(ctx, &unreadConversations)
-	if err != nil {
-		return nil, nil, err
-	}
-	if curUnreadConversations.Err() != nil {
-		return nil, nil, curUnreadConversations.Err()
+		return 0, 0, err
 	}
 
-	collMessages := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filterPageMessages := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 	}
-	curPageMessages, err := collMessages.Find(ctx, filterPageMessages)
+	allConversations, err := collConversations.CountDocuments(ctx, filterPageMessages)
 	if err != nil {
-		return nil, nil, err
-	}
-	defer curPageMessages.Close(ctx)
-	pageMessages := []stdmessage.StdMessage{}
-	err = curPageMessages.All(ctx, &pageMessages)
-	if err != nil {
-		return nil, nil, err
-	}
-	if curPageMessages.Err() != nil {
-		return nil, nil, curPageMessages.Err()
+		return 0, 0, err
 	}
 
-	return unreadConversations, pageMessages, nil
+	return unreadConversations, allConversations, nil
 }
