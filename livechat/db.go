@@ -27,5 +27,5 @@ type DBClient interface {
 	QueryFacebookAuthentication(ctx context.Context, pageID string) (*shops.FacebookAuthentication, error)
 	QueryLineAuthentication(ctx context.Context, pageID string) (*shops.LineAuthentication, error)
 	QueryInstagramAuthentication(ctx context.Context, pageID string) (*shops.InstagramAuthentication, error)
-	GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (unreadConversations []stdconversation.StdConversation, allMessages []stdmessage.StdMessage, err error)
+	GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (unreadConversations int64, allConversations int64, err error)
 }
