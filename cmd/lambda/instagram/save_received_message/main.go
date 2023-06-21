@@ -61,11 +61,14 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 				return err
 			}
 		}
-		err = c.dbClient.InsertMessage(ctx, &receiveMessage)
+		if receiveMessage.IsDeleted {
+			err = c.dbClient.RemoveDeletedMessage(ctx, receiveMessage.ShopID, stdmessage.PlatformInstagram, receiveMessage.ConversationID, receiveMessage.MessageID)
+		} else {
+			err = c.dbClient.InsertMessage(ctx, &receiveMessage)
+		}
 		if err != nil {
 			return err
 		}
-		return nil
 	}
 	return nil
 }
