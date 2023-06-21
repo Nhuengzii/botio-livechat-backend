@@ -230,6 +230,13 @@ module "instagram" {
       }
       dependencies = "{discord,db,sqswrapper}/**/*.go"
     }
+    get_page_id = {
+      handler_name = "line_get_page_id"
+      handler_path = format("%s/cmd/lambda/line/get_page_id", path.root)
+      environment_variables = {
+      }
+      dependencies = "{discord,db}/**/*.go"
+    }
     get_conversations = {
       handler_name = "instagram_get_conversations"
       handler_path = format("%s/cmd/lambda/instagram/get_conversations", path.root)
