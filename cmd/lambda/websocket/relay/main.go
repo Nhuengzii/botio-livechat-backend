@@ -40,7 +40,7 @@ type ReceivedMessage struct {
 
 type WebsocketMessage struct {
 	Action string                `json:"action"`
-	Data   stdmessage.StdMessage `json:"data"`
+	Data   stdmessage.StdMessage `json:"message"`
 }
 
 var (

@@ -25,7 +25,10 @@ type Payload struct {
 	IGTemplateGeneric []IGTemplateGeneric `json:"ig_template_generic"`
 	IGTemplateProduct []IGTemplateProduct `json:"ig_template_product"`
 
-	LineTemplateMessage LineTemplateMessage `json:"line_template_message"`
+	LineTemplateButtons       LineTemplateButtons       `json:"line_template_buttons"`
+	LineTemplateConfirm       LineTemplateConfirm       `json:"line_template_confirm"`
+	LineTemplateCarousel      LineTemplateCarousel      `json:"line_template_carousel"`
+	LineTemplateImageCarousel LineTemplateImageCarousel `json:"line_template_image_carousel"`
 }
 
 type Response struct {

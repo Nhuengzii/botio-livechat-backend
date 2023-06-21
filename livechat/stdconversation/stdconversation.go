@@ -15,7 +15,7 @@ type StdConversation struct {
 	UpdatedTime     int64         `json:"updatedTime" bson:"updatedTime"`
 	Participants    []Participant `json:"participants" bson:"participants"`
 	LastActivity    string        `json:"lastActivity" bson:"lastActivity"`
-	IsRead          bool          `json:"isRead" bson:"isRead"`
+	Unread          int           `json:"unread" bson:"unread"`
 }
 
 type Platform string
