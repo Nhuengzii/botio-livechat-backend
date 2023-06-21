@@ -294,7 +294,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,snswrapper,stdmessage,external_api,apigateway}/**/*.go"
+      dependencies = "{discord,db,snswrapper,stdmessage,external_api}/**/*.go"
     }
     save_received_message = {
       handler_name = "instagram_save_received_message"
@@ -305,7 +305,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,external_api,stdconversation,stdmessage,db,apigateway}/**/*.go"
+      dependencies = "{discord,external_api,stdconversation,stdmessage,db}/**/*.go"
     }
   }
   method_integrations = {
