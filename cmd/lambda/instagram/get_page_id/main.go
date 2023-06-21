@@ -21,7 +21,6 @@ import (
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("cmd/lambda/instagram/get_page_id/main.config.handler: %w", err)
 			discord.Log(c.discordWebhookURL, fmt.Sprintf("cmd/lambda/instagram/get_page_id/main.config.handler: %v", err))
 		}
 	}()
