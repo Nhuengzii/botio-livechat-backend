@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 	"log"
 	"os"
 	"time"
@@ -69,6 +70,8 @@ func main() {
 		mongodbURI        = os.Getenv("MONGODB_URI")
 		mongodbDatabase   = os.Getenv("MONGODB_DATABASE")
 		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
+		snsTopicARN       = os.Getenv("SNS_TOPIC_ARN")
+		awsRegion         = os.Getenv("AWS_REGION")
 	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     mongodbURI,
@@ -85,6 +88,8 @@ func main() {
 	defer dbClient.Close(ctx)
 	c := &config{
 		discordWebhookURL: discordWebhookURL,
+		snsTopicARN:       snsTopicARN,
+		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
 	}
 	lambda.Start(c.handler)

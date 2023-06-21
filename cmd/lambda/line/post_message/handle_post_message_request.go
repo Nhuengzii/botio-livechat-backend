@@ -176,13 +176,12 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		Attachments: attachments,
 		ReplyTo:     nil,
 	}
-	err = c.dbClient.UpdateConversationOnNewMessage(ctx, &stdMessage)
+
+	stdMessageJSON, err := json.Marshal(stdMessage)
+	err = c.snsClient.PublishMessage(c.snsTopicARN, string(stdMessageJSON))
 	if err != nil {
 		return err
 	}
-	err = c.dbClient.InsertMessage(ctx, &stdMessage)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
