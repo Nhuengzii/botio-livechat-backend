@@ -104,7 +104,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,apigateway}/**/*.go"
+      dependencies = "{discord,db,apigateway}/**/*.go"
     }
     validate_webhook = {
       handler_name = "facebook_validate_webhook"
