@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
 	"time"
@@ -27,21 +28,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shop, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 404,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Not Found",
-			}, err
+			return apigateway.NewProxyResponse(404, "Not Found", "*"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	lineChannelSecret := shop.Secret
 	lineSignature := req.Headers["x-line-signature"]
@@ -49,39 +38,15 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	err = validateSignature(lineChannelSecret, lineSignature, webhookBodyString)
 	if err != nil {
 		if errors.Is(err, errInvalidSignature) {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 401,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Unauthorized",
-			}, err
+			return apigateway.NewProxyResponse(401, "Unauthorized", "*"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	err = c.sqsClient.SendMessage(c.sqsQueueURL, webhookBodyString)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: "OK",
-	}, nil
+	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
 
 func main() {

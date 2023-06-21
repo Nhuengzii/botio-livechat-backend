@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -20,7 +21,7 @@ import (
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("cmd/lambda/facebook/get_page_id/main.config.handler: %w", err)
+			discord.Log(c.discordWebhookURL, fmt.Sprintf("cmd/lambda/facebook/get_page_id/main.config.handler: %v", err))
 		}
 	}()
 
@@ -31,19 +32,19 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	platform := stdmessage.PlatformFacebook
 
 	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
 	response := getpage.Response{
 		UnreadConversations: unreadConversations,
 		AllMessages:         allMessages,
 	}
 	responseJSON, err := json.Marshal(&response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: string(responseJSON),
-	}, nil
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
