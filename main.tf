@@ -416,7 +416,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,snswrapper,storage,stdmessage,apigateway}/**/*.go"
+      dependencies = "{discord,db,snswrapper,storage,stdmessage}/**/*.go"
     }
     save_received_message = {
       handler_name = "line_save_received_message"
@@ -426,7 +426,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,snswrapper,stdmessage,stdconversation,external_api,apigateway}/**/*.go"
+      dependencies = "{discord,db,snswrapper,stdmessage,stdconversation,external_api}/**/*.go"
     }
   }
   method_integrations = {
