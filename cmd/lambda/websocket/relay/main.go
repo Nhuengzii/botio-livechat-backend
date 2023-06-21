@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/cache/redis"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -54,11 +55,11 @@ func (c *Config) Handler(ctx context.Context, sqsEvent events.SQSEvent) (events.
 	for _, record := range sqsEvent.Records {
 		err := json.Unmarshal([]byte(record.Body), &receiveBody)
 		if err != nil {
-			return events.APIGatewayProxyResponse{}, errUnmarshalReceivedBody
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), errUnmarshalReceivedBody
 		}
 		err = json.Unmarshal([]byte(receiveBody.Message), &receiveMessage)
 		if err != nil {
-			return events.APIGatewayProxyResponse{}, errUnmarshalReceivedMessage
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), errUnmarshalReceivedMessage
 		}
 
 		webscoketMessage := WebsocketMessage{
@@ -68,11 +69,11 @@ func (c *Config) Handler(ctx context.Context, sqsEvent events.SQSEvent) (events.
 
 		jsonMessage, err := json.Marshal(webscoketMessage)
 		if err != nil {
-			return events.APIGatewayProxyResponse{}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		connections, err := c.cacheClient.GetShopConnections(ctx, receiveMessage.ShopID)
 		if err != nil {
-			return events.APIGatewayProxyResponse{}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		for _, connectionID := range connections {
 			err = c.webSocketClient.Send(ctx, connectionID, string(jsonMessage))
@@ -82,5 +83,5 @@ func (c *Config) Handler(ctx context.Context, sqsEvent events.SQSEvent) (events.
 		}
 
 	}
-	return events.APIGatewayProxyResponse{StatusCode: 200}, nil
+	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }

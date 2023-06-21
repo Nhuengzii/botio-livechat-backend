@@ -104,7 +104,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord}/**/*.go"
+      dependencies = "{discord,db,apigateway}/**/*.go"
     }
     validate_webhook = {
       handler_name = "facebook_validate_webhook"
@@ -115,7 +115,7 @@ module "facebook" {
         FACEBOOK_WEBHOOK_VERIFICATION_STRING = var.facebook_webhook_verification_string
         DISCORD_WEBHOOK_URL                  = var.discord_webhook_url
       }
-      dependencies = "{discord,db,sqswrapper}/**/*.go"
+      dependencies = "{discord,db,sqswrapper,apigateway}/**/*.go"
     }
     get_conversations = {
       handler_name = "facebook_get_conversations"
@@ -126,7 +126,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+      dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
     }
     patch_conversation = {
       handler_name = "facebook_patch_conversation"
@@ -147,7 +147,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+      dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
     }
     get_messages = {
       handler_name = "facebook_get_messages"
@@ -158,7 +158,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdmessage}/**/*.go"
+      dependencies = "{discord,api,db,stdmessage,apigateway}/**/*.go"
     }
     post_message = {
       handler_name = "facebook_post_message"
@@ -168,7 +168,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,external_api,stdmessage}/**/*.go"
+      dependencies = "{discord,api,db,external_api,stdmessage,apigateway}/**/*.go"
     }
     standardize_webhook = {
       handler_name = "facebook_standardize_webhook"
@@ -244,7 +244,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,db}/**/*.go"
+      dependencies = "{discord,db,apigateway}/**/*.go"
     }
     validate_webhook = {
       handler_name = "instagram_validate_webhook"
@@ -255,7 +255,7 @@ module "instagram" {
         INSTAGRAM_WEBHOOK_VERIFICATION_STRING = var.instagram_webhook_verification_string
         DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
       }
-      dependencies = "{discord,db,sqswrapper}/**/*.go"
+      dependencies = "{discord,db,sqswrapper,apigateway}/**/*.go"
     }
     get_conversations = {
       handler_name = "instagram_get_conversations"
@@ -266,7 +266,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+      dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
     }
     get_conversation = {
       handler_name = "instagram_get_conversation"
@@ -277,7 +277,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdconversation}/**/*.go"
+      dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
     }
     patch_conversation = {
       handler_name = "instagram_patch_conversation"
@@ -299,7 +299,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,stdmessage}/**/*.go"
+      dependencies = "{discord,api,db,stdmessage,apigateway}/**/*.go"
     }
     post_message = {
       handler_name = "instagram_post_message"
@@ -309,7 +309,7 @@ module "instagram" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
-      dependencies = "{discord,api,db,external_api,stdmessage}/**/*.go"
+      dependencies = "{discord,api,db,external_api,stdmessage,apigateway}/**/*.go"
     }
     standardize_webhook = {
       handler_name = "instagram_standardize_webhook"
@@ -385,7 +385,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db}/**/*.go"
+      dependencies = "{discord,db,apigateway}/**/*.go"
     }
     validate_webhook = {
       handler_name = "line_validate_webhook"
@@ -395,7 +395,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,sqswrapper}/**/*.go"
+      dependencies = "{discord,db,sqswrapper,apigateway}/**/*.go"
     }
     get_conversations = {
       handler_name = "line_get_conversations"
@@ -405,7 +405,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,api,stdconversation}/**/*.go"
+      dependencies = "{discord,db,api,stdconversation,apigateway}/**/*.go"
     }
     get_conversation = {
       handler_name = "line_get_conversation"
@@ -415,7 +415,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,api}/**/*.go"
+      dependencies = "{discord,db,api,apigateway}/**/*.go"
     }
     patch_conversation = {
       handler_name = "line_patch_conversation"
@@ -435,7 +435,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,api,stdmessage}/**/*.go"
+      dependencies = "{discord,db,api,stdmessage,apigateway}/**/*.go"
     }
     post_message = {
       handler_name = "line_post_message"
@@ -445,7 +445,7 @@ module "line" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,api,stdmessage}/**/*.go"
+      dependencies = "{discord,db,api,stdmessage,apigateway}/**/*.go"
     }
     standardize_webhook = {
       handler_name = "line_standardize_webhook"

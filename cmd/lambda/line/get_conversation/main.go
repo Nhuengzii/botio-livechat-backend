@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
 	"time"
@@ -30,55 +31,25 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			resp := getconversation.Response{
+			emptyResponse := getconversation.Response{
 				Conversation: nil,
 			}
-			responseJSON, err := json.Marshal(resp)
+			emptyResponseJSON, err := json.Marshal(emptyResponse)
 			if err != nil {
-				return events.APIGatewayProxyResponse{
-					StatusCode: 500,
-					Headers: map[string]string{
-						"Access-Control-Allow-Origin": "*",
-					},
-					Body: "Internal Server Error",
-				}, err
+				return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
 			}
-			return events.APIGatewayProxyResponse{
-				StatusCode: 200,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: string(responseJSON),
-			}, err
+			return apigateway.NewProxyResponse(200, string(emptyResponseJSON), "*"), err
 		}
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
 	}
 	resp := getconversation.Response{
 		Conversation: conversation,
 	}
 	responseJSON, err := json.Marshal(resp)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
 	}
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: string(responseJSON),
-	}, nil
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {

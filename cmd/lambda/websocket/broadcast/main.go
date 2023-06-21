@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/cache/redis"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/websocketwrapper"
@@ -42,9 +43,7 @@ func (c *Config) Handler(ctx context.Context, request events.APIGatewayWebsocket
 	err := json.Unmarshal([]byte(request.Body), &receiveMessage)
 	if err != nil {
 		fmt.Println(err)
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-		}, nil
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	shopID := receiveMessage.Message.ShopID
 	connections, err := c.cacheClient.GetShopConnections(ctx, shopID)
@@ -60,7 +59,5 @@ func (c *Config) Handler(ctx context.Context, request events.APIGatewayWebsocket
 		}
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-	}, nil
+	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }

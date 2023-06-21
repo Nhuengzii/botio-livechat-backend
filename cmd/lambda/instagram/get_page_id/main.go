@@ -2,10 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -14,7 +19,32 @@ import (
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
-	return events.APIGatewayProxyResponse{}, nil
+	defer func() {
+		if err != nil {
+			discord.Log(c.discordWebhookURL, fmt.Sprintf("cmd/lambda/instagram/get_page_id/main.config.handler: %v", err))
+		}
+	}()
+
+	pathParameters := request.PathParameters
+	shopID := pathParameters["shop_id"]
+	pageID := pathParameters["page_id"]
+
+	platform := stdmessage.PlatformInstagram
+
+	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+	response := getpage.Response{
+		UnreadConversations: unreadConversations,
+		AllMessages:         allMessages,
+	}
+	responseJSON, err := json.Marshal(&response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
