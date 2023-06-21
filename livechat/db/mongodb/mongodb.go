@@ -140,6 +140,31 @@ func (c *Client) UpdateConversationParticipants(ctx context.Context, conversatio
 	return nil
 }
 
+func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error {
+	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "conversationID", Value: conversationID},
+		{Key: "messageID", Value: messageID},
+	}
+	update := bson.M{
+		"$set": bson.D{
+			{Key: "isDeleted", Value: true},
+			{Key: "message", Value: ""},
+			{Key: "attachments", Value: bson.A{}},
+		},
+	}
+	err := coll.FindOneAndUpdate(ctx, filter, update).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return ErrNoDocuments
+		}
+		return err
+	}
+	return nil
+}
+
 func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
