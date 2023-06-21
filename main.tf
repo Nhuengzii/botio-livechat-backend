@@ -136,6 +136,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
+      dependencies = ""
     }
     get_conversation = {
       handler_name = "facebook_get_conversation"
