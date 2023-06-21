@@ -22,6 +22,9 @@ type Payload struct {
 	FBTemplateReceipt               []FBTemplateReceipt               `json:"fb_template_receipt"`
 	FBTemplateStructuredInformation []FBTemplateStructuredInformation `json:"fb_template_structured_information"`
 
+	IGTemplateGeneric []IGTemplateGeneric `json:"ig_template_generic"`
+	IGTemplateProduct []IGTemplateProduct `json:"ig_template_product"`
+
 	LineTemplateMessage LineTemplateMessage `json:"line_template_message"`
 }
 
