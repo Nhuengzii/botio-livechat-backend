@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"log"
 	"os"
@@ -38,36 +39,18 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Internal Server Error",
-			}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
 			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
 			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message)
 		} else {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 400,
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-				Body: "Bad Request",
-			}, errors.New("filter must have only one field at a time")
+			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errors.New("filter must have only one field at a time")
 		}
 	}
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	resp := getconversations.Response{
@@ -75,22 +58,10 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 	responseJSON, err := json.Marshal(resp)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			Body: "Internal Server Error",
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: string(responseJSON),
-	}, nil
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
