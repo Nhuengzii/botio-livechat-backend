@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -26,7 +28,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 
-	platform := "facebook"
+	platform := stdmessage.PlatformFacebook
 
 	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
 	response := getpage.Response{
