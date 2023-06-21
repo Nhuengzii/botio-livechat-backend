@@ -31,13 +31,13 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	platform := stdmessage.PlatformInstagram
 
-	unreadConversations, allMessages, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
+	unreadConversations, allConversations, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	response := getpage.Response{
 		UnreadConversations: unreadConversations,
-		AllMessages:         allMessages,
+		AllConversations:    allConversations,
 	}
 	responseJSON, err := json.Marshal(&response)
 	if err != nil {
