@@ -82,7 +82,7 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 					Payload:        stdmessage.Payload{Src: basicPayload.Src},
 				})
 			} else {
-				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
+				jsonByte, err := json.Marshal(attachment.Payload)
 				if err != nil {
 					return nil, err
 				}
@@ -92,16 +92,22 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 					return nil, err
 				}
 				var attachmentType stdmessage.AttachmentType
-				if templatePayload.TemplateType == "generic" {
+				var actualJsonPayload []byte
+				if len(templatePayload.Generic) != 0 {
 					attachmentType = stdmessage.AttachmentTypeIGTemplateGeneric
-				} else if templatePayload.TemplateType == "product" {
+					actualJsonPayload, err = json.Marshal(templatePayload.Generic)
+				} else if len(templatePayload.Product) != 0 {
 					attachmentType = stdmessage.AttachmentTypeIGTemplateProduct
+					actualJsonPayload, err = json.Marshal(templatePayload.Product)
 				} else {
 					return nil, errUnknownTemplateType
 				}
+				if err != nil {
+					return nil, err
+				}
 				attachments = append(attachments, stdmessage.Attachment{
 					AttachmentType: attachmentType,
-					Payload:        stdmessage.Payload{Src: string(jsonByte)},
+					Payload:        stdmessage.Payload{Src: string(actualJsonPayload)},
 				})
 
 			}

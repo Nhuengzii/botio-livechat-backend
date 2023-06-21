@@ -40,7 +40,8 @@ type BasicPayload struct {
 	Src string `json:"url"`
 }
 type TemplatePayload struct {
-	TemplateType string `json:"template_type"`
+	Generic map[string]any `json:"generic"`
+	Product map[string]any `json:"product"`
 }
 
 type ReplyMessage struct {
