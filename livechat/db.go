@@ -16,6 +16,7 @@ type DBClient interface {
 	UpdateConversationIsRead(ctx context.Context, conversationID string) error
 	CheckConversationExists(ctx context.Context, conversationID string) error
 	UpdateConversationParticipants(ctx context.Context, conversationID string) error
+	RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error
 	QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (*stdconversation.StdConversation, error)
 	QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) ([]stdmessage.StdMessage, error)
 	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) ([]stdmessage.StdMessage, error)
@@ -23,7 +24,7 @@ type DBClient interface {
 	QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) ([]stdconversation.StdConversation, error)
 	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) ([]stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
-	QueryFacebookPage(ctx context.Context, pageID string) (*shops.FacebookPage, error)
-	QueryLinePage(ctx context.Context, pageID string) (*shops.LinePage, error)
-	QueryInstagramPage(ctx context.Context, pageID string) (*shops.InstagramPage, error)
+	QueryFacebookAuthentication(ctx context.Context, pageID string) (*shops.FacebookAuthentication, error)
+	QueryLineAuthentication(ctx context.Context, pageID string) (*shops.LineAuthentication, error)
+	QueryInstagramAuthentication(ctx context.Context, pageID string) (*shops.InstagramAuthentication, error)
 }

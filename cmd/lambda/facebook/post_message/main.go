@@ -12,18 +12,27 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/postfbmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/reqfbsendmessage"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 var (
-	errNoPSIDParam                = errors.New("err query string parameter psid not given")
-	errNoShopIDPath               = errors.New("err path parameter shop_id not given")
-	errNoPageIDPath               = errors.New("err path parameter parameters page_id not given")
-	errNoConversationIDPath       = errors.New("err path parameter conversation_id not given")
-	errAttachmentTypeNotSupported = errors.New("err attachment type given is not supported")
+	errNoPSIDParam                      = errors.New("err query string parameter psid not given")
+	errNoShopIDPath                     = errors.New("err path parameter shop_id not given")
+	errNoPageIDPath                     = errors.New("err path parameter parameters page_id not given")
+	errNoConversationIDPath             = errors.New("err path parameter conversation_id not given")
+	errAttachmentTypeNotSupported       = errors.New("err attachment type given is not supported")
+	errNoSrcFoundForBasicPayload        = errors.New("err this attachment type should not have an empty url")
+	errNoPayloadFoundForTemplatePayload = errors.New("err this template attachment type should not have empty elements ")
+	errSendingFacebookMessage           = errors.New("err sending facebook message check the body of the request")
+)
+
+const (
+	templateButtonURLType  = "web_url"
+	templateTypeGeneric    = "generic"
+	attachmentTypeTemplate = "template"
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -68,7 +77,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookCredentials, err := c.dbClient.QueryFacebookPage(ctx, pageID)
+	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -79,7 +88,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookRequest, err := fmtFbRequest(&requestMessage, pageID, psid)
+	facebookRequest, err := fmtFbRequest(&requestMessage, psid)
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
@@ -89,7 +98,8 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			},
 		}, err
 	}
-	facebookResponse, err := postfbmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
+
+	facebookResponse, err := reqfbsendmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 503,
@@ -104,6 +114,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		RecipientID: facebookResponse.RecipientID,
 		MessageID:   facebookResponse.MessageID,
 		Timestamp:   facebookResponse.Timestamp,
+	}
+	if resp.MessageID == "" || resp.RecipientID == "" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Internal Server Error",
+			Headers: map[string]string{
+				"Access-Control-Allow-Origin": "*",
+			},
+		}, errSendingFacebookMessage
 	}
 
 	jsonBodyByte, err := json.Marshal(resp)

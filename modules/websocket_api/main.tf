@@ -82,8 +82,8 @@ module "routes_handler" {
     REDIS_PASSWORD   = local.redis_password
     WEBSOCKET_API_ID = var.websocket_api_id
   }
-  role_arn = aws_iam_role.assume_role_lambda.arn
-
+  role_arn     = aws_iam_role.assume_role_lambda.arn
+  dependencies = "{discord,cache,snswrapper,sqswraper,stdmessage,websocketwrapper}/**/*.go"
 }
 
 resource "aws_apigatewayv2_route" "routes_with_handler" {
@@ -142,6 +142,7 @@ module "relay_received_message" {
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
     WEBSOCKET_API_ID    = var.websocket_api_id
   }
+  dependencies = "{discord,cache,snswrapper,sqswraper,stdmessage,websocketwrapper}/**/*.go"
 }
 
 output "relay_received_message_handler" {

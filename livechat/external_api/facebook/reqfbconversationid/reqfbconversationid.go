@@ -1,4 +1,4 @@
-package getfbconversationid
+package reqfbconversationid
 
 import (
 	"encoding/json"
@@ -21,10 +21,10 @@ func GetConversationID(accessToken string, psid string, pageID string) (_ string
 	// important userID is not pageID psid only
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("getfbconversationid.GetConversationID: %w", err)
+			err = fmt.Errorf("reqfbconversationid.GetConversationID: %w", err)
 		}
 	}()
-	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=Messenger&user_id=%v&access_token=%v",
+	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=messenger&user_id=%v&access_token=%v",
 		pageID, psid, accessToken)
 	resp, err := http.Get(url)
 	if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -14,45 +15,150 @@ import (
 
 var errUnsupportedAttachmentType = errors.New("unsupported attachment type")
 
-func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, requestBody postmessage.Request) (err error) {
+func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, req postmessage.Request) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("handlePostMessageRequest: %w", err)
 		}
 	}()
-	if requestBody.Message != "" {
-		_, err = bot.PushMessage(conversationID, linebot.NewTextMessage(requestBody.Message)).Do()
+
+	// check conversation exists
+	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	if err != nil {
+		return err
+	}
+
+	attachments := []stdmessage.Attachment{}
+	// text message
+	if req.Message != "" {
+		_, err = bot.PushMessage(conversationID, toLineTextMessage(req)).Do()
 		if err != nil {
 			return err
 		}
 	} else {
-		switch stdmessage.AttachmentType(requestBody.Attachment.AttachmentType) {
+		// attachment
+		switch stdmessage.AttachmentType(req.Attachment.AttachmentType) {
 		case stdmessage.AttachmentTypeImage:
-			_, err = bot.PushMessage(conversationID, linebot.NewImageMessage(requestBody.Attachment.Payload.Src, requestBody.Attachment.Payload.Src)).Do()
+			_, err = bot.PushMessage(conversationID, toLineImageMessage(req)).Do()
 			if err != nil {
 				return err
 			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: req.Attachment.Payload.Src},
+			}
+			attachments = append(attachments, attachment)
 		case stdmessage.AttachmentTypeVideo:
-			_, err = bot.PushMessage(conversationID, linebot.NewVideoMessage(requestBody.Attachment.Payload.Src, requestBody.Attachment.Payload.Src)).Do()
+			_, err = bot.PushMessage(conversationID, toLineVideoMessage(req)).Do()
 			if err != nil {
 				return err
 			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: req.Attachment.Payload.Src},
+			}
+			attachments = append(attachments, attachment)
 		case stdmessage.AttachmentTypeAudio:
-			_, err = bot.PushMessage(conversationID, linebot.NewAudioMessage(requestBody.Attachment.Payload.Src, 30)).Do() // where to get duration?
+			_, err = bot.PushMessage(conversationID, toLineAudioMessage(req)).Do()
 			if err != nil {
 				return err
 			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: req.Attachment.Payload.Src},
+			}
+			attachments = append(attachments, attachment)
+		case stdmessage.AttachmentTypeLineTemplateButtons:
+			_, err = bot.PushMessage(conversationID, toLineButtonsTemplateMessage(req)).Do()
+			if err != nil {
+				return err
+			}
+			stdMessagePayloadSrcJSON, err := json.Marshal(
+				struct {
+					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
+					Payload        postmessage.LineTemplateButtons `json:"payload"`
+				}{
+					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+					Payload:        req.Attachment.Payload.LineTemplateButtons,
+				},
+			)
+			if err != nil {
+				return err
+			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: string(stdMessagePayloadSrcJSON)},
+			}
+			attachments = append(attachments, attachment)
+		case stdmessage.AttachmentTypeLineTemplateConfirm:
+			_, err = bot.PushMessage(conversationID, toLineConfirmTemplateMessage(req)).Do()
+			if err != nil {
+				return err
+			}
+			stdMessagePayloadSrcJSON, err := json.Marshal(
+				struct {
+					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
+					Payload        postmessage.LineTemplateButtons `json:"payload"`
+				}{
+					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+					Payload:        req.Attachment.Payload.LineTemplateButtons,
+				},
+			)
+			if err != nil {
+				return err
+			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: string(stdMessagePayloadSrcJSON)},
+			}
+			attachments = append(attachments, attachment)
+		case stdmessage.AttachmentTypeLineTemplateCarousel:
+			_, err = bot.PushMessage(conversationID, toLineCarouselTemplateMessage(req)).Do()
+			if err != nil {
+				return err
+			}
+			stdMessagePayloadSrcJSON, err := json.Marshal(
+				struct {
+					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
+					Payload        postmessage.LineTemplateButtons `json:"payload"`
+				}{
+					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+					Payload:        req.Attachment.Payload.LineTemplateButtons,
+				},
+			)
+			if err != nil {
+				return err
+			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: string(stdMessagePayloadSrcJSON)},
+			}
+			attachments = append(attachments, attachment)
+		case stdmessage.AttachmentTypeLineTemplateImageCarousel:
+			_, err = bot.PushMessage(conversationID, toLineImageCarouselTemplateMessage(req)).Do()
+			if err != nil {
+				return err
+			}
+			stdMessagePayloadSrcJSON, err := json.Marshal(
+				struct {
+					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
+					Payload        postmessage.LineTemplateButtons `json:"payload"`
+				}{
+					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+					Payload:        req.Attachment.Payload.LineTemplateButtons,
+				},
+			)
+			if err != nil {
+				return err
+			}
+			attachment := stdmessage.Attachment{
+				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
+				Payload:        stdmessage.Payload{Src: string(stdMessagePayloadSrcJSON)},
+			}
+			attachments = append(attachments, attachment)
 		default:
-			return fmt.Errorf("%w: %v", errUnsupportedAttachmentType, requestBody.Attachment.AttachmentType)
+			return fmt.Errorf("%w: %v", errUnsupportedAttachmentType, req.Attachment.AttachmentType)
 		}
-	}
-	attachments := []stdmessage.Attachment{}
-	if requestBody.Message == "" {
-		attachment := stdmessage.Attachment{
-			AttachmentType: stdmessage.AttachmentType(requestBody.Attachment.AttachmentType),
-			Payload:        stdmessage.Payload{Src: requestBody.Attachment.Payload.Src},
-		}
-		attachments = append(attachments, attachment)
 	}
 
 	stdMessage := stdmessage.StdMessage{
@@ -66,7 +172,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			UserID:   pageID,
 			UserType: stdmessage.UserTypeAdmin,
 		},
-		Message:     requestBody.Message,
+		Message:     req.Message,
 		Attachments: attachments,
 		ReplyTo:     nil,
 	}
