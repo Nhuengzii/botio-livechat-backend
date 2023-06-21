@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -66,9 +67,13 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			if err != nil {
 				return err
 			}
+			payloadJSON, err := json.Marshal(req)
+			if err != nil {
+				return err
+			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-				Payload:        stdmessage.Payload{},
+				Payload:        stdmessage.Payload{Src: string(payloadJSON)},
 			}
 			attachments = append(attachments, attachment)
 		case stdmessage.AttachmentTypeLineTemplateConfirm:
@@ -76,9 +81,13 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			if err != nil {
 				return err
 			}
+			payloadJSON, err := json.Marshal(req)
+			if err != nil {
+				return err
+			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-				Payload:        stdmessage.Payload{},
+				Payload:        stdmessage.Payload{Src: string(payloadJSON)},
 			}
 			attachments = append(attachments, attachment)
 		case stdmessage.AttachmentTypeLineTemplateCarousel:
@@ -86,9 +95,13 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			if err != nil {
 				return err
 			}
+			payloadJSON, err := json.Marshal(req)
+			if err != nil {
+				return err
+			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-				Payload:        stdmessage.Payload{},
+				Payload:        stdmessage.Payload{Src: string(payloadJSON)},
 			}
 			attachments = append(attachments, attachment)
 		case stdmessage.AttachmentTypeLineTemplateImageCarousel:
@@ -96,9 +109,13 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			if err != nil {
 				return err
 			}
+			payloadJSON, err := json.Marshal(req)
+			if err != nil {
+				return err
+			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-				Payload:        stdmessage.Payload{},
+				Payload:        stdmessage.Payload{Src: string(payloadJSON)},
 			}
 			attachments = append(attachments, attachment)
 		default:
