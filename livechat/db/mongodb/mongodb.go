@@ -464,7 +464,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 	return &shop.InstagramAuthentication, nil
 }
 
-func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (_ int64, _ int64, err error) {
+func (c *Client) GetPage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string) (_ int64, _ int64, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.GetPage: %w", err)
