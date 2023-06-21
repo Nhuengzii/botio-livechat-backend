@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -33,33 +34,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errNoShopIDPath
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoShopIDPath
 	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errNoPageIDPath
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
 	}
 	conversationID, ok := pathParams["conversation_id"]
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errNoConversationIDPath
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoConversationIDPath
 	}
 
 	stdMessages := []stdmessage.StdMessage{}
@@ -68,13 +51,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if !ok {
 		stdMessages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Body:       "Internal Server Error",
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-			}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 	} else {
 		var filter getmessages.Filter
@@ -82,13 +59,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformFacebook, pageID, conversationID, filter.Message)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Body:       "Internal Server Error",
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-			}, err
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 	}
 	getMessagesResponse := getmessages.Response{
@@ -97,35 +68,17 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	jsonBodyByte, err := json.Marshal(getMessagesResponse)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	if len(getMessagesResponse.Messages) != 0 {
 		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: 502,
-				Body:       "Bad Gateway",
-				Headers: map[string]string{
-					"Access-Control-Allow-Origin": "*",
-				},
-			}, err
+			return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
 		}
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       string(jsonBodyByte),
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-	}, nil
+	return apigateway.NewProxyResponse(200, string(jsonBodyByte), "*"), nil
 }
 
 func main() {
