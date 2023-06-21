@@ -111,6 +111,9 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(jsonBodyByte),
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*",
+		},
 	}, nil
 }
 

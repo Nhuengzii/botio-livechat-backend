@@ -96,6 +96,16 @@ module "facebook" {
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
+    get_page_id = {
+      handler_name = "facebook_get_page_id"
+      handler_path = format("%s/cmd/lambda/facebook/get_page_id", path.root)
+      environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord}/**/*.go"
+    }
     validate_webhook = {
       handler_name = "facebook_validate_webhook"
       handler_path = format("%s/cmd/lambda/facebook/validate_webhook", path.root)
@@ -173,6 +183,10 @@ module "facebook" {
     }
   }
   method_integrations = {
+    get_page_id = {
+      method  = "GET"
+      handler = "get_page_id"
+    }
     get_validate_webhook = {
       method  = "GET"
       handler = "validate_webhook"
@@ -208,6 +222,16 @@ module "instagram" {
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
+    get_page_id = {
+      handler_name = "instagram_get_page_id"
+      handler_path = format("%s/cmd/lambda/instagram/get_page_id", path.root)
+      environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,db}/**/*.go"
+    }
     validate_webhook = {
       handler_name = "instagram_validate_webhook"
       handler_path = format("%s/cmd/lambda/instagram/validate_webhook", path.root)
@@ -285,6 +309,10 @@ module "instagram" {
     }
   }
   method_integrations = {
+    get_page_id = {
+      method  = "GET"
+      handler = "get_page_id"
+    }
     get_validate_webhook = {
       method  = "GET"
       handler = "validate_webhook"
@@ -320,6 +348,16 @@ module "line" {
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
+    get_page_id = {
+      handler_name = "line_get_page_id"
+      handler_path = format("%s/cmd/lambda/line/get_page_id", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+      dependencies = "{discord,db}/**/*.go"
+    }
     validate_webhook = {
       handler_name = "line_validate_webhook"
       handler_path = format("%s/cmd/lambda/line/validate_webhook", path.root)
@@ -392,6 +430,10 @@ module "line" {
     }
   }
   method_integrations = {
+    get_page_id = {
+      method  = "GET"
+      handler = "get_page_id"
+    }
     post_validate_webhook = {
       method  = "POST"
       handler = "validate_webhook"
