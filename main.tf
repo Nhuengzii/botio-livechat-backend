@@ -100,6 +100,9 @@ module "facebook" {
       handler_name = "facebook_get_page_id"
       handler_path = format("%s/cmd/lambda/facebook/get_page_id", path.root)
       environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
       dependencies = "{discord}/**/*.go"
     }
@@ -219,6 +222,16 @@ module "instagram" {
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
+    get_page_id = {
+      handler_name = "instagram_get_page_id"
+      handler_path = format("%s/cmd/lambda/instagram/get_page_id", path.root)
+      environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = "{discord,db}/**/*.go"
+    }
     validate_webhook = {
       handler_name = "instagram_validate_webhook"
       handler_path = format("%s/cmd/lambda/instagram/validate_webhook", path.root)
@@ -229,13 +242,6 @@ module "instagram" {
         DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
       }
       dependencies = "{discord,db,sqswrapper}/**/*.go"
-    }
-    get_page_id = {
-      handler_name = "instagram_get_page_id"
-      handler_path = format("%s/cmd/lambda/instagram/get_page_id", path.root)
-      environment_variables = {
-      }
-      dependencies = "{discord,db}/**/*.go"
     }
     get_conversations = {
       handler_name = "instagram_get_conversations"
@@ -303,6 +309,10 @@ module "instagram" {
     }
   }
   method_integrations = {
+    get_page_id = {
+      method  = "GET"
+      handler = "get_page_id"
+    }
     get_validate_webhook = {
       method  = "GET"
       handler = "validate_webhook"
@@ -342,6 +352,9 @@ module "line" {
       handler_name = "line_get_page_id"
       handler_path = format("%s/cmd/lambda/line/get_page_id", path.root)
       environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
       dependencies = "{discord,db}/**/*.go"
     }
