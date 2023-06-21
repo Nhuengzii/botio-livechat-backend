@@ -6,7 +6,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func fmtFbRequest(req *postmessage.Request, pageID string, psid string) (_ *reqfbsendmessage.SendingMessage, err error) {
+func fmtFbRequest(req *postmessage.Request, psid string) (_ *reqfbsendmessage.SendingMessage, err error) {
 	var fbRequest reqfbsendmessage.SendingMessage
 
 	if req.Message != "" {

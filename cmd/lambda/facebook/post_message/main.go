@@ -88,7 +88,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		}, err
 	}
 
-	facebookRequest, err := fmtFbRequest(&requestMessage, pageID, psid)
+	facebookRequest, err := fmtFbRequest(&requestMessage, psid)
 	if !ok {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
