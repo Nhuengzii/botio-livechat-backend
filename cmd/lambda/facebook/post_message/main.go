@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/reqfbsendmessage"
@@ -45,69 +46,33 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	//**check parameters**//
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errNoPSIDParam
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPSIDParam
 	}
 	pageID, ok := request.PathParameters["page_id"]
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errNoPageIDPath
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
 	}
 	//**finish checking parameters**//
 
 	var requestMessage postmessage.Request
 	err = json.Unmarshal([]byte(request.Body), &requestMessage)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, pageID)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	facebookRequest, err := fmtFbRequest(&requestMessage, psid)
 	if !ok {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Bad Request",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
 	}
 
 	facebookResponse, err := reqfbsendmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 503,
-			Body:       "Service Unavailable",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(503, "Service Unavailable", "*"), err
 	}
 	// map facebook response to api response
 	resp := postmessage.Response{
@@ -116,33 +81,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		Timestamp:   facebookResponse.Timestamp,
 	}
 	if resp.MessageID == "" || resp.RecipientID == "" {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, errSendingFacebookMessage
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), errSendingFacebookMessage
 	}
 
 	jsonBodyByte, err := json.Marshal(resp)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Internal Server Error",
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-		}, err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       string(jsonBodyByte),
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*",
-		},
-	}, nil
+	return apigateway.NewProxyResponse(200, string(jsonBodyByte), "*"), nil
 }
 
 func main() {
