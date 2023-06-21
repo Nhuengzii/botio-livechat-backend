@@ -50,7 +50,7 @@ type StdMessage struct {
 	Message        string          `json:"message" bson:"message"`
 	Attachments    []Attachment    `json:"attachments" bson:"attachments"`
 	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
-	IsDeleted      bool            `json:"is_deleted" bson:"is_deleted"`
+	IsDeleted      bool            `json:"is_deleted" bson:"isDeleted"`
 }
 
 type Platform string
@@ -105,7 +105,9 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 		AttachmentTypeFBTemplateMedia,
 		AttachmentTypeFBTemplateProduct,
 		AttachmentTypeFBTemplateReceipt,
-		AttachmentTypeFBTemplateStructuredInformation:
+		AttachmentTypeFBTemplateStructuredInformation,
+		AttachmentTypeIGTemplateGeneric,
+		AttachmentTypeIGTemplateProduct:
 		return "ส่งเทมเพลต", nil
 	case AttachmentTypeLineFlex:
 		return "ส่งเฟล็กซ์", nil

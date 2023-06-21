@@ -33,6 +33,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 	var receiveWebhook ReceiveWebhook
 
 	for _, record := range sqsEvent.Records {
+		log.Println(string(record.Body))
 		err := json.Unmarshal([]byte(record.Body), &receiveWebhook)
 		if err != nil {
 			return err

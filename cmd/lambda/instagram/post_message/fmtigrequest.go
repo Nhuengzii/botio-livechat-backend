@@ -2,26 +2,25 @@ package main
 
 import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/facebook/reqfbsendmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/instagram/reqigsendmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func fmtFbRequest(req *postmessage.Request, psid string) (_ *reqfbsendmessage.SendingMessage, err error) {
-	var fbRequest reqfbsendmessage.SendingMessage
+func fmtIgRequest(req *postmessage.Request, psid string) (_ *reqigsendmessage.SendingMessage, err error) {
+	var igRequest reqigsendmessage.SendingMessage
 
 	if req.Message != "" {
-		fbRequest = reqfbsendmessage.SendingMessage{
-			Recipient: reqfbsendmessage.Recipient{
+		igRequest = reqigsendmessage.SendingMessage{
+			Recipient: reqigsendmessage.Recipient{
 				Id: psid,
 			},
-			MessagingType: "RESPONSE",
-			Message: reqfbsendmessage.MessageText{
+			Message: reqigsendmessage.MessageText{
 				Text: req.Message,
 			},
 		}
 	} else {
 		stdAttachment := stdmessage.AttachmentType(req.Attachment.AttachmentType)
-		var payload *reqfbsendmessage.AttachmentFacebookPayload
+		var payload *reqigsendmessage.AttachmentInstagramPayload
 		var attachmentType string
 		switch stdAttachment { // supported post type
 		case stdmessage.AttachmentTypeImage:
@@ -36,7 +35,7 @@ func fmtFbRequest(req *postmessage.Request, psid string) (_ *reqfbsendmessage.Se
 		case stdmessage.AttachmentTypeFile:
 			attachmentType = req.Attachment.AttachmentType
 			payload, err = fmtBasicPayload(req.Attachment.Payload)
-		case stdmessage.AttachmentTypeFBTemplateGeneric:
+		case stdmessage.AttachmentTypeIGTemplateGeneric:
 			attachmentType = attachmentTypeTemplate
 			payload, err = fmtGenericTemplatePayload(req.Attachment.Payload)
 			// add more supported type here
@@ -46,13 +45,12 @@ func fmtFbRequest(req *postmessage.Request, psid string) (_ *reqfbsendmessage.Se
 		if err != nil {
 			return nil, err
 		}
-		fbRequest = reqfbsendmessage.SendingMessage{
-			Recipient: reqfbsendmessage.Recipient{
+		igRequest = reqigsendmessage.SendingMessage{
+			Recipient: reqigsendmessage.Recipient{
 				Id: psid,
 			},
-			MessagingType: "RESPONSE",
-			Message: reqfbsendmessage.MessageAttachment{
-				Attachment: reqfbsendmessage.AttachmentFacebookRequest{
+			Message: reqigsendmessage.MessageAttachment{
+				Attachment: reqigsendmessage.AttachmentInstagramRequest{
 					AttachmentType: attachmentType,
 					Payload:        *payload,
 				},
@@ -60,5 +58,5 @@ func fmtFbRequest(req *postmessage.Request, psid string) (_ *reqfbsendmessage.Se
 		}
 	}
 
-	return &fbRequest, nil
+	return &igRequest, nil
 }

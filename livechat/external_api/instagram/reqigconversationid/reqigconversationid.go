@@ -17,14 +17,14 @@ type Conversation struct {
 	ID string `json:"id"`
 }
 
-func GetConversationID(accessToken string, igsid string, pageID string) (_ string, err error) {
+func GetConversationID(accessToken string, igsid string, facebookPageID string) (_ string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("reqigconversationid.GetConversationID: %w", err)
 		}
 	}()
 	url := fmt.Sprintf("https://graph.facebook.com/v16.0/%v/conversations?platform=instagram&user_id=%v&access_token=%v",
-		pageID, igsid, accessToken)
+		facebookPageID, igsid, accessToken)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err

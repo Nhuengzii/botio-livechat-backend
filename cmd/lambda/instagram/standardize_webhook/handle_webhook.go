@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
@@ -43,9 +42,6 @@ func (c *config) handleWebhookEntry(ctx context.Context, message *Entry) error {
 			if err != nil {
 				return err
 			}
-			//**text//
-			log.Println(string(standardMessageJSON))
-			//**finish test//
 			err = c.snsClient.PublishMessage(c.snsTopicARN, string(standardMessageJSON))
 			if err != nil {
 				return err

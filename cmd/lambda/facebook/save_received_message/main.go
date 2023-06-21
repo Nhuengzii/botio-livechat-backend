@@ -16,7 +16,6 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type receivedMessage struct {
@@ -44,7 +43,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return errUnmarshalReceivedBody
 		}
-		err = bson.UnmarshalExtJSON([]byte(receiveBody.Message), true, &receiveMessage)
+		err = json.Unmarshal([]byte(receiveBody.Message), &receiveMessage)
 		if err != nil {
 			return errUnmarshalReceivedMessage
 		}
