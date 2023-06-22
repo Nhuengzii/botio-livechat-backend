@@ -40,7 +40,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		// check for bad offset value
 		offsetPtr = &offset
 	}
 
@@ -64,7 +63,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
-			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername)
+			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, offsetPtr, limitPtr)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
 			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message)
 		} else {

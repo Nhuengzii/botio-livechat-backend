@@ -309,7 +309,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, offset *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
@@ -318,13 +318,24 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 
 	name = strings.Trim(name, " ")
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 		{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if offset != nil {
+		fOpt.SetSkip(int64(*offset))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
