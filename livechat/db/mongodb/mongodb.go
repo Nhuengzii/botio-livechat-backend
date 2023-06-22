@@ -385,6 +385,27 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
+func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string) ([]stdconversation.StdConversation, error) {
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	conversations := []stdconversation.StdConversation{}
+	err = cur.All(ctx, &conversations)
+	if err != nil {
+		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return conversations, nil
+}
+
 func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
 	defer func() {
 		if err != nil {
