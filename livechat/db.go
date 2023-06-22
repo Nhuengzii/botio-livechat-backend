@@ -22,7 +22,7 @@ type DBClient interface {
 	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) ([]stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, shopID string, pageID string, offset *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, offset *int, limit *int) ([]stdconversation.StdConversation, error)
-	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) ([]stdconversation.StdConversation, error)
+	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, offset *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
 	QueryFacebookAuthentication(ctx context.Context, pageID string) (*shops.FacebookAuthentication, error)
 	QueryLineAuthentication(ctx context.Context, pageID string) (*shops.LineAuthentication, error)

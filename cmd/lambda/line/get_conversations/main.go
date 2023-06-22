@@ -65,7 +65,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
 			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, offsetPtr, limitPtr)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
-			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message)
+			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, offsetPtr, limitPtr)
 		} else {
 			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errors.New("filter must have only one field at a time")
 		}
