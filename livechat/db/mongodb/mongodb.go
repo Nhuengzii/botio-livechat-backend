@@ -91,21 +91,33 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 		}
 		return err
 	}
-	currentUnread := conversation.Unread
-	update := bson.M{
-		"$set": bson.D{
-			{Key: "lastActivity", Value: lastActivity},
-			{Key: "updatedTime", Value: message.Timestamp},
-			{Key: "unread", Value: currentUnread + 1},
-		},
+
+	if message.Source.UserType == stdmessage.UserTypeAdmin {
+		update := bson.M{
+			"$set": bson.D{
+				{Key: "lastActivity", Value: lastActivity},
+				{Key: "updatedTime", Value: message.Timestamp},
+			},
+		}
+		err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	} else {
+		currentUnread := conversation.Unread
+		update := bson.M{
+			"$set": bson.D{
+				{Key: "lastActivity", Value: lastActivity},
+				{Key: "updatedTime", Value: message.Timestamp},
+				{Key: "unread", Value: currentUnread + 1},
+			},
+		}
+		err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	}
-	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return ErrNoDocuments
 		}
 		return err
 	}
+
 	return nil
 }
 
@@ -464,7 +476,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 	return &shop.InstagramAuthentication, nil
 }
 
-func (c *Client) GetPage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string) (_ int64, _ int64, err error) {
+func (c *Client) GetPage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string) (_ int64, _ int64, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.GetPage: %w", err)

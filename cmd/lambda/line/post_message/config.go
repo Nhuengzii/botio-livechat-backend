@@ -6,5 +6,7 @@ import (
 
 type config struct {
 	discordWebhookURL string
+	snsTopicARN       string
+	snsClient         livechat.PushNotificationClient
 	dbClient          livechat.DBClient
 }

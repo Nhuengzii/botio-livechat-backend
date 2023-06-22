@@ -207,7 +207,9 @@ locals {
     get_conversation      = {}
     patch_conversation    = {}
     get_messages          = {}
-    post_message          = {}
+    post_message = {
+      SNS_TOPIC_ARN = aws_sns_topic.save_and_relay_received_message.arn
+    }
   }
 }
 

@@ -98,10 +98,10 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
 					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
-					Payload        postmessage.LineTemplateButtons `json:"payload"`
+					Payload        postmessage.LineTemplateConfirm `json:"payload"`
 				}{
 					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-					Payload:        req.Attachment.Payload.LineTemplateButtons,
+					Payload:        req.Attachment.Payload.LineTemplateConfirm,
 				},
 			)
 			if err != nil {
@@ -119,11 +119,11 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
-					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
-					Payload        postmessage.LineTemplateButtons `json:"payload"`
+					AttachmentType stdmessage.AttachmentType        `json:"attachmentType"`
+					Payload        postmessage.LineTemplateCarousel `json:"payload"`
 				}{
 					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-					Payload:        req.Attachment.Payload.LineTemplateButtons,
+					Payload:        req.Attachment.Payload.LineTemplateCarousel,
 				},
 			)
 			if err != nil {
@@ -141,11 +141,11 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
-					AttachmentType stdmessage.AttachmentType       `json:"attachmentType"`
-					Payload        postmessage.LineTemplateButtons `json:"payload"`
+					AttachmentType stdmessage.AttachmentType             `json:"attachmentType"`
+					Payload        postmessage.LineTemplateImageCarousel `json:"payload"`
 				}{
 					AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
-					Payload:        req.Attachment.Payload.LineTemplateButtons,
+					Payload:        req.Attachment.Payload.LineTemplateImageCarousel,
 				},
 			)
 			if err != nil {
@@ -176,13 +176,12 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		Attachments: attachments,
 		ReplyTo:     nil,
 	}
-	err = c.dbClient.UpdateConversationOnNewMessage(ctx, &stdMessage)
+
+	stdMessageJSON, err := json.Marshal(stdMessage)
+	err = c.snsClient.PublishMessage(c.snsTopicARN, string(stdMessageJSON))
 	if err != nil {
 		return err
 	}
-	err = c.dbClient.InsertMessage(ctx, &stdMessage)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
