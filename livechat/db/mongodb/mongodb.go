@@ -203,7 +203,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	}
 
 	var fOpt options.FindOptions
-	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	fOpt.SetSort(bson.D{{Key: "timestamp", Value: -1}}) // descending sort
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
@@ -246,7 +246,7 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 	}
 
 	var fOpt options.FindOptions
-	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	fOpt.SetSort(bson.D{{Key: "timestamp", Value: -1}}) // descending sort
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
