@@ -240,8 +240,8 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
-		{Key: "message", Value: bson.D{
-			{Key: "$regex", Value: message},
+		{Key: "message", Value: bson.M{
+			"$regex": message, "$options": "i",
 		}},
 	}
 
@@ -344,7 +344,7 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
-		{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}},
+		{Key: "participants.username", Value: bson.M{"$regex": name, "$options": "i"}},
 	}
 
 	var fOpt options.FindOptions
@@ -385,7 +385,7 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
-		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}},
+		{Key: "message", Value: bson.M{"$regex": message, "$options": "i"}},
 	}
 
 	var fOpt options.FindOptions
