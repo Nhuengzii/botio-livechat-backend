@@ -28,7 +28,7 @@ resource "aws_iam_role" "assume_role_lambda" {
 resource "aws_sqs_queue" "webhook_standardizer" {
   name = format("%s_webhook_standardizer", var.platform)
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.terraform_queue_deadletter.arn
+    deadLetterTargetArn = aws_sqs_queue.webhook_standardizer_dlq.arn
     maxReceiveCount     = 4
   })
 }
@@ -37,9 +37,18 @@ resource "aws_sqs_queue" "save_and_relay_received_message" {
   for_each = toset(["save", "relay"])
   name     = format("%s_%s_received_message", var.platform, each.key)
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.terraform_queue_deadletter.arn
+    deadLetterTargetArn = aws_sqs_queue.save_and_relay_received_message_dlq.arn
     maxReceiveCount     = 4
   })
+}
+
+# Define Dead Letter Queue
+resource "aws_sqs_queue" "webhook_standardizer_dlq" {
+  name = "webhook_standardizer_dlq"
+}
+
+resource "aws_sqs_queue" "save_and_relay_received_message_dlq" {
+  name = "save_and_relay_received_message_dlq"
 }
 
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
