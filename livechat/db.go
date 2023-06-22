@@ -19,7 +19,7 @@ type DBClient interface {
 	RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error
 	QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (*stdconversation.StdConversation, error)
 	QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, offset *int, limit *int) ([]stdmessage.StdMessage, error)
-	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) ([]stdmessage.StdMessage, error)
+	QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, offset *int, limit *int) ([]stdmessage.StdMessage, error)
 	QueryConversations(ctx context.Context, shopID string, pageID string, offset *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, offset *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, offset *int, limit *int) ([]stdconversation.StdConversation, error)

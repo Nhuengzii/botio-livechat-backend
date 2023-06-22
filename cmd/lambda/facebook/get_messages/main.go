@@ -78,7 +78,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		var filter getmessages.Filter
 		err := json.Unmarshal([]byte(filterQueryString), &filter)
 
-		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformFacebook, pageID, conversationID, filter.Message)
+		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformFacebook, pageID, conversationID, filter.Message, offsetPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}

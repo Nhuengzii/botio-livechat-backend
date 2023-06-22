@@ -227,12 +227,13 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, offset *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
 		}
 	}()
+
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
@@ -243,7 +244,17 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 			{Key: "$regex", Value: message},
 		}},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if offset != nil {
+		fOpt.SetSkip(int64(*offset))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}

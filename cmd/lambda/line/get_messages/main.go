@@ -63,7 +63,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message)
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, offsetPtr, limitPtr)
 	}
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
