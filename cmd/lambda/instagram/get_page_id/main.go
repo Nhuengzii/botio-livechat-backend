@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"log"
 	"os"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getpage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
-
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -29,7 +28,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 
-	platform := stdmessage.PlatformInstagram
+	platform := stdconversation.PlatformInstagram
 
 	unreadConversations, allConversations, err := c.dbClient.GetPage(ctx, shopID, platform, pageID)
 	if err != nil {
