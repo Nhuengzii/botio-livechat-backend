@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -20,7 +19,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/line/get_messages/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/facebook/patch_conversation/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
@@ -30,33 +29,25 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
 
-	messages := []stdmessage.StdMessage{}
+	platform := stdconversation.PlatformFacebook
 
 	queryStringParameters := req.QueryStringParameters
-	filterString, ok := queryStringParameters["filter"]
-	if !ok {
-		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
-	} else {
-		filter := getmessages.Filter{}
-		err = json.Unmarshal([]byte(filterString), &filter)
-		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	read, ok := queryStringParameters["read"]
+	if ok {
+		if read == "true" {
+			err = c.dbClient.UpdateConversationIsRead(ctx, shopID, platform, pageID, conversationID)
+			if err != nil {
+				if errors.Is(err, mongodb.ErrNoDocuments) {
+					return apigateway.NewProxyResponse(404, "Not Found", err.Error()), nil
+				}
+				return apigateway.NewProxyResponse(500, "", err.Error()), nil
+			}
+		} else {
+			return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message)
-	}
-	if err != nil {
-		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	resp := getmessages.Response{
-		Messages: messages,
-	}
-	responseJSON, err := json.Marshal(resp)
-	if err != nil {
-		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
-	}
-
-	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
+	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
 
 func main() {
@@ -75,7 +66,7 @@ func main() {
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		logMessage := "cmd/lambda/line/get_messages/main.main: " + err.Error()
+		logMessage := "cmd/lambda/facebook/patch_conversation/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
 		log.Fatalln(logMessage)
 	}

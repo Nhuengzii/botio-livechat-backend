@@ -30,6 +30,9 @@ func (c *config) handleWebhookEntry(ctx context.Context, message *Entry) error {
 	}
 
 	for _, messaging := range message.Messagings {
+		if messaging.Message.IsUnsupported {
+			return errMessageNotSupported
+		}
 		if messaging.Message.MessageID != "" {
 			// standardize messaging hooks
 			var standardMessage *stdmessage.StdMessage

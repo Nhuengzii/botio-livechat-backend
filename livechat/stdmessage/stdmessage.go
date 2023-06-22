@@ -50,7 +50,7 @@ type StdMessage struct {
 	Message        string          `json:"message" bson:"message"`
 	Attachments    []Attachment    `json:"attachments" bson:"attachments"`
 	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
-	IsDeleted      bool            `json:"is_deleted" bson:"isDeleted"`
+	IsDeleted      bool            `json:"isDeleted" bson:"isDeleted"`
 }
 
 type Platform string
