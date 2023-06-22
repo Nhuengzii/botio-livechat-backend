@@ -485,6 +485,10 @@ module "line" {
       method  = "GET"
       handler = "get_conversation"
     }
+        patch_conversation = {
+      method  = "PATCH"
+      handler = "patch_conversation"
+    }
     get_messages = {
       method  = "GET"
       handler = "get_messages"
