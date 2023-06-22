@@ -189,7 +189,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, offset *int, limit *int) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
@@ -207,8 +207,8 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
-	if offset != nil {
-		fOpt.SetSkip(int64(*offset))
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
 	}
 
 	cur, err := coll.Find(ctx, filter, &fOpt)
@@ -227,7 +227,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, offset *int, limit *int) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
@@ -250,8 +250,8 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
-	if offset != nil {
-		fOpt.SetSkip(int64(*offset))
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
 	}
 
 	cur, err := coll.Find(ctx, filter, &fOpt)
@@ -293,7 +293,7 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 	return &conversation, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, offset *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -310,8 +310,8 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
-	if offset != nil {
-		fOpt.SetSkip(int64(*offset))
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
 	}
 
 	cur, err := coll.Find(ctx, filter, &fOpt)
@@ -330,7 +330,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, offset *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
@@ -352,8 +352,8 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
-	if offset != nil {
-		fOpt.SetSkip(int64(*offset))
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
 	}
 
 	cur, err := coll.Find(ctx, filter, &fOpt)
@@ -371,7 +371,7 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, offset *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
@@ -393,8 +393,8 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	if limit != nil {
 		fOpt.SetLimit(int64(*limit))
 	}
-	if offset != nil {
-		fOpt.SetSkip(int64(*offset))
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
 	}
 
 	cur, err := collMessage.Find(ctx, filterMessage, &fOpt)

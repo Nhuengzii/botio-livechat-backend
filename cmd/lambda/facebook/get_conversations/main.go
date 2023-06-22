@@ -44,14 +44,14 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdConversations := []stdconversation.StdConversation{}
 
-	offsetString, ok := request.QueryStringParameters["offset"]
-	var offsetPtr *int
-	if offsetString != "" {
-		offset, err := strconv.Atoi(offsetString)
+	skipString, ok := request.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		offsetPtr = &offset
+		skipPtr = &skip
 	}
 
 	limitString, ok := request.QueryStringParameters["limit"]
@@ -66,7 +66,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok { // no need to query with filter
-		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, offsetPtr, limitPtr)
+		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
@@ -80,12 +80,12 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		if filter.Message != "" && filter.ParticipantsUsername != "" {
 			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errTwoFilterParamsInOneRequest
 		} else if filter.ParticipantsUsername != "" { // query with ParticipantsUsername
-			stdConversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.ParticipantsUsername, offsetPtr, limitPtr)
+			stdConversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
 			if err != nil {
 				return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 			}
 		} else if filter.Message != "" { // query with message
-			stdConversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.Message, offsetPtr, limitPtr)
+			stdConversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformFacebook, pageID, filter.Message, skipPtr, limitPtr)
 			if err != nil {
 				return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 			}

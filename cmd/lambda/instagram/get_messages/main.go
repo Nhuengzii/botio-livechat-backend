@@ -47,14 +47,14 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdMessages := []stdmessage.StdMessage{}
 
-	offsetString, ok := request.QueryStringParameters["offset"]
-	var offsetPtr *int
-	if offsetString != "" {
-		offset, err := strconv.Atoi(offsetString)
+	skipString, ok := request.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		offsetPtr = &offset
+		skipPtr = &skip
 	}
 
 	limitString, ok := request.QueryStringParameters["limit"]
@@ -68,7 +68,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok {
-		stdMessages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, offsetPtr, limitPtr)
+		stdMessages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
@@ -76,7 +76,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		var filter getmessages.Filter
 		err := json.Unmarshal([]byte(filterQueryString), &filter)
 
-		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformInstagram, pageID, conversationID, filter.Message, offsetPtr, limitPtr)
+		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformInstagram, pageID, conversationID, filter.Message, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}

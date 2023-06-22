@@ -33,14 +33,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	conversations := []stdconversation.StdConversation{}
 
-	offsetString, ok := req.QueryStringParameters["offset"]
-	var offsetPtr *int
-	if offsetString != "" {
-		offset, err := strconv.Atoi(offsetString)
+	skipString, ok := req.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		offsetPtr = &offset
+		skipPtr = &skip
 	}
 
 	limitString, ok := req.QueryStringParameters["limit"]
@@ -55,7 +55,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, offsetPtr, limitPtr)
+		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, skipPtr, limitPtr)
 	} else {
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
@@ -63,9 +63,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
-			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, offsetPtr, limitPtr)
+			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
-			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, offsetPtr, limitPtr)
+			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, skipPtr, limitPtr)
 		} else {
 			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errors.New("filter must have only one field at a time")
 		}

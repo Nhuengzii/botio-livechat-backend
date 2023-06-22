@@ -33,14 +33,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	messages := []stdmessage.StdMessage{}
 
-	offsetString, ok := req.QueryStringParameters["offset"]
-	var offsetPtr *int
-	if offsetString != "" {
-		offset, err := strconv.Atoi(offsetString)
+	skipString, ok := req.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		offsetPtr = &offset
+		skipPtr = &skip
 	}
 
 	limitString, ok := req.QueryStringParameters["limit"]
@@ -56,14 +56,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, offsetPtr, limitPtr)
+		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
 	} else {
 		filter := getmessages.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, offsetPtr, limitPtr)
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, skipPtr, limitPtr)
 	}
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
