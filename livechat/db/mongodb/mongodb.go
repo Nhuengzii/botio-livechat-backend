@@ -121,7 +121,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	return nil
 }
 
-func (c *Client) UpdateConversationIsRead(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) error {
+func (c *Client) UpdateConversationUnread(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string, unread int) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
@@ -131,7 +131,7 @@ func (c *Client) UpdateConversationIsRead(ctx context.Context, shopID string, pl
 	}
 	update := bson.M{
 		"$set": bson.D{
-			{Key: "unread", Value: 0},
+			{Key: "unread", Value: unread},
 		},
 	}
 	err := coll.FindOneAndUpdate(ctx, filter, update).Err()

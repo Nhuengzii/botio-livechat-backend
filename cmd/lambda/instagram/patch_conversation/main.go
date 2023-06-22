@@ -35,7 +35,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	read, ok := queryStringParameters["read"]
 	if ok {
 		if read == "true" {
-			err = c.dbClient.UpdateConversationIsRead(ctx, shopID, platform, pageID, conversationID)
+			err = c.dbClient.UpdateConversationUnread(ctx, shopID, platform, pageID, conversationID, 0)
 			if err != nil {
 				if errors.Is(err, mongodb.ErrNoDocuments) {
 					return apigateway.NewProxyResponse(404, "Not Found", err.Error()), nil
