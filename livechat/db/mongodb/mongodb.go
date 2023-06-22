@@ -272,7 +272,7 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 	return &conversation, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, offset *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -283,7 +283,17 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if offset != nil {
+		fOpt.SetSkip(int64(*offset))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}

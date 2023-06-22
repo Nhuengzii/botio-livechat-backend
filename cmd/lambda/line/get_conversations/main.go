@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"log"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -31,10 +33,30 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	conversations := []stdconversation.StdConversation{}
 
+	offsetString, ok := req.QueryStringParameters["offset"]
+	var offsetPtr *int
+	if offsetString != "" {
+		offset, err := strconv.Atoi(offsetString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		// check for bad offset value
+		offsetPtr = &offset
+	}
+
+	limitString, ok := req.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
+		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, offsetPtr, limitPtr)
 	} else {
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)

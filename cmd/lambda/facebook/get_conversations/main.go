@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
@@ -43,9 +44,30 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdConversations := []stdconversation.StdConversation{}
 
+	offsetString, ok := request.QueryStringParameters["offset"]
+	var offsetPtr *int
+	if offsetString != "" {
+		offset, err := strconv.Atoi(offsetString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		// check for bad offset value
+		offsetPtr = &offset
+	}
+
+	limitString, ok := request.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
+
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok { // no need to query with filter
-		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
+		stdConversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, offsetPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
