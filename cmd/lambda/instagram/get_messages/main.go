@@ -71,12 +71,6 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	if len(getMessagesResponse.Messages) != 0 {
-		err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
-		if err != nil {
-			return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
-		}
-	}
 	return apigateway.NewProxyResponse(200, string(jsonBodyByte), "*"), nil
 }
 

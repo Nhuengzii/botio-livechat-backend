@@ -121,9 +121,12 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	return nil
 }
 
-func (c *Client) UpdateConversationIsRead(ctx context.Context, conversationID string) error {
+func (c *Client) UpdateConversationIsRead(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
 	}
 	update := bson.M{

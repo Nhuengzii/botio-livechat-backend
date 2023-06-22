@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getmessages"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -54,8 +55,6 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-
-	err = c.dbClient.UpdateConversationIsRead(ctx, conversationID)
 
 	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
