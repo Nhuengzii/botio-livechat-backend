@@ -438,12 +438,22 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
-func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string) ([]stdconversation.StdConversation, error) {
+func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}

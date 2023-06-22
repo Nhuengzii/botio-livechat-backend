@@ -44,7 +44,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	stdConversations := []stdconversation.StdConversation{}
 
-	skipString, ok := request.QueryStringParameters["skip"]
+	skipString, _ := request.QueryStringParameters["skip"]
 	var skipPtr *int
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
@@ -54,7 +54,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		skipPtr = &skip
 	}
 
-	limitString, ok := request.QueryStringParameters["limit"]
+	limitString := request.QueryStringParameters["limit"]
 	var limitPtr *int
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
