@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
@@ -30,6 +32,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversationID := pathParameters["conversation_id"]
 
 	platform := stdconversation.PlatformFacebook
+
+	var requestPatch patchconversation.Request
+	err = json.Unmarshal([]byte(req.Body), &requestPatch)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
 
 	queryStringParameters := req.QueryStringParameters
 	read, ok := queryStringParameters["read"]
