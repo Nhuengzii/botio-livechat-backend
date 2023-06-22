@@ -65,5 +65,5 @@ resource "aws_lambda_permission" "endpoint_handler_permissions" {
   statement_id  = "AllowMethodExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/GET/%s", var.rest_api_execution_arn, aws_api_gateway_resource.conversations.path)
+  source_arn    = format("%s/*/GET%s", var.rest_api_execution_arn, aws_api_gateway_resource.conversations.path)
 }
