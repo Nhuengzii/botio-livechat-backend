@@ -189,7 +189,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, offset *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
@@ -201,7 +201,17 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 		"pageID":         pageID,
 		"conversationID": conversationID,
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if offset != nil {
+		fOpt.SetSkip(int64(*offset))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}

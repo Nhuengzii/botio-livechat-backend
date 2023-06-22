@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
@@ -32,10 +33,30 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	messages := []stdmessage.StdMessage{}
 
+	offsetString, ok := req.QueryStringParameters["offset"]
+	var offsetPtr *int
+	if offsetString != "" {
+		offset, err := strconv.Atoi(offsetString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		offsetPtr = &offset
+	}
+
+	limitString, ok := req.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
+
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, offsetPtr, limitPtr)
 	} else {
 		filter := getmessages.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
