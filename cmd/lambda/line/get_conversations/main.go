@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"log"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -31,10 +33,29 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	conversations := []stdconversation.StdConversation{}
 
+	skipString, ok := req.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		skipPtr = &skip
+	}
+
+	limitString, ok := req.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID)
+		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, skipPtr, limitPtr)
 	} else {
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
@@ -42,9 +63,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
-			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername)
+			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
-			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message)
+			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, skipPtr, limitPtr)
 		} else {
 			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errors.New("filter must have only one field at a time")
 		}

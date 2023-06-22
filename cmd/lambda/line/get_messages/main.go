@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
@@ -32,17 +33,37 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	messages := []stdmessage.StdMessage{}
 
+	skipString, ok := req.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		skipPtr = &skip
+	}
+
+	limitString, ok := req.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
+
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID)
+		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
 	} else {
 		filter := getmessages.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message)
+		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, skipPtr, limitPtr)
 	}
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err

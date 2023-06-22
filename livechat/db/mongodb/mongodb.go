@@ -189,7 +189,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 	return nil
 }
 
-func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
@@ -201,7 +201,17 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 		"pageID":         pageID,
 		"conversationID": conversationID,
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "timestamp", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -217,12 +227,13 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
 		}
 	}()
+
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
@@ -233,7 +244,17 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 			{Key: "$regex", Value: message},
 		}},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "timestamp", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +293,7 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 	return &conversation, nil
 }
 
-func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
@@ -283,7 +304,17 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +330,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
@@ -308,13 +339,24 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 
 	name = strings.Trim(name, " ")
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 		{Key: "participants.username", Value: bson.D{{Key: "$regex", Value: name}}},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -329,7 +371,7 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
@@ -338,13 +380,24 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 
 	message = strings.Trim(message, " ")
 	collMessage := c.client.Database(c.Database).Collection(c.CollectionMessages)
+
 	filterMessage := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 		{Key: "message", Value: bson.D{{Key: "$regex", Value: message}}},
 	}
-	cur, err := collMessage.Find(ctx, filterMessage)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := collMessage.Find(ctx, filterMessage, &fOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -385,12 +438,22 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
-func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string) ([]stdconversation.StdConversation, error) {
+func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 	}
-	cur, err := coll.Find(ctx, filter)
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}

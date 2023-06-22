@@ -21,3 +21,8 @@ variable "dependencies" {
   type    = string
   default = ""
 }
+
+variable "timeout" {
+  type    = number
+  default = 3
+}

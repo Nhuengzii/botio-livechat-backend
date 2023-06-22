@@ -36,6 +36,7 @@ resource "aws_lambda_function" "handler" {
   runtime          = "go1.x"
   role             = var.role_arn
   source_code_hash = data.archive_file.handler_zip.output_base64sha256
+  timeout          = var.timeout
   environment {
     variables = var.environment_variables
   }

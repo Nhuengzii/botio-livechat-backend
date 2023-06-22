@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -27,7 +29,27 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	pathParameters := req.PathParameters
 	shopID := pathParameters["shop_id"]
 
-	conversations, err := c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID)
+	skipString := req.QueryStringParameters["skip"]
+	var skipPtr *int
+	if skipString != "" {
+		skip, err := strconv.Atoi(skipString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		skipPtr = &skip
+	}
+
+	limitString := req.QueryStringParameters["limit"]
+	var limitPtr *int
+	if limitString != "" {
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+		limitPtr = &limit
+	}
+
+	conversations, err := c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID, skipPtr, limitPtr)
 	if err != nil {
 		discord.Log(c.discordWebhookURL, "ListConversations error")
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err

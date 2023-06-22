@@ -27,11 +27,28 @@ resource "aws_iam_role" "assume_role_lambda" {
 # Define Queue
 resource "aws_sqs_queue" "webhook_standardizer" {
   name = format("%s_webhook_standardizer", var.platform)
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.webhook_standardizer_dlq.arn
+    maxReceiveCount     = 4
+  })
 }
 
 resource "aws_sqs_queue" "save_and_relay_received_message" {
   for_each = toset(["save", "relay"])
   name     = format("%s_%s_received_message", var.platform, each.key)
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.save_and_relay_received_message_dlq.arn
+    maxReceiveCount     = 4
+  })
+}
+
+# Define Dead Letter Queue
+resource "aws_sqs_queue" "webhook_standardizer_dlq" {
+  name = "webhook_standardizer_dlq"
+}
+
+resource "aws_sqs_queue" "save_and_relay_received_message_dlq" {
+  name = "save_and_relay_received_message_dlq"
 }
 
 data "aws_iam_policy_document" "sqs_allow_send_message_from_sns" {
@@ -217,6 +234,18 @@ locals {
       SNS_TOPIC_ARN = aws_sns_topic.save_and_relay_received_message.arn
     }
   }
+  timeout_variables_mapping = {
+    validate_webhook      = 3
+    standardize_webhook   = 3
+    get_page_id           = 3
+    save_received_message = 3
+    get_conversations     = 3
+    post_conversation     = 3
+    get_conversation      = 3
+    patch_conversation    = 3
+    get_messages          = 3
+    post_message          = 20
+  }
 }
 
 # Define Handler
@@ -229,6 +258,7 @@ module "handlers" {
   handler_path          = each.value.handler_path
   role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = merge(each.value.environment_variables, local.environment_variables_mapping[each.key])
+  timeout               = local.timeout_variables_mapping[each.key]
   dependencies          = each.value.dependencies
 }
 
