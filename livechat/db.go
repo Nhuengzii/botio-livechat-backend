@@ -13,7 +13,7 @@ type DBClient interface {
 	InsertConversation(ctx context.Context, conversation *stdconversation.StdConversation) error
 	InsertMessage(ctx context.Context, message *stdmessage.StdMessage) error
 	UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) error
-	UpdateConversationIsRead(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) error
+	UpdateConversationUnread(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string, unread int) error
 	CheckConversationExists(ctx context.Context, conversationID string) error
 	UpdateConversationParticipants(ctx context.Context, conversationID string) error
 	RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error
