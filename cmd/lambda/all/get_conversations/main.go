@@ -29,6 +29,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	conversations, err := c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID)
 	if err != nil {
+		discord.Log(c.discordWebhookURL, "ListConversations error")
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
@@ -37,6 +38,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
+		discord.Log(c.discordWebhookURL, "json Marshal error")
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
