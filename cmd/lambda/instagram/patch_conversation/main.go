@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"os"
 	"time"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
@@ -31,22 +33,22 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 
 	platform := stdconversation.PlatformInstagram
 
-	queryStringParameters := req.QueryStringParameters
-	read, ok := queryStringParameters["read"]
-	if ok {
-		if read == "true" {
-			err = c.dbClient.UpdateConversationUnread(ctx, shopID, platform, pageID, conversationID, 0)
-			if err != nil {
-				if errors.Is(err, mongodb.ErrNoDocuments) {
-					return apigateway.NewProxyResponse(404, "Not Found", err.Error()), nil
-				}
-				return apigateway.NewProxyResponse(500, "", err.Error()), nil
-			}
-		} else {
-			return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
-		}
+	var requestPatch patchconversation.Request
+	err = json.Unmarshal([]byte(req.Body), &requestPatch)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
+	if requestPatch.Unread != nil {
+		err = c.dbClient.UpdateConversationUnread(ctx, shopID, platform, pageID, conversationID, *requestPatch.Unread)
+		if err != nil {
+			if errors.Is(err, mongodb.ErrNoDocuments) {
+				return apigateway.NewProxyResponse(404, "Not Found", "*"), nil
+			}
+			return apigateway.NewProxyResponse(500, "", "*"), nil
+		}
+	}
+	// didn't use else to check if there is no field return err because potential new patch fields
 	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
 
