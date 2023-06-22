@@ -18,7 +18,7 @@ resource "null_resource" "build_handler" {
     ]))
   }
   provisioner "local-exec" {
-    command = format("CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C %s -o main .", var.handler_path)
+    command = format("CGO_ENABLED=0 GOOS=linux go build -C %s -o main .", var.handler_path)
   }
 }
 
