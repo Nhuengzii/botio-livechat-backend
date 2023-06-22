@@ -128,6 +128,16 @@ module "facebook" {
       }
       dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
     }
+    patch_conversation = {
+      handler_name = "facebook_patch_conversation"
+      handler_path = format("%s/cmd/lambda/facebook/patch_conversation", path.root)
+      environment_variables = {
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = ""
+    }
     get_conversation = {
       handler_name = "facebook_get_conversation"
       handler_path = format("%s/cmd/lambda/facebook/get_conversation", path.root)
@@ -203,6 +213,10 @@ module "facebook" {
       method  = "GET"
       handler = "get_conversation"
     }
+    patch_conversation = {
+      method  = "PATCH"
+      handler = "patch_conversation"
+    }
     get_messages = {
       method  = "GET"
       handler = "get_messages"
@@ -264,6 +278,17 @@ module "instagram" {
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
       }
       dependencies = "{discord,api,db,stdconversation,apigateway}/**/*.go"
+    }
+    patch_conversation = {
+      handler_name = "instagram_patch_conversation"
+      handler_path = format("%s/cmd/lambda/instagram/patch_conversation", path.root)
+      environment_variables = {
+        ACCESS_TOKEN        = var.instagram_access_token
+        MONGODB_DATABASE    = var.mongo_database
+        MONGODB_URI         = var.mongo_uri
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      }
+      dependencies = ""
     }
     get_messages = {
       handler_name = "instagram_get_messages"
@@ -329,6 +354,10 @@ module "instagram" {
       method  = "GET"
       handler = "get_conversation"
     }
+    patch_conversation = {
+      method  = "PATCH"
+      handler = "patch_conversation"
+    }
     get_messages = {
       method  = "GET"
       handler = "get_messages"
@@ -388,6 +417,16 @@ module "line" {
       }
       dependencies = "{discord,db,api,apigateway}/**/*.go"
     }
+    patch_conversation = {
+      handler_name = "line_patch_conversation"
+      handler_path = format("%s/cmd/lambda/line/patch_conversation", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+      dependencies = "{discord,db,api}/**/*.go"
+    }
     get_messages = {
       handler_name = "line_get_messages"
       handler_path = format("%s/cmd/lambda/line/get_messages", path.root)
@@ -445,6 +484,10 @@ module "line" {
     get_conversation = {
       method  = "GET"
       handler = "get_conversation"
+    }
+        patch_conversation = {
+      method  = "PATCH"
+      handler = "patch_conversation"
     }
     get_messages = {
       method  = "GET"

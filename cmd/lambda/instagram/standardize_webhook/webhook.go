@@ -19,12 +19,13 @@ type Messaging struct {
 }
 
 type Message struct {
-	IsEcho      bool         `json:"is_echo"`
-	IsDeleted   bool         `json:"is_deleted"`
-	MessageID   string       `json:"mid"`
-	Text        string       `json:"text"`
-	Attachments []Attachment `json:"attachments"`
-	ReplyTo     ReplyMessage `json:"reply_to"`
+	IsEcho        bool         `json:"is_echo"`
+	IsDeleted     bool         `json:"is_deleted"`
+	IsUnsupported bool         `json:"is_unsupported"`
+	MessageID     string       `json:"mid"`
+	Text          string       `json:"text"`
+	Attachments   []Attachment `json:"attachments"`
+	ReplyTo       ReplyMessage `json:"reply_to"`
 }
 
 type User struct {
