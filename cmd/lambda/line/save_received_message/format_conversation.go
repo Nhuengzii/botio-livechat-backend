@@ -2,20 +2,19 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/line/getlineuserprofile"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-func newStdConversation(lineChannelAccessToken string, message *stdmessage.StdMessage) (_ *stdconversation.StdConversation, err error) {
+func newStdConversation(bot *linebot.Client, message *stdmessage.StdMessage) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("newStdConversation: %w", err)
 		}
 	}()
-	userProfile, err := getlineuserprofile.GetUserProfile(lineChannelAccessToken, message.Source.UserID)
+	userProfile, err := bot.GetProfile(message.Source.UserID).Do()
 	if err != nil {
 		return nil, err
 	}

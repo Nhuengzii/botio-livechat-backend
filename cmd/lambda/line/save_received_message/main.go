@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"log"
 	"os"
 	"time"
@@ -36,12 +37,17 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		pageID := stdMessage.PageID
-		shop, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
+		auth, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 		if err != nil {
 			return err
 		}
-		lineChannelAccessToken := shop.AccessToken
-		err = c.handleMessage(ctx, lineChannelAccessToken, &stdMessage)
+		lineChannelAccessToken := auth.AccessToken
+		lineChannelSecret := auth.Secret
+		bot, err := linebot.New(lineChannelSecret, lineChannelAccessToken)
+		if err != nil {
+			return err
+		}
+		err = c.handleMessage(ctx, bot, stdMessage)
 		if err != nil {
 			return err
 		}
