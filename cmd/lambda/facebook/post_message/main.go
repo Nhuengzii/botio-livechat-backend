@@ -24,6 +24,8 @@ var (
 	errNoShopIDPath                     = errors.New("err path parameter shop_id not given")
 	errNoPageIDPath                     = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath             = errors.New("err path parameter conversation_id not given")
+	errConversationNotExist             = errors.New("err conversation ID does not exist")
+	errPageNotExist                     = errors.New("err page ID does not exist")
 	errAttachmentTypeNotSupported       = errors.New("err attachment type given is not supported")
 	errNoSrcFoundForBasicPayload        = errors.New("err this attachment type should not have an empty url")
 	errNoPayloadFoundForTemplatePayload = errors.New("err this template attachment type should not have empty elements ")
@@ -46,11 +48,19 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	//**check parameters**//
 	psid, ok := request.QueryStringParameters["psid"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPSIDParam
+		return apigateway.NewProxyResponse(400, errNoPSIDParam.Error(), "*"), nil
 	}
 	pageID, ok := request.PathParameters["page_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
+		return apigateway.NewProxyResponse(400, errNoPageIDPath.Error(), "*"), nil
+	}
+	conversationID := request.PathParameters["conversation_id"]
+	if !ok {
+		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
+	}
+	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	if err != nil {
+		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}
 	//**finish checking parameters**//
 
@@ -62,17 +72,20 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, pageID)
 	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil
+		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	facebookRequest, err := fmtFbRequest(&requestMessage, psid)
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
 	}
 
 	facebookResponse, err := reqfbsendmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
 	if err != nil {
-		return apigateway.NewProxyResponse(503, "Service Unavailable", "*"), err
+		return apigateway.NewProxyResponse(503, "Service Unavailable", "*"), nil
 	}
 	// map facebook response to api response
 	resp := postmessage.Response{
@@ -81,7 +94,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		Timestamp:   facebookResponse.Timestamp,
 	}
 	if resp.MessageID == "" || resp.RecipientID == "" {
-		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), errSendingFacebookMessage
+		return apigateway.NewProxyResponse(500, errSendingFacebookMessage.Error(), "*"), nil
 	}
 
 	jsonBodyByte, err := json.Marshal(resp)

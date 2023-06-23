@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -17,6 +18,11 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+)
+
+var (
+	errConversationNotExist = errors.New("err conversation ID does not exist")
+	errPageNotExist         = errors.New("err page ID does not exist")
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -33,12 +39,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversationID := pathParameters["conversation_id"]
 	err = c.dbClient.CheckConversationExists(ctx, conversationID)
 	if err != nil {
-		return apigateway.NewProxyResponse(404, "Not Found", "*"), err
+		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}
 	page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, "Not Found", "*"), err
+			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
@@ -56,7 +62,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	err = c.handlePostMessageRequest(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
 	if err != nil {
 		if errors.Is(err, errUnsupportedAttachmentType) {
-			return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+			return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
