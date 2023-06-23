@@ -1,92 +1,714 @@
-openapi: 3.0.3
+openapi: "3.0.1"
 info:
-  title: Botio Live Chat API
-  description: This is an api for Botio live chat system
-  contact:
-    email: you@your-company.com
-  license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  title: "botio_rest_api"
+  version: "2023-06-23T16:06:20Z"
 servers:
-  - url: https://virtserver.swaggerhub.com/PAFFx/LiveChat/1.0.0
-    description: SwaggerHub API Auto Mocking
-tags:
-  - name: admins
-    description: Secured Admin-only calls
-  - name: developers
-    description: Operations available to regular developers
+  - url: "https://uwjxbrtk8b.execute-api.ap-southeast-1.amazonaws.com/{basePath}"
+    variables:
+      basePath:
+        default: "dev"
 paths:
-  /inventory:
+  /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
-      tags:
-        - developers
-      summary: searches inventory
-      description: |
-        By passing in the appropriate options, you can search for
-        available inventory in the system
-      operationId: searchInventory
+      responses:
       parameters:
-        - name: searchString
-          in: query
-          description: pass an optional search string for looking up inventory
-          required: false
-          style: form
-          explode: true
+        - name: "shop_id"
+          in: "path"
+          required: true
           schema:
-            type: string
-        - name: skip
-          in: query
-          description: number of records to skip for pagination
-          required: false
-          style: form
-          explode: true
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
           schema:
-            minimum: 0
-            type: integer
-            format: int32
-        - name: limit
-          in: query
-          description: maximum number of records to return
-          required: false
-          style: form
-          explode: true
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
           schema:
-            maximum: 50
-            minimum: 0
-            type: integer
-            format: int32
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
       responses:
         "200":
-          description: search results matching criteria
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/InventoryItem"
-                x-content-type: application/json
-        "400":
-          description: bad input parameter
-    post:
-      tags:
-        - admins
-      summary: adds an inventory item
-      description: Adds an item to the system
-      operationId: addInventory
-      requestBody:
-        description: Inventory item to add
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/InventoryItem"
+                $ref: "#/components/schemas/Empty"
+    patch:
       responses:
-        "201":
-          description: item created
-        "400":
-          description: "invalid input, object invalid"
-        "409":
-          description: an existing item already exists
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/all/conversations:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/line/{page_id}/webhook:
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/facebook/{page_id}:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/instagram/{page_id}/conversations:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/facebook/{page_id}/webhook:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/instagram/{page_id}/webhook:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/facebook/{page_id}/conversations:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/line/{page_id}:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/instagram/{page_id}:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /shops/{shop_id}/line/{page_id}/conversations:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+    patch:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
+    get:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    options:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Max-Age:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+    patch:
+      responses:
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
 components:
   schemas:
     StandardMessage:
@@ -100,33 +722,26 @@ components:
         - source
         - message
         - attachments
-        - replyTo
         - isDeleted
       type: object
       properties:
         shopID:
           type: string
-          example: 1
         platform:
           type: string
-          example: "facebook"
         pageID:
           type: string
-          example: "wjpoufnskdt"
         conversationID:
           type: string
-          example: "uasdjfkajsdlfkj"
         messageID:
           type: string
-          example: "aapoisherknmvupawe"
         timestamp:
           type: integer
-          example: 1687538664
+          format: int64
         source:
           $ref: "#/components/schemas/Source"
         message:
           type: string
-          example: "Hello, how can I help you?"
         attachments:
           type: array
           items: 
@@ -135,33 +750,93 @@ components:
           $ref: "#/components/schemas/RepliedMessage"
         isDeleted:
           type: boolean
-          example: false
     Source:
+      required:
+        - userID
+        - userType
       type: object
       properties:
         userID:
           type: string
-          example: "aapoisherknmvupawe"
         userType:
           type: string
-          example: "user"
     Attachment:
+      required:
+        - attachmentType
+        - payload
       type: object
       properties:
         attachmentType:
           type: string
-          example: "image"
         payload:
           $ref: "#/components/schemas/Payload"
     Payload:
+      required:
+        - src
       type: object
       properties:
         src:
           type: string
-          example: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
     RepliedMessage:
+      required:
+        - messageID
       type: object
       properties:
         messageID:
           type: string
-          example: "aapoisherknmvupawe"
+    StandardConversation:
+      required:
+        - shopID
+        - platform
+        - pageID
+        - conversationID
+        - conversationPic
+        - updatedTime
+        - participants
+        - lastActivity
+        - unread
+      type: object
+      properties:
+        shopID:
+          type: string
+        platform:
+          type: string
+        pageID:
+          type: string
+        conversationID:
+          type: string
+        conversationPic:
+          $ref: "#/components/schemas/Payload"
+        updatedTime:
+          type: integer
+          format: int64
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/Participant"
+        lastActivity:
+          type: string
+        unread:
+          type: integer
+    Participant:
+      required:
+        - userID
+        - username
+        - profilePic
+      type: object
+      properties:
+        userID:
+          type: string
+        username:
+          type: string
+        profilePic:
+          $ref: "#/components/schemas/Payload"
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+
+  parameters:
+
+  requestBodies:
+
+  responses:
