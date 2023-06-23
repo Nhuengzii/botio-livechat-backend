@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -17,6 +18,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
+
+var errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
@@ -57,6 +60,27 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		conversations, err = c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+	} else { // need to query with filter
+		var filter getconversations.Filter
+
+		err := json.Unmarshal([]byte(filterQueryString), &filter)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
+
+		if filter.Message != "" && filter.ParticipantsUsername != "" {
+			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errTwoFilterParamsInOneRequest
+		} else if filter.ParticipantsUsername != "" { // query with ParticipantsUsername
+			conversations, err = c.dbClient.QueryConversationsOfAllPlatformWithParticipantsName(ctx, shopID, filter.ParticipantsUsername, skipPtr, limitPtr)
+			if err != nil {
+				return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			}
+		} else if filter.Message != "" { // query with message
+			conversations, err = c.dbClient.QueryConversationsOfAllPlatformWithMessage(ctx, shopID, filter.Message, skipPtr, limitPtr)
+			if err != nil {
+				return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			}
 		}
 	}
 
