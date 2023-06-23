@@ -89,51 +89,79 @@ paths:
           description: an existing item already exists
 components:
   schemas:
-    InventoryItem:
+    StandardMessage:
       required:
-        - id
-        - manufacturer
-        - name
-        - releaseDate
+        - shopID
+        - platform
+        - pageID
+        - conversationID
+        - messageID
+        - timestamp
+        - source
+        - message
+        - attachments
+        - replyTo
+        - isDeleted
       type: object
       properties:
-        id:
+        shopID:
           type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
+          example: 1
+        platform:
           type: string
-          example: Widget Adapter
-        releaseDate:
+          example: "facebook"
+        pageID:
           type: string
-          format: date-time
-          example: 2016-08-29T09:12:33.001Z
-        manufacturer:
-          $ref: "#/components/schemas/Manufacturer"
-      example:
-        releaseDate: 2016-08-29T09:12:33.001Z
-        name: Widget Adapter
-        id: d290f1ee-6c54-4b01-90e6-d701748f0851
-        manufacturer:
-          phone: 408-867-5309
-          name: ACME Corporation
-          homePage: https://www.acme-corp.com
-    Manufacturer:
-      required:
-        - name
+          example: "wjpoufnskdt"
+        conversationID:
+          type: string
+          example: "uasdjfkajsdlfkj"
+        messageID:
+          type: string
+          example: "aapoisherknmvupawe"
+        timestamp:
+          type: integer
+          example: 1687538664
+        source:
+          $ref: "#/components/schemas/Source"
+        message:
+          type: string
+          example: "Hello, how can I help you?"
+        attachments:
+          type: array
+          items: 
+            $ref: "#/components/schemas/Attachment"
+        replyTo:
+          $ref: "#/components/schemas/RepliedMessage"
+        isDeleted:
+          type: boolean
+          example: false
+    Source:
       type: object
       properties:
-        name:
+        userID:
           type: string
-          example: ACME Corporation
-        homePage:
+          example: "aapoisherknmvupawe"
+        userType:
           type: string
-          format: url
-          example: https://www.acme-corp.com
-        phone:
+          example: "user"
+    Attachment:
+      type: object
+      properties:
+        attachmentType:
           type: string
-          example: 408-867-5309
-      example:
-        phone: 408-867-5309
-        name: ACME Corporation
-        homePage: https://www.acme-corp.com
+          example: "image"
+        payload:
+          $ref: "#/components/schemas/Payload"
+    Payload:
+      type: object
+      properties:
+        src:
+          type: string
+          example: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+    RepliedMessage:
+      type: object
+      properties:
+        messageID:
+          type: string
+          example: "aapoisherknmvupawe"
