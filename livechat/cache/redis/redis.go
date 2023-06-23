@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -26,8 +27,8 @@ func (c *Client) Close() error {
 	return nil
 }
 
-func (c *Client) Set(ctx context.Context, key string, value string) error {
-	err := c.client.Set(ctx, key, value, 0).Err()
+func (c *Client) Set(ctx context.Context, key string, value string, duration int64) error {
+	err := c.client.Set(ctx, key, value, time.Duration(duration)).Err()
 	if err != nil {
 		return err
 	}
@@ -54,8 +55,8 @@ func (c *Client) GetShopConnections(ctx context.Context, shopID string) ([]strin
 	return connectionIDs, nil
 }
 
-func (c *Client) SetShopConnection(ctx context.Context, shopID string, connectionID string) error {
-	err := c.client.Set(ctx, shopID+":"+connectionID, shopID, 0).Err()
+func (c *Client) SetShopConnection(ctx context.Context, shopID string, connectionID string, duration int64) error {
+	err := c.client.Set(ctx, shopID+":"+connectionID, shopID, time.Duration(duration)).Err()
 	if err != nil {
 		return err
 	}
