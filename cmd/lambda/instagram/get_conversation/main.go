@@ -34,29 +34,22 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoShopIDPath
+		return apigateway.NewProxyResponse(400, errNoShopIDPath.Error(), "*"), nil
 	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
+		return apigateway.NewProxyResponse(400, errNoPageIDPath.Error(), "*"), nil
 	}
 	conversationID, ok := pathParams["conversation_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoConversationIDPath
+		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
 	}
 	//**end path params checking//
 
 	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			resp := getconversation.Response{
-				Conversation: nil,
-			}
-			responseJSON, err := json.Marshal(resp)
-			if err != nil {
-				return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
-			}
-			return apigateway.NewProxyResponse(200, string(responseJSON), "*"), err
+			return apigateway.NewProxyResponse(404, err.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
 	}

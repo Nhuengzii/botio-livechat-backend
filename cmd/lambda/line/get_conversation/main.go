@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -31,14 +32,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			emptyResponse := getconversation.Response{
-				Conversation: nil,
-			}
-			emptyResponseJSON, err := json.Marshal(emptyResponse)
-			if err != nil {
-				return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
-			}
-			return apigateway.NewProxyResponse(200, string(emptyResponseJSON), "*"), err
+			return apigateway.NewProxyResponse(404, err.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
 	}
