@@ -438,7 +438,7 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
-func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
+func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
@@ -469,7 +469,7 @@ func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shop
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsOfAllPlatformWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
@@ -508,7 +508,7 @@ func (c *Client) QueryConversationsOfAllPlatformWithParticipantsName(ctx context
 	return conversations, nil
 }
 
-func (c *Client) QueryConversationsOfAllPlatformWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) QueryConversationsOfAllPlatformsWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
