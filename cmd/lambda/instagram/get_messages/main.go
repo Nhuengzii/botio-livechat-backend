@@ -23,6 +23,8 @@ var (
 	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter conversation_id not given")
+	errSkipIntOnly          = errors.New("err skip parameter can only be integer")
+	errLimitIntOnly         = errors.New("err limit parameter can only be integer")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -34,15 +36,15 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoShopIDPath
+		return apigateway.NewProxyResponse(400, errNoShopIDPath.Error(), "*"), nil
 	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
+		return apigateway.NewProxyResponse(400, errNoPageIDPath.Error(), "*"), nil
 	}
 	conversationID, ok := pathParams["conversation_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoConversationIDPath
+		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
 	}
 
 	stdMessages := []stdmessage.StdMessage{}
@@ -52,7 +54,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errSkipIntOnly.Error(), "*"), nil
 		}
 		skipPtr = &skip
 	}
@@ -62,7 +64,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errLimitIntOnly.Error(), "*"), nil
 		}
 		limitPtr = &limit
 	}
