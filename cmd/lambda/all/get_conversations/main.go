@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getconversations"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -49,10 +50,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		limitPtr = &limit
 	}
 
-	conversations, err := c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID, skipPtr, limitPtr)
-	if err != nil {
-		discord.Log(c.discordWebhookURL, "ListConversations error")
-		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	conversations := []stdconversation.StdConversation{}
+
+	filterQueryString, ok := req.QueryStringParameters["filter"]
+	if !ok { // no need to query with filter
+		conversations, err = c.dbClient.ListConversationsOfAllPlatformsOfShop(ctx, shopID, skipPtr, limitPtr)
+		if err != nil {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+		}
 	}
 
 	response := getconversations.Response{
