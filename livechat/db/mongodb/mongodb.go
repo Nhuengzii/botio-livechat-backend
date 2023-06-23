@@ -469,6 +469,110 @@ func (c *Client) ListConversationsOfAllPlatformsOfShop(ctx context.Context, shop
 	return conversations, nil
 }
 
+func (c *Client) QueryConversationsOfAllPlatformWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
+		}
+	}()
+
+	name = strings.Trim(name, " ")
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "participants.username", Value: bson.M{"$regex": name, "$options": "i"}},
+	}
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := coll.Find(ctx, filter, &fOpt)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	conversations := []stdconversation.StdConversation{}
+	err = cur.All(ctx, &conversations)
+	if err != nil {
+		return nil, err
+	} else if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return conversations, nil
+}
+
+func (c *Client) QueryConversationsOfAllPlatformWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
+		}
+	}()
+
+	message = strings.Trim(message, " ")
+	collMessage := c.client.Database(c.Database).Collection(c.CollectionMessages)
+
+	filterMessage := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "message", Value: bson.M{"$regex": message, "$options": "i"}},
+	}
+
+	var fOpt options.FindOptions
+	fOpt.SetSort(bson.D{{Key: "updatedTime", Value: -1}}) // descending sort
+	if limit != nil {
+		fOpt.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		fOpt.SetSkip(int64(*skip))
+	}
+
+	cur, err := collMessage.Find(ctx, filterMessage, &fOpt)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	conversations := []stdconversation.StdConversation{}
+
+	uniqueConversationIDSet := map[string]struct{}{} // using map to implement set
+
+	for cur.Next(ctx) {
+		var message stdmessage.StdMessage
+		err := cur.Decode(&message)
+		if err != nil {
+			return nil, err
+		}
+		uniqueConversationIDSet[message.ConversationID] = struct{}{} // add conversationID to set
+	}
+
+	var uniqueConversationIDFilter []string
+
+	for conversationID := range uniqueConversationIDSet {
+		uniqueConversationIDFilter = append(uniqueConversationIDFilter, conversationID)
+	}
+
+	if len(uniqueConversationIDFilter) != 0 {
+		collConversation := c.client.Database(c.Database).Collection(c.CollectionConversations)
+		filterConversation := bson.M{"conversationID": bson.M{"$in": uniqueConversationIDFilter}}
+		cur, err = collConversation.Find(ctx, filterConversation)
+		if err != nil {
+			return nil, err
+		}
+		err = cur.All(ctx, &conversations)
+		if err := cur.Err(); err != nil {
+			return nil, err
+		}
+	}
+
+	return conversations, nil
+}
+
 func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
 	defer func() {
 		if err != nil {

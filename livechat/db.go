@@ -25,6 +25,8 @@ type DBClient interface {
 	QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryShop(ctx context.Context, pageID string) (*shops.Shop, error)
 	ListConversationsOfAllPlatformsOfShop(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
+	QueryConversationsOfAllPlatformWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
+	QueryConversationsOfAllPlatformWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
 	QueryFacebookAuthentication(ctx context.Context, pageID string) (*shops.FacebookAuthentication, error)
 	QueryLineAuthentication(ctx context.Context, pageID string) (*shops.LineAuthentication, error)
 	QueryInstagramAuthentication(ctx context.Context, pageID string) (*shops.InstagramAuthentication, error)
