@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Simple Inventory API
-  description: This is a simple API
+  title: Botio Live Chat API
+  description: This is an api for Botio live chat system
   contact:
     email: you@your-company.com
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
   - url: https://virtserver.swaggerhub.com/PAFFx/LiveChat/1.0.0
