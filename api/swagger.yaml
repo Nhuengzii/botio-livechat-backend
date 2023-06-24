@@ -20,6 +20,8 @@ tags:
     description: Operations that involve the instagram platform
   - name: line
     description: Operations that involve the line platform
+  - name: webhook
+    description: Webhook operations that should only be call by the subscribed webhook
 paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
