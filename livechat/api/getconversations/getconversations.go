@@ -1,4 +1,4 @@
-// Package getconversations define response body for rest api endpoints that return a list of stdconversation.StdConversation.
+// Package getconversations define response body and filter query string parameter for rest api endpoints that return a list of stdconversation.StdConversation.
 //
 // The getconversations package should only be use to return response to the api caller.
 package getconversations
