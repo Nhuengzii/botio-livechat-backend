@@ -21,6 +21,7 @@ var (
 	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter parameters conversation_id not given")
+	errConversationNotExist = errors.New("err conversation does not exist")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -48,7 +49,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, err.Error(), "*"), nil
+			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
 	}

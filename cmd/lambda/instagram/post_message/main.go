@@ -77,7 +77,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 	igRequest, err := fmtIgRequest(&requestMessage, psid)
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
+		return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 	}
 
 	shop, err := c.dbClient.QueryShop(ctx, pageID)
