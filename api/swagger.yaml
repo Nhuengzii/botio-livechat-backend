@@ -30,13 +30,6 @@ paths:
         By passing in appropriate path parameters, you can search for
         a facebook conversation of specific shop and page that matches the conversationID
       operationId: getFacebookConversation
-      responses:
-        "200":
-          description: successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StandardConversationWrapper"
       parameters:
         - name: "shop_id"
           in: "path"
@@ -53,6 +46,13 @@ paths:
           required: true
           schema:
             type: "string"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardConversationWrapper"
     patch:
       tags:
         - facebook
@@ -61,9 +61,6 @@ paths:
         By passing in appropriate path parameters and request body, you can update 
         facebook conversation's fields of specific shop and page that matches the conversationID,
       operationId: patchFacebookConversation
-      responses:
-        "200":
-          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -80,22 +77,35 @@ paths:
           required: true
           schema:
             type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unread:
+                  description: updated unread count of the conversation
+                  type: integer
+      responses:
+        "200":
+          description: successful
   /shops/{shop_id}/all/conversations:
     get:
-      responses:
-        "200":
-          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
           required: true
           schema:
             type: "string"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardConversationList"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
-      responses:
-        "200":
-          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -112,10 +122,14 @@ paths:
           required: true
           schema:
             type: "string"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardMessageList"
     post:
-      responses:
-        "200":
-          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -132,6 +146,11 @@ paths:
           required: true
           schema:
             type: "string"
+      requestBody:
+        
+      responses:
+        "200":
+          description: successful
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       responses:
