@@ -11,6 +11,7 @@ paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
       responses:
+
       parameters:
         - name: "shop_id"
           in: "path"
@@ -834,9 +835,3 @@ components:
     Empty:
       title: "Empty Schema"
       type: "object"
-
-  parameters:
-
-  requestBodies:
-
-  responses:
