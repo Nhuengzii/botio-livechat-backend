@@ -23,6 +23,8 @@ var (
 	errNoPageIDPath                = errors.New("err path parameter parameters page_id not given")
 	errNoShopIDPath                = errors.New("err path parameter parameters shop_id not given")
 	errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
+	errSkipIntOnly                 = errors.New("err skip parameter can only be integer")
+	errLimitIntOnly                = errors.New("err limit parameter can only be integer")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -35,11 +37,11 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	pathParams := request.PathParameters
 	shopID, ok := pathParams["shop_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoShopIDPath
+		return apigateway.NewProxyResponse(400, errNoShopIDPath.Error(), "*"), nil
 	}
 	pageID, ok := pathParams["page_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), errNoPageIDPath
+		return apigateway.NewProxyResponse(400, errNoPageIDPath.Error(), "*"), nil
 	}
 
 	stdConversations := []stdconversation.StdConversation{}
@@ -49,7 +51,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errSkipIntOnly.Error(), "*"), nil
 		}
 		skipPtr = &skip
 	}
@@ -59,7 +61,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errLimitIntOnly.Error(), "*"), nil
 		}
 		limitPtr = &limit
 	}
@@ -78,7 +80,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if filter.Message != "" && filter.ParticipantsUsername != "" {
-			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errTwoFilterParamsInOneRequest
+			return apigateway.NewProxyResponse(400, errTwoFilterParamsInOneRequest.Error(), "*"), nil
 		} else if filter.ParticipantsUsername != "" { // query with ParticipantsUsername
 			stdConversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformInstagram, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
 			if err != nil {
