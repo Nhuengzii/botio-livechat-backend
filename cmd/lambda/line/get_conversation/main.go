@@ -17,6 +17,8 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+var errConversationNotExist = errors.New("err conversationID does not exist")
+
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
@@ -32,7 +34,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	conversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, err.Error(), "*"), nil
+			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
 	}

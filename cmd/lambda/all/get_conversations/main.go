@@ -42,7 +42,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, errSkipIntOnly.Error(), "*"), nil
+			return apigateway.NewProxyResponse(400, errSkipIntOnly.Error(), "*"), nil
 		}
 		skipPtr = &skip
 	}
@@ -52,7 +52,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, errLimitIntOnly.Error(), "*"), nil
+			return apigateway.NewProxyResponse(400, errLimitIntOnly.Error(), "*"), nil
 		}
 		limitPtr = &limit
 	}
