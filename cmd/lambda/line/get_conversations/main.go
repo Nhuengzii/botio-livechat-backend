@@ -19,6 +19,12 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+var (
+	errSkipIntOnly                 = errors.New("err skip parameter can only be integer")
+	errLimitIntOnly                = errors.New("err limit parameter can only be integer")
+	errTwoFilterParamsInOneRequest = errors.New("err path parameters filter can only give 1 filter per 1 request")
+)
+
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
@@ -38,7 +44,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errSkipIntOnly.Error(), "*"), nil
 		}
 		skipPtr = &skip
 	}
@@ -48,7 +54,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errLimitIntOnly.Error(), "*"), nil
 		}
 		limitPtr = &limit
 	}
@@ -67,7 +73,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
 			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, skipPtr, limitPtr)
 		} else {
-			return apigateway.NewProxyResponse(400, "Bad Request", "*"), errors.New("filter must have only one field at a time")
+			return apigateway.NewProxyResponse(400, errTwoFilterParamsInOneRequest.Error(), "*"), nil
 		}
 	}
 	if err != nil {

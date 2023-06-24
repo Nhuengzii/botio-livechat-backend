@@ -46,28 +46,35 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return errUnmarshalReceivedMessage
 		}
 
-		err = c.dbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
-		if err != nil {
-			if errors.Is(err, mongodb.ErrNoDocuments) {
-				conversation, err := c.newStdConversation(ctx, &receiveMessage)
-				if err != nil {
+		if !receiveMessage.IsDeleted {
+			err = c.dbClient.UpdateConversationOnNewMessage(ctx, &receiveMessage)
+			if err != nil {
+				if errors.Is(err, mongodb.ErrNoDocuments) {
+					conversation, err := c.newStdConversation(ctx, &receiveMessage)
+					if err != nil {
+						return err
+					}
+					err = c.dbClient.InsertConversation(ctx, conversation)
+					if err != nil {
+						return err
+					}
+				} else {
 					return err
 				}
-				err = c.dbClient.InsertConversation(ctx, conversation)
-				if err != nil {
-					return err
-				}
-			} else {
+			}
+			err = c.dbClient.InsertMessage(ctx, &receiveMessage)
+			if err != nil {
 				return err
 			}
-		}
-		if receiveMessage.IsDeleted {
-			err = c.dbClient.RemoveDeletedMessage(ctx, receiveMessage.ShopID, stdmessage.PlatformInstagram, receiveMessage.ConversationID, receiveMessage.MessageID)
 		} else {
-			err = c.dbClient.InsertMessage(ctx, &receiveMessage)
-		}
-		if err != nil {
-			return err
+			err = c.dbClient.UpdateConversationOnDeletedMessage(ctx, &receiveMessage)
+			if err != nil {
+				return err
+			}
+			err = c.dbClient.RemoveDeletedMessage(ctx, receiveMessage.ShopID, stdmessage.PlatformInstagram, receiveMessage.ConversationID, receiveMessage.MessageID)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

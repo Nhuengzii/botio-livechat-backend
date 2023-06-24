@@ -45,7 +45,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			if errors.Is(err, mongodb.ErrNoDocuments) {
 				return apigateway.NewProxyResponse(404, "Not Found", "*"), nil
 			}
-			return apigateway.NewProxyResponse(500, "", "*"), nil
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 	}
 	return apigateway.NewProxyResponse(200, "OK", "*"), nil

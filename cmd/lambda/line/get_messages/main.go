@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -16,6 +17,11 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+)
+
+var (
+	errSkipIntOnly  = errors.New("err skip parameter can only be integer")
+	errLimitIntOnly = errors.New("err limit parameter can only be integer")
 )
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
@@ -38,7 +44,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if skipString != "" {
 		skip, err := strconv.Atoi(skipString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errSkipIntOnly.Error(), "*"), nil
 		}
 		skipPtr = &skip
 	}
@@ -48,7 +54,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if limitString != "" {
 		limit, err := strconv.Atoi(limitString)
 		if err != nil {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+			return apigateway.NewProxyResponse(400, errLimitIntOnly.Error(), "*"), nil
 		}
 		limitPtr = &limit
 	}
