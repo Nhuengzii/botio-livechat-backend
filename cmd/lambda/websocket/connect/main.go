@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	// "time"
 
@@ -29,7 +30,7 @@ func main() {
 func (c *config) handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	shopID := request.QueryStringParameters["shopID"]
 	connectionID := request.RequestContext.ConnectionID
-	err = c.cacheClient.SetShopConnection(ctx, shopID, connectionID, 7200)
+	err = c.cacheClient.SetShopConnection(ctx, shopID, connectionID, 7200*time.Second)
 	if err != nil {
 		return apigateway.NewProxyResponse(502, "Bad Gateway", "*"), err
 	}

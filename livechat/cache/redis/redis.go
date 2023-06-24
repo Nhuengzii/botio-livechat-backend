@@ -27,7 +27,7 @@ func (c *Client) Close() error {
 	return nil
 }
 
-func (c *Client) Set(ctx context.Context, key string, value string, duration int64) error {
+func (c *Client) Set(ctx context.Context, key string, value string, duration time.Duration) error {
 	err := c.client.Set(ctx, key, value, time.Duration(duration)).Err()
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (c *Client) GetShopConnections(ctx context.Context, shopID string) ([]strin
 	return connectionIDs, nil
 }
 
-func (c *Client) SetShopConnection(ctx context.Context, shopID string, connectionID string, duration int64) error {
+func (c *Client) SetShopConnection(ctx context.Context, shopID string, connectionID string, duration time.Duration) error {
 	err := c.client.Set(ctx, shopID+":"+connectionID, shopID, time.Duration(duration)).Err()
 	if err != nil {
 		return err
