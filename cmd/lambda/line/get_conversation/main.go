@@ -17,7 +17,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var errConversationNotExist = errors.New("err conversationID does not exist")
+var errConversationNotExist = errors.New("err conversation does not exist")
 
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {

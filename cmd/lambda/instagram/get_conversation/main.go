@@ -21,7 +21,7 @@ var (
 	errNoShopIDPath         = errors.New("err path parameter parameters shop_id not given")
 	errNoPageIDPath         = errors.New("err path parameter parameters page_id not given")
 	errNoConversationIDPath = errors.New("err path parameter parameters conversation_id not given")
-	errConversationNotExist = errors.New("err conversationID does not exist")
+	errConversationNotExist = errors.New("err conversation does not exist")
 )
 
 func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
