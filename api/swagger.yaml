@@ -514,6 +514,3 @@ components:
           type: string
         profilePic:
           $ref: "#/components/schemas/Payload"
-    Empty:
-      title: "Empty Schema"
-      type: "object"
