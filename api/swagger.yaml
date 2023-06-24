@@ -13,6 +13,10 @@ paths:
       responses:
         "200":
           description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardConversationWrapper"
       parameters:
         - name: "shop_id"
           in: "path"
@@ -119,6 +123,7 @@ paths:
             type: "string"
   /shops/{shop_id}/facebook/{page_id}:
     get:
+      responses:
       parameters:
         - name: "shop_id"
           in: "path"
@@ -558,3 +563,35 @@ components:
           type: string
         profilePic:
           $ref: "#/components/schemas/Payload"
+    StandardConversationList:
+      required:
+        - conversations
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardConversation"
+    StandardMessageList:
+      required:
+        - messages
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardMessage"
+    StandardConversationWrapper:
+      required:
+        - conversation
+      type: object
+      properties:
+        conversation:
+          $ref: "#/components/schemas/StandardConversation"
+    StandardMessageWrapper:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          $ref: "#/components/schemas/StandardMessage"
