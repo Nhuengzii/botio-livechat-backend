@@ -1,6 +1,6 @@
 // Package getmessages define response body and filter query string parameter for rest api endpoints that return a list of stdmessage.StdMessage.
 //
-// The getmessages package should only be use to return response to the api caller.
+// The getmessages package should only be use to read query string parameter and return response to the api caller.
 package getmessages
 
 import (
