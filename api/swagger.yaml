@@ -13,39 +13,23 @@ servers:
         default: "dev"
 tags:
   - name: all
-    description: Operations that involves all platform the api supports
+    description: Operations that involve all platforms the api supported
   - name: facebook
-    description: Operations that involvers facebook platform
+    description: Operations that involve the facebook platform
   - name: instagram
-    description: Operations that involvers instagram platform
+    description: Operations that involve the instagram platform
   - name: line
-    description: Operations that involvers line platform
+    description: Operations that involve the line platform
 paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
       tags:
         - facebook
-      summary: GET a facebook conversation by its conversationID
+      summary: get a facebook conversation by its conversation_id
       description: |
         By passing in appropriate path parameters, you can search for
-        a facebook conversation of specific shop and page that matches the conversationID
+        a facebook conversation of specific shop and page that matches the conversation_id
       operationId: getFacebookConversation
-      parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
       responses:
         "200":
           description: successful
@@ -53,14 +37,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StandardConversationWrapper"
+      parameters:
+        - name: "shop_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "conversation_id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
     patch:
       tags:
         - facebook
-      summary: PATCH a facebook conversation's fields with matches conversationID
+      summary: update a facebook conversation's fields with matching conversation_id
       description: |
         By passing in appropriate path parameters and request body, you can update 
-        facebook conversation's fields of specific shop and page that matches the conversationID,
+        facebook conversation's fields of specific shop and page that matches the conversation_id,
       operationId: patchFacebookConversation
+      responses:
+        "200":
+          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -77,35 +80,37 @@ paths:
           required: true
           schema:
             type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                unread:
-                  description: updated unread count of the conversation
-                  type: integer
-      responses:
-        "200":
-          description: successful
   /shops/{shop_id}/all/conversations:
     get:
+      tags:
+        - all
+      summary: list all conversations of a specific shop
+      description: |
+        By passing in appropriate path parameter shop_id, you can list
+        all conversations of a specific shop that matches the shop_id,
+      operationId: listAllConversations
+      responses:
+        "200":
+          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
           required: true
           schema:
             type: "string"
-      responses:
-        "200":
-          description: successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StandardConversationList"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
+      tags:
+        - facebook
+      summary: list all messages in a specific facebook conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific conversation,
+        the conversation has to be a facebook conversation
+      operationId: listFacebookMessages
+      responses:
+        "200":
+          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -122,14 +127,18 @@ paths:
           required: true
           schema:
             type: "string"
-      responses:
-        "200":
-          description: successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StandardMessageList"
     post:
+      tags:
+        - facebook
+      summary: send a facebook message to specific conversation
+      description: |
+        By passing in appropriate path parameters request body and query string parameter
+        , you can send a facebook message to a specific conversation,
+        the target conversation has to be a facebook conversation
+      operationId: postFacebookMessage
+      responses:
+        "200":
+          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -146,11 +155,6 @@ paths:
           required: true
           schema:
             type: "string"
-      requestBody:
-        
-      responses:
-        "200":
-          description: successful
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       responses:
@@ -169,7 +173,17 @@ paths:
             type: "string"
   /shops/{shop_id}/facebook/{page_id}:
     get:
+      tags:
+        - facebook
+      summary: get a specific page's facebook conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's facebook conversation statuses, such as number of
+        currently unread conversations
+      operationId: getFacebookPageStatus
       responses:
+        "200":
+          description: successful
       parameters:
         - name: "shop_id"
           in: "path"
@@ -183,6 +197,13 @@ paths:
             type: "string"
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
+      tags:
+        - instagram
+      summary: list all conversations of a specific instagram page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific instagram page,
+      operationId: listInstagramConversations
       responses:
         "200":
           description: successful
@@ -261,6 +282,13 @@ paths:
             type: "string"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
+      tags:
+        - instagram
+      summary: list all messages in a specific instagram conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific instagram conversation,
+      operationId: listInstagramMessages
       responses:
         "200":
           description: successful
@@ -281,6 +309,13 @@ paths:
           schema:
             type: "string"
     post:
+      tags:
+        - instagram
+      summary: send an instagram message to specific instagram conversation
+      description: |
+        By passing in appropriate path parameters body and query string parameters, 
+        you can send an instagram message to a specific instagram conversation,
+      operationId: postInstagramMessage
       responses:
         "200":
           description: successful
@@ -302,6 +337,13 @@ paths:
             type: "string"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
+      tags:
+        - facebook
+      summary: list all conversations of a specific facebook page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific facebook page,
+      operationId: listFacebookConversations
       responses:
         "200":
           description: successful
@@ -318,6 +360,14 @@ paths:
             type: "string"
   /shops/{shop_id}/line/{page_id}:
     get:
+      tags:
+        - line
+      summary: get a specific page's line conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's line conversation statuses, such as number of
+        currently unread conversations
+      operationId: getLinePageStatus
       responses:
         "200":
           description: successful
@@ -334,6 +384,13 @@ paths:
             type: "string"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
+      tags:
+        - line
+      summary: list all messages in a specific line conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific line conversation,
+      operationId: listLineMessages
       responses:
         "200":
           description: successful
@@ -354,6 +411,13 @@ paths:
           schema:
             type: "string"
     post:
+      tags:
+        - line
+      summary: send a line message to specific line conversation
+      description: |
+        By passing in appropriate path parameters body and query string parameters, 
+        you can send a line message to a specific line conversation,
+      operationId: postLineMessage
       responses:
         "200":
           description: successful
@@ -375,6 +439,14 @@ paths:
             type: "string"
   /shops/{shop_id}/instagram/{page_id}:
     get:
+      tags:
+        - instagram
+      summary: get a specific page's instagram conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's instagram conversation statuses, such as number of
+        currently unread conversations
+      operationId: getInstagramPageStatus
       responses:
         "200":
           description: successful
@@ -391,6 +463,13 @@ paths:
             type: "string"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
+      tags:
+        - line
+      summary: list all conversations of a specific line page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific line page,
+      operationId: listLineConversations
       responses:
         "200":
           description: successful
@@ -407,6 +486,13 @@ paths:
             type: "string"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
+      tags:
+        - instagram
+      summary: get an instagram conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        an instagram conversation of specific shop and page that matches the conversation_id
+      operationId: getInstagramConversation
       responses:
         "200":
           description: successful
@@ -427,6 +513,13 @@ paths:
           schema:
             type: "string"
     patch:
+      tags:
+        - instagram
+      summary: update an instagram conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        instagram conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchInstagramConversation
       responses:
         "200":
           description: successful
@@ -448,6 +541,13 @@ paths:
             type: "string"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
+      tags:
+        - line
+      summary: get a line conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        a line conversation of specific shop and page that matches the conversation_id
+      operationId: getLineConversation
       responses:
         "200":
           description: successful
@@ -468,6 +568,13 @@ paths:
           schema:
             type: "string"
     patch:
+      tags:
+        - line
+      summary: update a line conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        line conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchLineConversation
       responses:
         "200":
           description: successful
