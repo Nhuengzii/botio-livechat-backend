@@ -7,7 +7,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
-// A Response contains response body that should be return to the api caller.
+// A Response contains response body of the api request in case the call's a success.
 type Response struct {
 	// Messages store a slice of stdmessage.StdMessage struct define in package stdmessage.
 	Messages []stdmessage.StdMessage `json:"messages"`

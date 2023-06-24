@@ -3,7 +3,7 @@
 // The getpage package should only be use to return response to the api caller.
 package getpage
 
-// A Response contains response body that should be return to the api caller.
+// A Response contains response body of the api request in case the call's a success.
 type Response struct {
 	UnreadConversations int64 `json:"unreadConversations"` // number of conversations that is not yet read by page admin
 	AllConversations    int64 `json:"allConversations"`    // number of page's total conversations
