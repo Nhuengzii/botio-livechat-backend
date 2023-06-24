@@ -1,4 +1,4 @@
-// Package apigateway implements apigateway helper functions
+// Package apigateway contains apigateway helper functions
 package apigateway
 
 import "github.com/aws/aws-lambda-go/events"
