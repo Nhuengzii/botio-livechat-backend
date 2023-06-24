@@ -36,14 +36,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 		}
-		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	resp := getconversation.Response{
 		Conversation: conversation,
 	}
 	responseJSON, err := json.Marshal(resp)
 	if err != nil {
-		return apigateway.NewProxyResponse(500, "Internal ServerError", "*"), err
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
