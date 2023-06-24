@@ -11,9 +11,25 @@ servers:
     variables:
       basePath:
         default: "dev"
+tags:
+  - name: all
+    description: Operations that involves all platform the api supports
+  - name: facebook
+    description: Operations that involvers facebook platform
+  - name: instagram
+    description: Operations that involvers instagram platform
+  - name: line
+    description: Operations that involvers line platform
 paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
+      tags:
+        - facebook
+      summary: GET a facebook conversation by its conversationID
+      description: |
+        By passing in appropriate path parameters, you can search for
+        a facebook conversation of specific shop and page that matches the conversationID
+      operationId: getFacebookConversation
       responses:
         "200":
           description: successful
@@ -34,6 +50,13 @@ paths:
           schema:
             type: "string"
     patch:
+      tags:
+        - facebook
+      summary: PATCH a facebook conversation's fields with matches conversationID
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        facebook conversation's fields of specific shop and page that matches the conversationID,
+      operationId: patchFacebookConversation
       responses:
         "200":
           description: successful
