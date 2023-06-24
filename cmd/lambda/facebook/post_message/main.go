@@ -80,7 +80,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	facebookRequest, err := fmtFbRequest(&requestMessage, psid)
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
+		return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 	}
 
 	facebookResponse, err := reqfbsendmessage.SendMessage(facebookCredentials.AccessToken, *facebookRequest, pageID)
