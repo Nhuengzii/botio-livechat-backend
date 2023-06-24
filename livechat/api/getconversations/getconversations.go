@@ -7,16 +7,16 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 )
 
-// A Response contains response that should be return to the api caller.
+// A Response contains response body that should be return to the api caller.
 type Response struct {
-	// Conversation store an slice of stdconversation.StdConversation struct define in package stdconversation.
+	// Conversations store a slice of stdconversation.StdConversation struct define in package stdconversation.
 	Conversations []stdconversation.StdConversation `json:"conversations"`
 }
 
-// A filter contains api request's query string parameters for filtering return result.
+// A Filter contains api request's query string parameters for filtering return result.
 //
 // *** only 1 field can exists at the same time. ***
 type Filter struct {
 	ParticipantsUsername string `json:"with_participants_username"` // filter conversations by participants's username
-	Message              string `json:"with_message"`               // filter covnersations by messages that its contain
+	Message              string `json:"with_message"`               // filter conversations by messages that its contain
 }

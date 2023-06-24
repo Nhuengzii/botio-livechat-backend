@@ -5,7 +5,7 @@ package getconversation
 
 import "github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
-// A Response contains response that should be return to the api caller.
+// A Response contains response body that should be return to the api caller.
 type Response struct {
 	// Conversation store a pointer to StdConversation struct define in package stdconversation.
 	Conversation *stdconversation.StdConversation `json:"conversation"`
