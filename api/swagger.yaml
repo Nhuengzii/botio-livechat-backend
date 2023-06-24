@@ -1,9 +1,13 @@
 openapi: "3.0.1"
 info:
-  title: "botio_rest_api"
-  version: "2023-06-23T16:06:20Z"
+  title: "botio_livechat_rest_api"
+  description: This is a simple API
+  version: "1.0.0"
+  contact:
+    email: admin@botio.io
 servers:
-  - url: "https://uwjxbrtk8b.execute-api.ap-southeast-1.amazonaws.com/{basePath}"
+  # url to be change
+  - url: "https://oq0hx8j60a.execute-api.ap-southeast-1.amazonaws.com/{basePath}"
     variables:
       basePath:
         default: "dev"
