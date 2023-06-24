@@ -78,6 +78,9 @@ type RepliedMessage struct {
 }
 
 func (message *StdMessage) ToLastActivityString() (string, error) {
+	if message.IsDeleted {
+		return "ยกเลิกข้อความ", nil
+	}
 	if len(message.Attachments) == 0 {
 		return message.Message, nil
 	}

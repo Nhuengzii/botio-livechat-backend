@@ -69,6 +69,59 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 	return nil
 }
 
+func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.UpdateConversationOnNewMessage: %w", err)
+		}
+	}()
+	if message.IsDeleted {
+		coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
+		filter := bson.D{
+			{Key: "shopID", Value: message.ShopID},
+			{Key: "conversationID", Value: message.ConversationID},
+			{Key: "pageID", Value: message.PageID},
+		}
+		fOpt := options.FindOneOptions{
+			Sort: bson.D{{Key: "timestamp", Value: -1}},
+		}
+		var lastMessage stdmessage.StdMessage
+		err = coll.FindOne(ctx, filter, &fOpt).Decode(&lastMessage)
+		if err != nil {
+			if errors.Is(err, mongo.ErrNoDocuments) {
+				return ErrNoDocuments
+			}
+			return err
+		}
+		if message.MessageID == lastMessage.MessageID {
+			// change last activity
+			lastActivity, err := message.ToLastActivityString()
+			if err != nil {
+				return err
+			}
+
+			coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+			filter := bson.D{
+				{Key: "shopID", Value: message.ShopID},
+				{Key: "conversationID", Value: message.ConversationID},
+			}
+			update := bson.M{
+				"$set": bson.D{
+					{Key: "lastActivity", Value: lastActivity},
+				},
+			}
+			err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+			if err != nil {
+				if errors.Is(err, mongo.ErrNoDocuments) {
+					return ErrNoDocuments
+				}
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
@@ -81,6 +134,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	}
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
+		{Key: "shopID", Value: message.ShopID},
 		{Key: "conversationID", Value: message.ConversationID},
 	}
 	var conversation stdconversation.StdConversation
