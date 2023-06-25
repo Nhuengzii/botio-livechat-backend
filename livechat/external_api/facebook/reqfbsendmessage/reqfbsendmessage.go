@@ -1,3 +1,6 @@
+// Package reqfbsendmessage implement a function to call facebook api request for sending message
+//
+// # Use Graph API v16.0
 package reqfbsendmessage
 
 import (
@@ -8,6 +11,14 @@ import (
 	"time"
 )
 
+// SendMessage makes a facebook API call to send message to target recipient and return SendingMessageResponse which is facebook response to the message sending request.
+// Return an error if it occurs.
+//
+// # Allow sending one text message or one attachment message. Cannot be send together.
+//
+// *** note that sending picture or file or video might take some time ***
+//
+// Use facebook page accessToken.
 func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *SendingMessageResponse, err error) {
 	defer func() {
 		if err != nil {
@@ -34,53 +45,61 @@ func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *
 	return &response, nil
 }
 
-// facebook api response
+// SendingMessageResponse contains facebook send message via api response
 type SendingMessageResponse struct {
-	RecipientID string `json:"recipient_id"`
-	MessageID   string `json:"message_id"`
-	Timestamp   int64  `json:"timestamp"`
+	RecipientID string `json:"recipient_id"` // psid of the recipient
+	MessageID   string `json:"message_id"`   // sent message's ID
+	Timestamp   int64  `json:"timestamp"`    // sent message's timestamp
 }
 
-// facebook api send message top level struct
+// SendingMessage contains facebook send message request body
+//
+// [facebook Send API doc] : https://developers.facebook.com/docs/messenger-platform/reference/send-api/
 type SendingMessage struct {
-	Recipient     Recipient `json:"recipient"`
-	Message       Message   `json:"message"`
-	MessagingType string    `json:"messaging_type"`
+	Recipient Recipient `json:"recipient"` // target user psid
+	Message   Message   `json:"message"`   // message body contains either text message or attachment message
+	// The type of message being sent
+	//
+	//  – RESPONSE : Message is in response to a received message. This includes promotional and non-promotional messages sent inside the 24-hour standard messaging window. For example, use this tag to respond if a person asks for a reservation confirmation or an status update.
+	//  – UPDATE : Message is being sent proactively and is not in response to a received message. This includes promotional and non-promotional messages sent inside the the 24-hour standard messaging window.
+	//  – UPDATE_TAG : Message is non-promotional and is being sent outside the 24-hour standard messaging window with a message tag. The message must match the allowed use case for the tag.
+	MessagingType string `json:"messaging_type"`
 }
 
-// interface for TextMessage and Message with attachment
+// interface for text message and Message with attachment
 type Message interface {
 	Message()
 }
 
-// text message
+// MessageText contains text string that caller wanted to send
 type MessageText struct {
-	Text string `json:"text"`
+	Text string `json:"text"` // text message
 }
 
-// message with attachment
+// MessageAttachment contains attachment that caller wanted to send
 type MessageAttachment struct {
-	Attachment AttachmentFacebookRequest `json:"attachment"`
+	Attachment AttachmentFacebookRequest `json:"attachment"` // attachment message
 }
 
 // implement Message
 func (MessageText) Message()       {}
 func (MessageAttachment) Message() {}
 
-// attachment struct
+// AttachmentFacebookRequest contain informations about the request attachment
 type AttachmentFacebookRequest struct {
-	AttachmentType string                    `json:"type"`
-	Payload        AttachmentFacebookPayload `json:"payload"`
+	AttachmentType string                    `json:"type"`    // type of the attachment facebook supported
+	Payload        AttachmentFacebookPayload `json:"payload"` // actual payload of the attachment
 }
 
-// payload struct
+// AttachmentFacebookRequest contain informations about the attachment payload
 type AttachmentFacebookPayload struct {
-	Src          string     `json:"url,omitempty"`
-	IsReusable   bool       `json:"is_reusable,omitempty"`
-	TemplateType string     `json:"template_type,omitempty"`
-	Elements     []Template `json:"elements,omitempty"` // each element must match the template type
+	Src          string     `json:"url,omitempty"`           // usable for media type attachment(image,video,audio,file). URL of the attachment.
+	IsReusable   bool       `json:"is_reusable,omitempty"`   // the Messenger Platform supports saving assets via the Send API and Attachment Upload API. This allows you reuse assets, rather than uploading them every time they are needed.
+	TemplateType string     `json:"template_type,omitempty"` // type of template caller want to send. only usable if the AttachmentFacebookRequest's AttachmentType is "template".
+	Elements     []Template `json:"elements,omitempty"`      // each element must match the template type. only usable if the AttachmentFacebookRequest's AttachmentType is "template".
 }
 
+// Recipient contain target reciever of the message's informations
 type Recipient struct {
-	Id string `json:"id"`
+	Id string `json:"id"` // PSID of the reciever
 }

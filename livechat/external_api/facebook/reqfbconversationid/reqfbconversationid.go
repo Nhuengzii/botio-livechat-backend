@@ -1,4 +1,6 @@
 // Package reqfbconversationid implement a function to call facebook api request for a conversationID
+//
+// # Use Graph API v16.0
 package reqfbconversationid
 
 import (
@@ -21,11 +23,11 @@ type Conversation struct {
 	ID string `json:"id"` //
 }
 
-// GetConversationID returns a string of facebook conversationID,If there is a participants with matching PSID in the conversation.
+// GetConversationID makes a faceook API call and returns a string of facebook conversationID,If there is a participants with matching PSID in the conversation.
 // Only return conversation in a specific page.
-// Return an error if it occurs
+// Return an error if it occurs.
 //
-// GetConversationID use facebook page accessToken.
+// Use facebook page accessToken.
 func GetConversationID(accessToken string, psid string, pageID string) (_ string, err error) {
 	// important userID is not pageID psid only
 	defer func() {
