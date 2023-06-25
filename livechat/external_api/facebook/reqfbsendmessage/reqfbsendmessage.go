@@ -1,6 +1,6 @@
 // Package reqfbsendmessage implement a function to call facebook api request for sending message
 //
-// # Use Graph API v16.0
+// # Uses Graph API v16.0
 package reqfbsendmessage
 
 import (

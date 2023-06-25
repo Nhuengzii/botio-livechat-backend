@@ -1,6 +1,6 @@
 // Package reqfbconversationid implement a function to call facebook api request for a conversationID
 //
-// # Use Graph API v16.0
+// # Uses Graph API v16.0
 package reqfbconversationid
 
 import (
