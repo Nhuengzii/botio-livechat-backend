@@ -1,3 +1,4 @@
+// Package discord implements helper function for logging to specific discord server.
 package discord
 
 import (
@@ -7,6 +8,10 @@ import (
 	"net/http"
 )
 
+// Log log message string to discord via discord webhook.
+//
+// Logging to discord take some resources and time.
+// Recommend that caller only use this function to log error so that it doesn't take to much resources.
 func Log(webhookURL string, message string) {
 	if webhookURL != "" {
 		payload := map[string]string{"content": message}
