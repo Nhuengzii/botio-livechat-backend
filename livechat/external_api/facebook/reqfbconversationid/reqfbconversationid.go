@@ -24,7 +24,7 @@ type Conversation struct {
 }
 
 // GetConversationID makes a faceook API call and returns a string of facebook conversationID,If there is a participants with matching PSID in the conversation.
-// Only return conversation in a specific page.
+// Only return conversation in a specify page.
 // Return an error if it occurs.
 //
 // Use facebook page accessToken.
