@@ -1,3 +1,4 @@
+// Package stdmessage define StdMessage a message format able to define various platform's messages.
 package stdmessage
 
 import (
@@ -39,44 +40,94 @@ const (
 	AttachmentTypeIGTemplateProduct               AttachmentType = "instagram-template-product"
 )
 
+// A StdMessage contains various information about specific message.
+//
+// # StdMessage is the main message's structure used to communicate in this system.
 type StdMessage struct {
-	ShopID         string          `json:"shopID" bson:"shopID"`
-	Platform       Platform        `json:"platform" bson:"platform"`
-	PageID         string          `json:"pageID" bson:"pageID"`
-	ConversationID string          `json:"conversationID" bson:"conversationID"`
-	MessageID      string          `json:"messageID" bson:"messageID"`
-	Timestamp      int64           `json:"timestamp" bson:"timestamp"`
-	Source         Source          `json:"source" bson:"source"`
-	Message        string          `json:"message" bson:"message"`
-	Attachments    []Attachment    `json:"attachments" bson:"attachments"`
-	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"`
-	IsDeleted      bool            `json:"isDeleted" bson:"isDeleted"`
+	ShopID         string          `json:"shopID" bson:"shopID"`                       // identified specific shop
+	Platform       Platform        `json:"platform" bson:"platform"`                   // a platform the message belongs to
+	PageID         string          `json:"pageID" bson:"pageID"`                       // identified specific page
+	ConversationID string          `json:"conversationID" bson:"conversationID"`       // identified specific conversation
+	MessageID      string          `json:"messageID" bson:"messageID"`                 // identified specific message
+	Timestamp      int64           `json:"timestamp" bson:"timestamp"`                 // timestamp the message was sent
+	Source         Source          `json:"source" bson:"source"`                       // author of the message
+	Message        string          `json:"message" bson:"message"`                     // text component of the message
+	Attachments    []Attachment    `json:"attachments" bson:"attachments"`             // various attachments sent with the message
+	ReplyTo        *RepliedMessage `json:"replyTo,omitempty" bson:"replyTo,omitempty"` // this message was used to reply to other message
+	IsDeleted      bool            `json:"isDeleted" bson:"isDeleted"`                 // if true the message was unsend and has been deleted
 }
 
+// A Platform used to define a platform that the message belongs to.
+//
+//   - facebook
+//   - line
+//   - instagram
 type Platform string
 
+// A Source store informations about the author of the message.
 type Source struct {
-	UserID   string   `json:"userID" bson:"userID"`
+	UserID string `json:"userID" bson:"userID"` // identified user
+	// # user's type can be either user or admin.
+	// 	- user : customer that has chat with the page.
+	// 	- admin : page's admin.
 	UserType UserType `json:"userType" bson:"userType"`
 }
 
+// # A UserType can be either
+//   - user : customer that has chat with the page.
+//   - admin : page's admin.
 type UserType string
 
+// An Attachment store various informations about specific attachment.
 type Attachment struct {
-	AttachmentType AttachmentType `json:"attachmentType" bson:"attachmentType"`
-	Payload        Payload        `json:"payload" bson:"payload"`
+	AttachmentType AttachmentType `json:"attachmentType" bson:"attachmentType"` // type of the attachment
+	Payload        Payload        `json:"payload" bson:"payload"`               // actual payload of the attachment
 }
 
+// An AttachmentType stores attachment type string.
+//
+// # Non-specific-platform AttachmentTypes.
+//   - image
+//   - video
+//   - audio
+//   - file
+//
+// # Line specific AttachmentTypes.
+//   - sticker
+//   - line-emoji
+//   - line-template-buttons
+//   - line-template-confirm
+//   - line-template-carousel
+//   - line-template-image-carousel
+//   - line-flex
+//
+// # Facebook specific AttachmentTypes.
+//   - facebook-template-button
+//   - facebook-template-coupon
+//   - facebook-template-customer-feedback.
+//   - facebook-template-generic
+//   - facebook-template-media
+//   - facebook-template-product
+//   - facebook-template-receipt
+//   - facebook-template-structured-information
+//
+// # Instagram specific AttachmentTypes.
+//   - instagram-template-generic
+//   - instagram-template-product
 type AttachmentType string
 
+// A Payload contains Src the content of media type attachments (image,video,audio,file).
 type Payload struct {
-	Src string `json:"src" bson:"src"`
+	Src string `json:"src" bson:"src"` // URL storing payload's content
 }
 
+// A RepliedMessage contains information about target replied message.
 type RepliedMessage struct {
-	MessageID string `json:"messageID" bson:"messageID"`
+	MessageID string `json:"messageID" bson:"messageID"` // identified message
 }
 
+// ToLastActivityString return a string that tells what activity last happen in the conversation.
+// Return error if it occurs.
 func (message *StdMessage) ToLastActivityString() (string, error) {
 	if message.IsDeleted {
 		return "ยกเลิกข้อความ", nil
