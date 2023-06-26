@@ -1,23 +1,28 @@
+// Package shops defines Shop, a struct storing config about a specific shop
 package shops
 
 type Shop struct {
-	ShopID                  string                  `bson:"shopID"`
-	FacebookPageID          string                  `bson:"facebookPageID"`
-	LinePageID              string                  `bson:"linePageID"`
-	InstagramPageID         string                  `bson:"instagramPageID"`
-	FacebookAuthentication  FacebookAuthentication  `bson:"facebookAuthentication"`
-	LineAuthentication      LineAuthentication      `bson:"lineAuthentication"`
-	InstagramAuthentication InstagramAuthentication `bson:"instagramAuthentication"`
+	ShopID                  string                  `bson:"shopID"`                  // identifying specific shop
+	FacebookPageID          string                  `bson:"facebookPageID"`          // identifying specific facebook page
+	LinePageID              string                  `bson:"linePageID"`              // identifying specific line page
+	InstagramPageID         string                  `bson:"instagramPageID"`         // identifying specific instagram page
+	FacebookAuthentication  FacebookAuthentication  `bson:"facebookAuthentication"`  // store page's facebook authentication variables
+	LineAuthentication      LineAuthentication      `bson:"lineAuthentication"`      // store page's line authentication variables
+	InstagramAuthentication InstagramAuthentication `bson:"instagramAuthentication"` // store page's instagram authentication variables
 }
 
+// A FacebookAuthentication store page's facebook authentication variables
 type FacebookAuthentication struct {
-	AccessToken string `bson:"accessToken"`
+	AccessToken string `bson:"accessToken"` // page's access token
 }
 
+// A LineAuthentication store page's line authentication variables
 type LineAuthentication struct {
-	AccessToken string `bson:"accessToken"`
-	Secret      string `bson:"secret"`
+	AccessToken string `bson:"accessToken"` // line's bot access token
+	Secret      string `bson:"secret"`      // line's app secret
 }
+
+// An InstagramAuthentication store page's instagram authentication variables
 type InstagramAuthentication struct {
-	AccessToken string `bson:"accessToken"`
+	AccessToken string `bson:"accessToken"` // instagram's page access token
 }
