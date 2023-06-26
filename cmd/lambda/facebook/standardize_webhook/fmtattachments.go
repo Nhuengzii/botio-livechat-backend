@@ -2,6 +2,16 @@ package main
 
 import "github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 
+func fmtBasicAttachments(basicPayload BasicPayload, attachmentType string, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+	attachments := []stdmessage.Attachment{}
+	attachments = append(attachments, stdmessage.Attachment{
+		AttachmentType: stdmessage.AttachmentType(attachmentType),
+		Payload:        stdmessage.Payload{Src: basicPayload.Src},
+	})
+
+	return attachments, nil
+}
+
 func fmtTemplateAttachments(templatePayload TemplatePayload, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
 	attachments := []stdmessage.Attachment{}
 	var attachmentType stdmessage.AttachmentType

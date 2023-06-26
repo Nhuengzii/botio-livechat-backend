@@ -76,10 +76,10 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 				if err != nil {
 					return nil, err
 				}
-				attachments = append(attachments, stdmessage.Attachment{
-					AttachmentType: stdmessage.AttachmentType(attachment.AttachmentType),
-					Payload:        stdmessage.Payload{Src: basicPayload.Src},
-				})
+				attachments, err = fmtBasicAttachments(basicPayload, attachment.AttachmentType, jsonByte)
+				if err != nil {
+					return nil, err
+				}
 			} else {
 				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
 				if err != nil {
