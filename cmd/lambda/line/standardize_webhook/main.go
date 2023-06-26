@@ -39,13 +39,12 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		uploader := amazons3.NewUploader(os.Getenv("AWS_REGION"))
 		shop, err := c.dbClient.QueryShop(ctx, pageID)
 		if err != nil {
 			return err
 		}
 		shopID := shop.ShopID
-		err = c.handleEvents(ctx, shopID, pageID, bot, *uploader, hookBody)
+		err = c.handleEvents(ctx, shopID, pageID, bot, c.uploader, hookBody)
 		if err != nil {
 			return err
 		}
@@ -62,6 +61,7 @@ func main() {
 		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
 		snsTopicARN       = os.Getenv("SNS_TOPIC_ARN")
 		awsRegion         = os.Getenv("AWS_REGION")
+		s3BucketName      = os.Getenv("S3_BUCKET_NAME")
 	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     mongodbURI,
@@ -70,6 +70,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 	})
+	uploader := amazons3.NewUploader(awsRegion, s3BucketName)
 	if err != nil {
 		logMessage := "cmd/lambda/line/standardize_webhook/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
@@ -81,6 +82,7 @@ func main() {
 		snsTopicARN:       snsTopicARN,
 		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
+		uploader:          *uploader,
 	}
 	lambda.Start(c.handler)
 }
