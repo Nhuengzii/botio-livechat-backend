@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -8,17 +9,60 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
 )
 
-func fmtBasicAttachments(basicPayload BasicPayload, attachmentType string, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 	attachments := []stdmessage.Attachment{}
+	if len(messaging.Message.Attachments) > 0 {
+		for _, attachment := range messaging.Message.Attachments {
+			if attachment.AttachmentType != "template" {
+				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
+				if err != nil {
+					return nil, err
+				}
+				var basicPayload BasicPayload
+				err = json.Unmarshal([]byte(jsonByte), &basicPayload)
+				if err != nil {
+					return nil, err
+				}
+				attachments, err = c.fmtBasicAttachments(basicPayload, attachment.AttachmentType, jsonByte)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
+				if err != nil {
+					return nil, err
+				}
+				var templatePayload TemplatePayload
+				err = json.Unmarshal(jsonByte, &templatePayload)
+				if err != nil {
+					return nil, err
+				}
+				attachments, err = c.fmtTemplateAttachments(templatePayload, jsonByte)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
+	return attachments, nil
+}
+
+func (c *config) fmtBasicAttachments(basicPayload BasicPayload, attachmentType string, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+	attachments := []stdmessage.Attachment{}
+	location, err := getAndUploadMessageContent(c.uploader, basicPayload.Src)
+	if err != nil {
+		return nil, err
+	}
 	attachments = append(attachments, stdmessage.Attachment{
 		AttachmentType: stdmessage.AttachmentType(attachmentType),
-		Payload:        stdmessage.Payload{Src: basicPayload.Src},
+		Payload:        stdmessage.Payload{Src: location},
 	})
 
 	return attachments, nil
 }
 
-func fmtTemplateAttachments(templatePayload TemplatePayload, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+func (c *config) fmtTemplateAttachments(templatePayload TemplatePayload, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
 	attachments := []stdmessage.Attachment{}
 	var attachmentType stdmessage.AttachmentType
 
