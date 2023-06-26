@@ -1,3 +1,4 @@
+// Package websocketwrapper implements apigateway's websocket for manipulating websocket operations.
 package websocketwrapper
 
 import (
@@ -8,10 +9,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 )
 
+// A Client contains apigatewaymanagementapi's client.
 type Client struct {
-	client *apigatewaymanagementapi.Client
+	client *apigatewaymanagementapi.Client // used to perform various websocket operations
 }
 
+// NewClient create and return an apigateway's websocket client.
 func NewClient(endpoint string) *Client {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
 	if err != nil {
@@ -28,6 +31,8 @@ func NewClient(endpoint string) *Client {
 	return &Client{client: svc}
 }
 
+// Send recieve a message string and send the message into a specific websocket connectionID.
+// Return an error if it occurs.
 func (c *Client) Send(ctx context.Context, connectionID string, message string) error {
 	input := &apigatewaymanagementapi.PostToConnectionInput{ConnectionId: aws.String(connectionID), Data: []byte(message)}
 	_, err := c.client.PostToConnection(context.Background(), input)
