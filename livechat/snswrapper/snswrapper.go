@@ -1,3 +1,4 @@
+// Package snswrapper implements SNS's Client for manipulating SNS's service database
 package snswrapper
 
 import (
@@ -8,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
-// A Client contains mongodb client and a Target struct.
+// A Client contains SNS's client and a Target struct.
 type Client struct {
 	client *sns.SNS // SNS's client used to do various SNS's operation
 }
