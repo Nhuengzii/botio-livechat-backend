@@ -1,18 +1,23 @@
+// Package amazons3 implements Uploader for manipulating amazons3 storage service
 package amazons3
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
-	"io"
 )
 
+// An Uploader contains s3manager.Uploader used to do various s3 bucket operations.
 type Uploader struct {
-	uploader *s3manager.Uploader
+	uploader *s3manager.Uploader // uploader method can be used to perform s3 bucket operations
 }
 
+// NewUploader returns a new Uploader which contains s3 uploader inside.
+// Return an error if it occurs.
 func NewUploader(awsRegion string) *Uploader {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
@@ -21,6 +26,8 @@ func NewUploader(awsRegion string) *Uploader {
 	return &Uploader{uploader}
 }
 
+// UploadFile upload input file into the specified bucket and return a location string if the operations was a success.
+// Return an error if it occurs.
 func (u *Uploader) UploadFile(bucketName string, file io.Reader) (string, error) {
 	result, err := u.uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(bucketName),
