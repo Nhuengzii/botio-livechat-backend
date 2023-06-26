@@ -1,27 +1,29 @@
 openapi: "3.0.1"
 info:
-  title: "botio_livechat_rest_api"
-  description: This is a simple API
+  title: "Botio Live Chat API"
+  description: "This is an API for Botio livechat system."
   version: "1.0.0"
   contact:
-    email: admin@botio.io
+    email: "admin@botio.io"
 servers:
-  # url to be change
-  - url: "https://oq0hx8j60a.execute-api.ap-southeast-1.amazonaws.com/{basePath}"
+  # id is subject to change
+  - url: "https://{id}.execute-api.ap-southeast-1.amazonaws.com/{stage}"
     variables:
-      basePath:
+      id:
+        default: "oq0hx8j60a"
+      stage:
         default: "dev"
 tags:
   - name: all
-    description: Operations that involve all platforms the api supported
+    description: Operations that involve all platforms this api supports
   - name: facebook
-    description: Operations that involve the facebook platform
+    description: Operations that involve facebook platform
   - name: instagram
-    description: Operations that involve the instagram platform
+    description: Operations that involve instagram platform
   - name: line
-    description: Operations that involve the line platform
+    description: Operations that involve line platform
   - name: webhook
-    description: Webhook operations that should only be call by the subscribed webhook
+    description: Webhook operations that should only be called by the subscribing web clients
 paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
@@ -32,29 +34,19 @@ paths:
         By passing in appropriate path parameters, you can search for
         a facebook conversation of specific shop and page that matches the conversation_id
       operationId: getFacebookConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
       responses:
-        "200":
-          description: successful
+        200:
+          description: "OK"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StandardConversationWrapper"
-      parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
     patch:
       tags:
         - facebook
@@ -63,25 +55,21 @@ paths:
         By passing in appropriate path parameters and request body, you can update 
         facebook conversation's fields of specific shop and page that matches the conversation_id,
       operationId: patchFacebookConversation
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/ConversationPatch"
+      responses:
+        200:
+          description: "OK"
+        204:
+          description: "No Content"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/all/conversations:
     get:
       tags:
@@ -598,7 +586,7 @@ paths:
             type: "string"
 components:
   schemas:
-    StandardMessage:
+    Message:
       required:
         - shopID
         - platform
@@ -671,7 +659,7 @@ components:
       properties:
         messageID:
           type: string
-    StandardConversation:
+    Conversation:
       required:
         - shopID
         - platform
@@ -718,7 +706,7 @@ components:
           type: string
         profilePic:
           $ref: "#/components/schemas/Payload"
-    StandardConversationList:
+    ConversationArray:
       required:
         - conversations
       type: object
@@ -726,8 +714,8 @@ components:
         conversations:
           type: array
           items:
-            $ref: "#/components/schemas/StandardConversation"
-    StandardMessageList:
+            $ref: "#/components/schemas/Conversation"
+    MessageArray:
       required:
         - messages
       type: object
@@ -735,18 +723,46 @@ components:
         messages:
           type: array
           items:
-            $ref: "#/components/schemas/StandardMessage"
-    StandardConversationWrapper:
+            $ref: "#/components/schemas/Message"
+    ConversationWrapper:
       required:
         - conversation
       type: object
       properties:
         conversation:
-          $ref: "#/components/schemas/StandardConversation"
-    StandardMessageWrapper:
+          $ref: "#/components/schemas/Conversation"
+    MessageWrapper:
       required:
         - message
       type: object
       properties:
         message:
-          $ref: "#/components/schemas/StandardMessage"
+          $ref: "#/components/schemas/Message"
+  parameters:
+    ShopID:
+      name: shop_id
+      in: path
+      required: true
+      schema:
+        type: string
+    PageID:
+      name: page_id
+      in: path
+      required: true
+      schema:
+        type: string
+    ConversationID:
+      name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    ConversationPatch:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              unread:
+                type: integer
