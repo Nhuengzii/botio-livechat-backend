@@ -1,5 +1,4 @@
-// Package stdconversation define StdConversation a conversation format able to define various platform's conversation.
-// It is stored and mainly used in this architecture.
+// Package stdconversation define StdConversation a conversation format able to define various platform's conversations.
 package stdconversation
 
 const (
@@ -8,12 +7,12 @@ const (
 	PlatformLine      Platform = "line"
 )
 
-// A StdConversation contains various information about a specific conversation.
+// A StdConversation contains various information about specific conversation.
 //
-// # StdConversation is the main structure used to communicate in this system.
+// # StdConversation is the main conversation's structure used to communicate in this system.
 type StdConversation struct {
 	ShopID          string        `json:"shopID" bson:"shopID"`                   // identified specific shop
-	Platform        Platform      `json:"platform" bson:"platform"`               // specific platform the conversation belongs to
+	Platform        Platform      `json:"platform" bson:"platform"`               // a platform the conversation belongs to
 	PageID          string        `json:"pageID" bson:"pageID"`                   // identified specific page
 	ConversationID  string        `json:"conversationID" bson:"conversationID"`   // identified specific conversation
 	ConversationPic Payload       `json:"conversationPic" bson:"conversationPic"` // store conversation's display picture
@@ -23,10 +22,14 @@ type StdConversation struct {
 	Unread          int           `json:"unread" bson:"unread"`                   // number of conversation's currently unread messages
 }
 
-// A Platform used to define what platform the conversation belongs to.
+// A Platform used to define a platform that the conversation belongs to.
+//
+//   - facebook
+//   - line
+//   - instagram
 type Platform string
 
-// A Participant store informations about user participating in a specifc conversation
+// A Participant store informations about user participating in a specifc conversation.
 type Participant struct {
 	UserID     string  `json:"userID" bson:"userID"`         // identified user
 	Username   string  `json:"username" bson:"username"`     // user's username
