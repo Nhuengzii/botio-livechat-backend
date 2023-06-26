@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// CacheClient is an interface for cache client, for example, Redis
 type CacheClient interface {
 	Close() error
 	Set(ctx context.Context, key string, value string, duration time.Duration) error

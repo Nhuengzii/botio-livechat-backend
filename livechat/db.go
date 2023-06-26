@@ -8,6 +8,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 )
 
+// DBClient is an interface for database client, for example, MongoDB
 type DBClient interface {
 	Close(ctx context.Context) error
 	InsertConversation(ctx context.Context, conversation *stdconversation.StdConversation) error
