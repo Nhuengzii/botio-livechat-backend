@@ -1,6 +1,12 @@
 package main
 
-import "github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
+)
 
 func fmtBasicAttachments(basicPayload BasicPayload, attachmentType string, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
 	attachments := []stdmessage.Attachment{}
@@ -40,4 +46,27 @@ func fmtTemplateAttachments(templatePayload TemplatePayload, jsonBytePayload []b
 		Payload:        stdmessage.Payload{Src: string(jsonBytePayload)},
 	})
 	return attachments, nil
+}
+
+func getAndUploadMessageContent(uploader amazons3.Uploader, src string) (_ string, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("getAndUploadMessageContent: %w", err)
+		}
+	}()
+	resp, err := http.Get(src)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", errBadImageURL
+	}
+
+	location, err := uploader.UploadFile(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return location, nil
 }
