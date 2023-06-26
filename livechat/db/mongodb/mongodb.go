@@ -20,8 +20,8 @@ var ErrNoDocuments = mongo.ErrNoDocuments
 
 // A Client contains mongodb client and a Target struct.
 type Client struct {
-	client *mongo.Client
-	Target
+	client *mongo.Client // mongodb's client used to do mongo operation
+	Target               // target database's  information
 }
 
 // A Target contains information about the target database.
