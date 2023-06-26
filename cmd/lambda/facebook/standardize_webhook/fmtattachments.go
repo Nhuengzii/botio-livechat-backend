@@ -10,20 +10,12 @@ import (
 )
 
 func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
+	var err error
 	attachments := []stdmessage.Attachment{}
 	if len(messaging.Message.Attachments) > 0 {
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
-				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
-				if err != nil {
-					return nil, err
-				}
-				var basicPayload BasicPayload
-				err = json.Unmarshal([]byte(jsonByte), &basicPayload)
-				if err != nil {
-					return nil, err
-				}
-				attachments, err = c.fmtBasicAttachments(basicPayload, attachment.AttachmentType, jsonByte)
+				attachments, err = c.fmtBasicAttachments(attachment)
 				if err != nil {
 					return nil, err
 				}
@@ -48,14 +40,24 @@ func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, er
 	return attachments, nil
 }
 
-func (c *config) fmtBasicAttachments(basicPayload BasicPayload, attachmentType string, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+func (c *config) fmtBasicAttachments(attachment Attachment) ([]stdmessage.Attachment, error) {
+	jsonByte, err := json.Marshal(attachment.Payload) // actual payload
+	if err != nil {
+		return nil, err
+	}
+	var basicPayload BasicPayload
+	err = json.Unmarshal([]byte(jsonByte), &basicPayload)
+	if err != nil {
+		return nil, err
+	}
+
 	attachments := []stdmessage.Attachment{}
 	location, err := getAndUploadMessageContent(c.uploader, basicPayload.Src)
 	if err != nil {
 		return nil, err
 	}
 	attachments = append(attachments, stdmessage.Attachment{
-		AttachmentType: stdmessage.AttachmentType(attachmentType),
+		AttachmentType: stdmessage.AttachmentType(attachment.AttachmentType),
 		Payload:        stdmessage.Payload{Src: location},
 	})
 

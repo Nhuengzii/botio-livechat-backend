@@ -39,7 +39,13 @@ type BasicPayload struct {
 	Src string `json:"url"`
 }
 type TemplatePayload struct {
-	TemplateType string `json:"template_type"`
+	TemplateType string    `json:"template_type"`
+	Elements     []Element `json:"elements"`
+}
+
+// only have ImageURL because that's all we need
+type Element struct {
+	ImageURL string `json:"image_url"`
 }
 
 type ReplyMessage struct {
