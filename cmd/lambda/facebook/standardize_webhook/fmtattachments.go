@@ -16,23 +16,11 @@ func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, er
 		for _, attachment := range messaging.Message.Attachments {
 			if attachment.AttachmentType != "template" {
 				attachments, err = c.fmtBasicAttachments(attachment)
-				if err != nil {
-					return nil, err
-				}
 			} else {
-				jsonByte, err := json.Marshal(attachment.Payload) // actual payload
-				if err != nil {
-					return nil, err
-				}
-				var templatePayload TemplatePayload
-				err = json.Unmarshal(jsonByte, &templatePayload)
-				if err != nil {
-					return nil, err
-				}
-				attachments, err = c.fmtTemplateAttachments(templatePayload, jsonByte)
-				if err != nil {
-					return nil, err
-				}
+				attachments, err = c.fmtTemplateAttachments(attachment)
+			}
+			if err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -41,18 +29,8 @@ func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, er
 }
 
 func (c *config) fmtBasicAttachments(attachment Attachment) ([]stdmessage.Attachment, error) {
-	jsonByte, err := json.Marshal(attachment.Payload) // actual payload
-	if err != nil {
-		return nil, err
-	}
-	var basicPayload BasicPayload
-	err = json.Unmarshal([]byte(jsonByte), &basicPayload)
-	if err != nil {
-		return nil, err
-	}
-
 	attachments := []stdmessage.Attachment{}
-	location, err := getAndUploadMessageContent(c.uploader, basicPayload.Src)
+	location, err := getAndUploadMessageContent(c.uploader, attachment.Payload.Src)
 	if err != nil {
 		return nil, err
 	}
@@ -64,32 +42,62 @@ func (c *config) fmtBasicAttachments(attachment Attachment) ([]stdmessage.Attach
 	return attachments, nil
 }
 
-func (c *config) fmtTemplateAttachments(templatePayload TemplatePayload, jsonBytePayload []byte) ([]stdmessage.Attachment, error) {
+func (c *config) fmtTemplateAttachments(attachment Attachment) ([]stdmessage.Attachment, error) {
 	attachments := []stdmessage.Attachment{}
-	var attachmentType stdmessage.AttachmentType
 
-	if templatePayload.TemplateType == "button" {
+	var attachmentType stdmessage.AttachmentType
+	if attachment.Payload.TemplateType == "button" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateButton
-	} else if templatePayload.TemplateType == "coupon" {
+	} else if attachment.Payload.TemplateType == "coupon" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateCoupon
-	} else if templatePayload.TemplateType == "customer_feedback" {
+		if attachment.Payload.ImageURL != "" {
+			location, err := getAndUploadMessageContent(c.uploader, attachment.Payload.ImageURL)
+			if err != nil {
+				return nil, err
+			}
+			attachment.Payload.ImageURL = location
+		}
+	} else if attachment.Payload.TemplateType == "customer_feedback" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateCustomerFeedback
-	} else if templatePayload.TemplateType == "generic" {
+	} else if attachment.Payload.TemplateType == "generic" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateGeneric
-	} else if templatePayload.TemplateType == "media" {
+		for index, element := range attachment.Payload.Elements {
+			if element.ImageURL != "" {
+				location, err := getAndUploadMessageContent(c.uploader, element.ImageURL)
+				if err != nil {
+					return nil, err
+				}
+				attachment.Payload.Elements[index].ImageURL = location
+			}
+		}
+	} else if attachment.Payload.TemplateType == "media" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateMedia
-	} else if templatePayload.TemplateType == "product" {
+	} else if attachment.Payload.TemplateType == "product" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateProduct
-	} else if templatePayload.TemplateType == "receipt" {
+	} else if attachment.Payload.TemplateType == "receipt" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateReceipt
-	} else if templatePayload.TemplateType == "customer_information" {
+		for index, element := range attachment.Payload.Elements {
+			if element.ImageURL != "" {
+				location, err := getAndUploadMessageContent(c.uploader, element.ImageURL)
+				if err != nil {
+					return nil, err
+				}
+				attachment.Payload.Elements[index].ImageURL = location
+			}
+		}
+	} else if attachment.Payload.TemplateType == "customer_information" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateStructuredInformation
 	} else {
 		return nil, errUnknownTemplateType
 	}
+
+	jsonByte, err := json.Marshal(attachment.Payload)
+	if err != nil {
+		return nil, err
+	}
 	attachments = append(attachments, stdmessage.Attachment{
 		AttachmentType: attachmentType,
-		Payload:        stdmessage.Payload{Src: string(jsonBytePayload)},
+		Payload:        stdmessage.Payload{Src: string(jsonByte)},
 	})
 	return attachments, nil
 }
