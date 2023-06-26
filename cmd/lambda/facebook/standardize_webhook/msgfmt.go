@@ -90,31 +90,10 @@ func fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
 				if err != nil {
 					return nil, err
 				}
-				var attachmentType stdmessage.AttachmentType
-				if templatePayload.TemplateType == "button" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateButton
-				} else if templatePayload.TemplateType == "coupon" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateCoupon
-				} else if templatePayload.TemplateType == "customer_feedback" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateCustomerFeedback
-				} else if templatePayload.TemplateType == "generic" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateGeneric
-				} else if templatePayload.TemplateType == "media" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateMedia
-				} else if templatePayload.TemplateType == "product" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateProduct
-				} else if templatePayload.TemplateType == "receipt" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateReceipt
-				} else if templatePayload.TemplateType == "customer_information" {
-					attachmentType = stdmessage.AttachmentTypeFBTemplateStructuredInformation
-				} else {
-					return nil, errUnknownTemplateType
+				attachments, err = fmtTemplateAttachments(templatePayload, jsonByte)
+				if err != nil {
+					return nil, err
 				}
-				attachments = append(attachments, stdmessage.Attachment{
-					AttachmentType: attachmentType,
-					Payload:        stdmessage.Payload{Src: string(jsonByte)},
-				})
-
 			}
 		}
 	}
