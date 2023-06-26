@@ -27,3 +27,12 @@ func NewClient(endpoint string) *Client {
 	})
 	return &Client{client: svc}
 }
+
+func (c *Client) Send(ctx context.Context, connectionID string, message string) error {
+	input := &apigatewaymanagementapi.PostToConnectionInput{ConnectionId: aws.String(connectionID), Data: []byte(message)}
+	_, err := c.client.PostToConnection(context.Background(), input)
+	if err != nil {
+		return err
+	}
+	return nil
+}
