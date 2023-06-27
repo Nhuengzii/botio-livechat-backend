@@ -238,11 +238,6 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	return nil
 }
 
-func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
-	// TODO implement
-	return nil
-}
-
 // RemoveDeletedMessage update specific message's fields on unsend message events.
 // Return an error if it occurs.
 //
@@ -277,7 +272,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 
 // QueryMessages return a slice of stdmessage.StdMessage in a specific conversation.
 // Only return messages in specific platform.
-// Return an empty slice if none were found
+// Return an empty slice if none were found.
 // Return an error if it occurs.
 //
 // The return values is sorted descending with the message's timestamp.
