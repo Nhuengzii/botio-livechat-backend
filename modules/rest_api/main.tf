@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "s3" {
     ]
     effect = "Allow"
     resources = [
-      aws_s3_bucket.bucket.id
+      aws_s3_bucket.bucket.arn
     ]
   }
 }
