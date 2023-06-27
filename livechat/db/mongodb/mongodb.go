@@ -1,3 +1,4 @@
+// Package mongodb implements DBClient for manipulating mongodb database
 package mongodb
 
 import (
@@ -17,19 +18,23 @@ import (
 
 var ErrNoDocuments = mongo.ErrNoDocuments
 
+// A Client contains mongodb client and a Target struct.
 type Client struct {
-	client *mongo.Client
-	Target
+	client *mongo.Client // mongodb's client used to do mongo operation
+	Target               // target database's  information
 }
 
+// A Target contains information about the target database.
 type Target struct {
-	URI                     string
-	Database                string
-	CollectionConversations string
-	CollectionMessages      string
-	CollectionShops         string
+	URI                     string // connection URI of the db
+	Database                string // Database name
+	CollectionConversations string // Conversations collection name
+	CollectionMessages      string // Messages collection name
+	CollectionShops         string // Shops collection name
 }
 
+// NewClient returns a new Client which contains mongodb client inside.
+// Return an error if it occurs.
 func NewClient(ctx context.Context, target Target) (*Client, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(target.URI).SetServerAPIOptions(serverAPI)
@@ -43,6 +48,8 @@ func NewClient(ctx context.Context, target Target) (*Client, error) {
 	}, nil
 }
 
+// Close close a mongodb client connection, releasing resources.
+// Return an error if it occurs.
 func (c *Client) Close(ctx context.Context) error {
 	err := c.client.Disconnect(ctx)
 	if err != nil {
@@ -51,6 +58,8 @@ func (c *Client) Close(ctx context.Context) error {
 	return nil
 }
 
+// InsertConversation insert a document containing new conversation to the target's CollectionConversations.
+// Return an error if it occurs.
 func (c *Client) InsertConversation(ctx context.Context, conversation *stdconversation.StdConversation) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	_, err := coll.InsertOne(ctx, conversation)
@@ -60,6 +69,8 @@ func (c *Client) InsertConversation(ctx context.Context, conversation *stdconver
 	return nil
 }
 
+// InsertMessage insert a document containing new message to the target's CollectionMessages.
+// Return an error if it occurs.
 func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessage) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	_, err := coll.InsertOne(ctx, message)
@@ -69,6 +80,10 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 	return nil
 }
 
+// UpdateConversationOnDeletedMessage update a conversation based on recieved unsend message events.
+// Return an error if it occurs.
+//
+// update last activity if the unsent message was the last message
 func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
@@ -122,6 +137,10 @@ func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message
 	return nil
 }
 
+// UpdateConversationOnNewMessage update a conversation based on recieved new message events.
+// Return an error if it occurs.
+//
+// update last activity, updated time and increment unread count if the sender wasn't an UserTypeAdmin
 func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
@@ -175,6 +194,8 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 	return nil
 }
 
+// UpdateConversationUnread update a conversation's unread field to a specified integer.
+// Return an error if it occurs.
 func (c *Client) UpdateConversationUnread(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string, unread int) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
@@ -198,6 +219,10 @@ func (c *Client) UpdateConversationUnread(ctx context.Context, shopID string, pl
 	return nil
 }
 
+// CheckConversationExists return an ErrNoDocuments if the conversation with matching conversationID does not exist.
+// If other errors occured CheckConversationExists will return that error.
+//
+// If the conversation was found CheckConversationExists return nil
 func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
@@ -213,11 +238,13 @@ func (c *Client) CheckConversationExists(ctx context.Context, conversationID str
 	return nil
 }
 
-func (c *Client) UpdateConversationParticipants(ctx context.Context, conversationID string) error {
-	// TODO implement
-	return nil
-}
-
+// RemoveDeletedMessage update specific message's fields on unsend message events.
+// Return an error if it occurs.
+//
+// update various fields
+//   - isDeleted : true
+//   - message : ""
+//   - attachments : []
 func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.D{
@@ -243,6 +270,18 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 	return nil
 }
 
+// QueryMessages return a slice of stdmessage.StdMessage in a specific conversation.
+// Only return messages in specific platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// The return values is sorted descending with the message's timestamp.
+// This means that the queried slice will start with the latest message in the conversation.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
@@ -281,6 +320,20 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
+// QueryMessages return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
+// Only return messages in specific platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// *** use case insensitive search ***
+//
+// The return values is sorted descending with the message's timestamp.
+// This means that the queried slice will start with the latest message in the conversation.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
@@ -324,6 +377,8 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 	return messages, nil
 }
 
+// QueryConversation return a specific stdconversation.StdConversation that match the conversationID.
+// Return an error if it occurs.
 func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -347,6 +402,18 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 	return &conversation, nil
 }
 
+// QueryConversations return a slice of stdconversation.StdConversation in a page.
+// Only return conversations in specific platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result conversations to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum conversations result. Limit value should not be negative.
 func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -384,6 +451,20 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	return conversations, nil
 }
 
+// QueryConversationsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
+// Only return conversations in specific platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// *** use case insensitive search ***
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -425,6 +506,20 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	return conversations, nil
 }
 
+// QueryConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+// Only return conversations in specific platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// *** use case insensitive search ***
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -492,6 +587,18 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
+// QueryConversationsOfAllPlatforms return a slice of stdconversation.StdConversation in a page.
+// Return conversations in all platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result conversations to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum conversations result. Limit value should not be negative.
 func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
@@ -523,6 +630,20 @@ func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID st
 	return conversations, nil
 }
 
+// QueryConversationsOfAllPlatformsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
+// Return conversations in all platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// *** use case insensitive search ***
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -562,6 +683,20 @@ func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx contex
 	return conversations, nil
 }
 
+// QueryConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+// Return conversations in all platform.
+// Return an empty slice if none were found.
+// Return an error if it occurs.
+//
+// *** use case insensitive search ***
+//
+// The return values is sorted descending with the conversation's lastActivity timestamp.
+// This means that the queried slice will start with the latest conversation that an activity occured.
+//
+// # pagination parameters (skip and limit should be input as nil if caller doesn't need any pagination)
+//
+//   - skip(integer): number of result messages to skip. Skip value should not be negative.
+//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 func (c *Client) QueryConversationsOfAllPlatformsWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
@@ -627,6 +762,8 @@ func (c *Client) QueryConversationsOfAllPlatformsWithMessage(ctx context.Context
 	return conversations, nil
 }
 
+// QueryShop return shops.Shop that contains a matching pageID of any platform.
+// Return an error if it occurs.
 func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
 	defer func() {
 		if err != nil {
@@ -658,6 +795,10 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	return &shop, nil
 }
 
+// QueryFacebookAuthentication return shops.FacebookAuthentication that contains a matching pageID of facebook platform.
+// Return an error if it occurs.
+//
+// Can be use to get access token
 func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string) (_ *shops.FacebookAuthentication, err error) {
 	defer func() {
 		if err != nil {
@@ -679,6 +820,10 @@ func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string)
 	return &shop.FacebookAuthentication, nil
 }
 
+// QueryLineAuthentication return shops.QueryLineAuthentication that contains a matching pageID of line platform.
+// Return an error if it occurs.
+//
+// Can be use to get access token
 func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ *shops.LineAuthentication, err error) {
 	defer func() {
 		if err != nil {
@@ -700,6 +845,10 @@ func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ 
 	return &shop.LineAuthentication, nil
 }
 
+// QueryInstagramAuthentication return shops.QueryInstagramAuthentication that contains a matching pageID of instagram platform.
+// Return an error if it occurs.
+//
+// Can be use to get access token
 func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string) (_ *shops.InstagramAuthentication, err error) {
 	defer func() {
 		if err != nil {
@@ -721,6 +870,8 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 	return &shop.InstagramAuthentication, nil
 }
 
+// GetPage return number of unread conversations and total conversations of the specified page.
+// Return an error if it occurs.
 func (c *Client) GetPage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string) (_ int64, _ int64, err error) {
 	defer func() {
 		if err != nil {
