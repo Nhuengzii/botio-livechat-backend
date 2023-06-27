@@ -2,28 +2,33 @@ package amazons3
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
-	"io"
 )
 
 type Uploader struct {
-	uploader *s3manager.Uploader
+	uploader   *s3manager.Uploader
+	bucketName string
 }
 
-func NewUploader(awsRegion string) *Uploader {
+func NewUploader(awsRegion string, bucketName string) *Uploader {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
 	}))
 	uploader := s3manager.NewUploader(sess)
-	return &Uploader{uploader}
+	return &Uploader{
+		uploader:   uploader,
+		bucketName: bucketName,
+	}
 }
 
-func (u *Uploader) UploadFile(bucketName string, file io.Reader) (string, error) {
+func (u *Uploader) UploadFile(file io.Reader) (string, error) {
 	result, err := u.uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucketName),
+		Bucket: aws.String(u.bucketName),
 		Key:    aws.String(uuid.New().String()),
 		Body:   file,
 	})
