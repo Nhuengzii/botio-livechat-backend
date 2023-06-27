@@ -13,10 +13,12 @@ import (
 
 // An Uploader contains s3manager.Uploader used to do various s3 bucket operations.
 type Uploader struct {
-	uploader   *s3manager.Uploader
-	bucketName string
+	uploader   *s3manager.Uploader // s3 sdk
+	bucketName string              // target bucket name
 }
 
+// NewUploader returns a new Uploader which contains s3 uploader inside.
+// Return an error if it occurs.
 func NewUploader(awsRegion string, bucketName string) *Uploader {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
@@ -28,6 +30,8 @@ func NewUploader(awsRegion string, bucketName string) *Uploader {
 	}
 }
 
+// UploadFile upload input file into the specified bucket and return a location string if the operations was a success.
+// Return an error if it occurs.
 func (u *Uploader) UploadFile(file io.Reader) (string, error) {
 	result, err := u.uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(u.bucketName),
