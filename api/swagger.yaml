@@ -60,14 +60,12 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/ConversationPatch"
+        $ref: "#/components/requestBodies/PatchConversation"
       responses:
         200:
           description: "OK"
-        204:
-          description: "No Content"
-        400:
-          description: "Bad Request"
+        402:
+          description: "Unprocessable Entity"
         404:
           description: "Not Found"
   /shops/{shop_id}/all/conversations:
@@ -88,9 +86,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
         404:
           description: "Not Found"
-  # TODO from here ↓
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -101,25 +100,24 @@ paths:
         all messages of a specific conversation,
         the conversation has to be a facebook conversation
       operationId: listFacebookMessages
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+    # TODO from here ↓
     post:
       tags:
         - facebook
@@ -129,25 +127,15 @@ paths:
         , you can send a facebook message to a specific conversation,
         the target conversation has to be a facebook conversation
       operationId: postFacebookMessage
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+
+      responses:
+        200:
+          description: "OK"
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       responses:
@@ -742,6 +730,283 @@ components:
       properties:
         message:
           $ref: "#/components/schemas/Message"
+    PostMessageAttachment:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+            - "file"
+            - "line-template-buttons"
+            - "line-template-confirm"
+            - "line-template-carousel"
+            - "line-template-image-carousel"
+            - "facebook-template-generic"
+        payload:
+          oneOf:
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+    PostMessageAttachmentPayloadImage:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the image"
+    PostMessageAttachmentPayloadVideo:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the video"
+    PostMessageAttachmentPayloadAudio:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the audio"
+    PostMessageAttachmentPayloadFile:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the file"
+    PostMessageAttachmentPayloadLineTemplateButtons:
+      type: object
+      required:
+        - line_template_buttons
+      properties:
+        line_template_buttons:
+          $ref: "#/components/schemas/LineTemplateButtons"
+    PostMessageAttachmentPayloadLineTemplateConfirm:
+      type: object
+      required:
+        - line_template_confirm
+      properties:
+        line_template_confirm:
+          $ref: "#/components/schemas/LineTemplateConfirm"
+    PostMessageAttachmentPayloadLineTemplateCarousel:
+      type: object
+      required:
+        - line_template_carousel
+      properties:
+        line_template_carousel:
+          $ref: "#/components/schemas/LineTemplateCarousel"
+    PostMessageAttachmentPayloadLineTemplateImageCarousel:
+      type: object
+      required:
+        - line_template_image_carousel
+      properties:
+        line_template_image_carousel:
+          $ref: "#/components/schemas/LineTemplateImageCarousel"
+    PostMessageAttachmentPayloadFacebookTemplateGeneric:
+      type: object
+      required:
+        - fb_template_generic
+      properties:
+        fb_template_generic:
+          $ref: "#/components/schemas/FacebookTemplateGeneric"
+    PostMessageAttachmentPayloadInstagramGeneric:
+      type: object
+      required:
+        - ig_template_generic
+      properties:
+        ig_template_generic:
+          $ref: "#/components/schemas/InstagramTemplateGeneric"
+    LineTemplateButtons:
+      type: object
+      required:
+        - altText
+        - text
+        - actions
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        thumbnailImageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1:1
+            Max width: 1024px
+            Max file size: 10 MB
+        text:
+          type: string
+          description: |
+            Text displayed in the template
+            Max character limit: 160 (no image or title)
+            Max character limit: 60 (message with an image or title)
+        defaultAction:
+          $ref: "#/components/schemas/LineTemplateAction"
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            Max objects: 4
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateConfirm:
+      type: object
+      required:
+        - altText
+        - text
+        - actions
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        text:
+          type: string
+          description: |
+            Text displayed in the template
+            Max character limit: 240
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            2 objects only
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateCarousel:
+      type: object
+      required:
+        - altText
+        - columns
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        columns:
+          type: array
+          description: |
+            Array of columns
+            Max objects: 10
+          items:
+            $ref: "#/components/schemas/LineTemplateCarouselColumn"
+    LineTemplateCarouselColumn:
+      type: object
+      required:
+        - text
+        - actions
+      properties:
+        thumbnailImageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1.51:1 (width:height)
+            Max width: 1024px
+            Max file size: 10 MB
+        title:
+          type: string
+          description: |
+            Title
+            Max character limit: 40
+        text:
+          type: string
+          description: |
+            Message text
+            Max character limit: 120 (no image or title)
+            Max character limit: 60 (message with an image or title)
+        defaultAction:
+          $ref: "#/components/schemas/LineTemplateAction"
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            Max objects: 3
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateImageCarousel:
+      type: object
+      required:
+        - altText
+        - columns
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        columns:
+          type: array
+          description: |
+            Array of columns
+            Max objects: 10
+          items:
+            $ref: "#/components/schemas/LineTemplateImageCarouselColumn"
+    LineTemplateImageCarouselColumn:
+      type: object
+      required:
+        - imageUrl
+        - action
+      properties:
+        imageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1:1
+            Max width: 1024px
+            Max file size: 10 MB
+        action:
+          $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateAction:
+      type: object
+      required:
+        - uri
+      properties:
+        label:
+          type: string
+          description: |
+            Label for the action
+            Max character limit: 12 (Image carousel template)
+            Max character limit: 20 (Other than image carousel)
+        uri:
+          type: string
+          description: |
+            URI opened when the action is performed (Max character limit: 1000)
+            http(s)://
+            line://
+            tel:
+    FacebookTemplateGeneric:
+      type: object
+    InstagramTemplateGeneric:
+      type: object
   parameters:
     ShopID:
       name: shop_id
@@ -761,8 +1026,20 @@ components:
       required: true
       schema:
         type: string
+    Skip:
+      name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
   requestBodies:
-    ConversationPatch:
+    PatchConversation:
       content:
         application/json:
           schema:
@@ -770,3 +1047,14 @@ components:
             properties:
               unread:
                 type: integer
+    PostMessage:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: "text message"
+                properties:
+                  message:
+                    type: string
+              - $ref: "#/components/schemas/PostMessageAttachment"
