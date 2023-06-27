@@ -70,7 +70,6 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
-  # TODO from here ↓
   /shops/{shop_id}/all/conversations:
     get:
       tags:
@@ -80,15 +79,18 @@ paths:
         By passing in appropriate path parameter shop_id, you can list
         all conversations of a specific shop that matches the shop_id,
       operationId: listAllConversations
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        404:
+          description: "Not Found"
+  # TODO from here ↓
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
