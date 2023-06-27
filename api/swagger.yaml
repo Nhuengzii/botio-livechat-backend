@@ -64,8 +64,8 @@ paths:
       responses:
         200:
           description: "OK"
-        402:
-          description: "Unprocessable Entity"
+        400:
+          description: "Bad Request"
         404:
           description: "Not Found"
   /shops/{shop_id}/all/conversations:
@@ -117,7 +117,6 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
-    # TODO from here ↓
     post:
       tags:
         - facebook
@@ -132,26 +131,25 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-
+        $ref: "#/components/requestBodies/PostMessage"
       responses:
         200:
           description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        503:
+          description: "Service Unavailable"
+  # TODO from here ↓
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
@@ -1034,7 +1032,7 @@ components:
         url:
           type: string
         title:
-            type: string
+          type: string
     FacebookDefaultAction:
       type: object
       required:
