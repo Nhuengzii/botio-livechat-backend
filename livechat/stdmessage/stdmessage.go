@@ -132,22 +132,28 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 	if message.IsDeleted {
 		return "ยกเลิกข้อความ", nil
 	}
+	lastActivity := ""
+	if message.Source.UserType == UserType("admin") {
+		lastActivity = "คุณ : "
+	}
+
 	if len(message.Attachments) == 0 {
-		return message.Message, nil
+		lastActivity += message.Message
+		return lastActivity, nil
 	}
 	switch message.Attachments[0].AttachmentType {
 	case AttachmentTypeImage:
-		return "ส่งรูปภาพ", nil
+		lastActivity += "ส่งรูปภาพ"
 	case AttachmentTypeVideo:
-		return "ส่งวิดีโอ", nil
+		lastActivity += "ส่งวิดีโอ"
 	case AttachmentTypeAudio:
-		return "ส่งข้อความเสียง", nil
+		lastActivity += "ส่งข้อความเสียง"
 	case AttachmentTypeFile:
-		return "ส่งไฟล์", nil
+		lastActivity += "ส่งไฟล์"
 	case AttachmentTypeSticker:
-		return "ส่งสติกเกอร์", nil
+		lastActivity += "ส่งสติกเกอร์"
 	case AttachmentTypeLineEmoji:
-		return message.Message, nil
+		lastActivity += message.Message
 	case AttachmentTypeLineTemplateButtons,
 		AttachmentTypeLineTemplateConfirm,
 		AttachmentTypeLineTemplateCarousel,
@@ -162,10 +168,11 @@ func (message *StdMessage) ToLastActivityString() (string, error) {
 		AttachmentTypeFBTemplateStructuredInformation,
 		AttachmentTypeIGTemplateGeneric,
 		AttachmentTypeIGTemplateProduct:
-		return "ส่งเทมเพลต", nil
+		lastActivity += "ส่งเทมเพลต"
 	case AttachmentTypeLineFlex:
-		return "ส่งเฟล็กซ์", nil
+		lastActivity += "ส่งเฟล็กซ์"
 	default:
 		return "", fmt.Errorf("stdmessage.ToLastActivityString: unknown attachment type: %v", message.Attachments[0].AttachmentType)
 	}
+	return lastActivity, nil
 }
