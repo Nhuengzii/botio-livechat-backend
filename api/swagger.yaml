@@ -22,8 +22,6 @@ tags:
     description: Operations that involve instagram platform
   - name: line
     description: Operations that involve line platform
-  - name: webhook
-    description: Webhook operations that should only be called by the subscribing web clients
 paths:
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
@@ -47,6 +45,8 @@ paths:
                 $ref: "#/components/schemas/ConversationWrapper"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     patch:
       tags:
         - facebook
@@ -68,6 +68,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/all/conversations:
     get:
       tags:
@@ -940,10 +942,6 @@ components:
       required:
         - title
         - default_action
-        - oneOf:
-            - message
-            - picture
-            - buttons
       properties:
         title:
           type: string
@@ -979,10 +977,6 @@ components:
       required:
         - title
         - default_action
-        - oneOf:
-            - message
-            - picture
-            - buttons
       properties:
         title:
           type: string
