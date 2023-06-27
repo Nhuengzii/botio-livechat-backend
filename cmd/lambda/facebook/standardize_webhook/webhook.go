@@ -42,16 +42,16 @@ type Attachment struct {
 type Payload struct {
 	Src string `json:"url,omitempty"` // for normal payload
 
-	TemplateType string   `json:"template_type,omitempty"`
-	Title        string   `json:"title,omitempty"`
-	Subtitle     string   `json:"subtitle,omitempty"`
-	ImageURL     string   `json:"image_url,omitempty"`
-	Payload      string   `json:"payload,omitempty"`
-	Buttons      []Button `json:"buttons,omitempty"` // for button template types
-	Text         string   `json:"text,omitempty"`
+	TemplateType string    `json:"template_type,omitempty"`
+	Title        string    `json:"title,omitempty"`
+	Subtitle     string    `json:"subtitle,omitempty"`
+	ImageURL     string    `json:"image_url,omitempty"`
+	Payload      string    `json:"payload,omitempty"`
+	Buttons      []*Button `json:"buttons,omitempty"` // for button template types
+	Text         string    `json:"text,omitempty"`
 
 	// --- Structured Information ---
-	Countries []string `json:"countries"`
+	Countries []*string `json:"countries,omitempty"`
 	//--- Coupon ---
 	CouponCode           string `json:"coupon_code,omitempty"`
 	CouponURL            string `json:"coupon_url,omitempty"`
@@ -59,24 +59,24 @@ type Payload struct {
 	CouponPreMessage     string `json:"coupon_pre_message,omitempty"`
 
 	// --- Customer Feedback ---
-	ButtonTitle     string           `json:"button_title,omitempty"`
-	FeedbackScreens []FeedbackScreen `json:"feedback_screens,omitempty"`
-	BusinessPrivacy BusinessPrivacy  `json:"business_privacy,omitempty"`
-	ExpiresInDays   string           `json:"expires_in_days,omitempty"`
+	ButtonTitle     string            `json:"button_title,omitempty"`
+	FeedbackScreens []*FeedbackScreen `json:"feedback_screens,omitempty"`
+	BusinessPrivacy *BusinessPrivacy  `json:"business_privacy,omitempty"`
+	ExpiresInDays   string            `json:"expires_in_days,omitempty"`
 
 	// --- Generic ---
-	Elements []Element `json:"elements,omitempty"`
+	Elements []*Element `json:"elements,omitempty"`
 
 	// --- Receipt ---
-	RecipientName string       `json:"recipient_name,omitempty"`
-	OrderNumber   string       `json:"order_number,omitempty"`
-	Currency      string       `json:"currency,omitempty"`
-	PaymentMethod string       `json:"payment_method,omitempty"`
-	OrderURL      string       `json:"order_url,omitempty"`
-	Timestamp     int64        `json:"timestamp,omitempty"`
-	Address       Address      `json:"address,omitempty"`
-	Summary       Summary      `json:"summary,omitempty"`
-	Adjustments   []Adjustment `json:"adjustments,omitempty"`
+	RecipientName string        `json:"recipient_name,omitempty"`
+	OrderNumber   string        `json:"order_number,omitempty"`
+	Currency      string        `json:"currency,omitempty"`
+	PaymentMethod string        `json:"payment_method,omitempty"`
+	OrderURL      string        `json:"order_url,omitempty"`
+	Timestamp     int64         `json:"timestamp,omitempty"`
+	Address       *Address      `json:"address,omitempty"`
+	Summary       *Summary      `json:"summary,omitempty"`
+	Adjustments   []*Adjustment `json:"adjustments,omitempty"`
 }
 
 type Element struct {
@@ -85,7 +85,7 @@ type Element struct {
 	Subtitle      string        `json:"subtitle,omitempty"`
 	ImageURL      string        `json:"image_url,omitempty"`
 	DefaultAction DefaultAction `json:"default_action,omitempty"`
-	Buttons       []Button      `json:"buttons,omitempty"`
+	Buttons       []*Button     `json:"buttons,omitempty"`
 
 	// --- Reciept ---
 	Quantity int    `json:"quantity,omitempty"`
@@ -110,8 +110,8 @@ type Button struct {
 	// postback : payload sent to postback webhook events
 	// phone_number : payload is a phone number
 	// game_play : payload is serialized json pauload
-	Payload      string       `json:"payload,omitempty"`
-	GameMetaData GameMetaData `json:"game_metadata,omitempty"`
+	Payload      string        `json:"payload,omitempty"`
+	GameMetaData *GameMetaData `json:"game_metadata,omitempty"`
 }
 
 type DefaultAction struct {
