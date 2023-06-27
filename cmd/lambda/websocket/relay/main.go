@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/cache/redis"
@@ -17,13 +18,15 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello Me")
+	ctx, cancel := context.WithTimeout(context.Background(), 2500*time.Millisecond)
+	defer cancel()
+
 	addr := os.Getenv("REDIS_ADDR")
 	password := os.Getenv("REDIS_PASSWORD")
 	webhookURL := os.Getenv("DISCORD_WEBHOOK_URL")
 	websocket_api_id := os.Getenv("WEBSOCKET_API_ID")
 	cacheClient := redis.NewClient(addr, password)
-	websocketClient := websocketwrapper.NewClient(fmt.Sprintf("https://%s.execute-api.ap-southeast-1.amazonaws.com/dev", websocket_api_id))
+	websocketClient := websocketwrapper.NewClient(ctx, fmt.Sprintf("https://%s.execute-api.ap-southeast-1.amazonaws.com/dev", websocket_api_id))
 	if websocketClient == nil {
 		fmt.Println("websocketClient is nil")
 	}

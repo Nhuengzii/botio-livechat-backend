@@ -15,8 +15,8 @@ type Client struct {
 }
 
 // NewClient create and return an apigateway's websocket client.
-func NewClient(endpoint string) *Client {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
+func NewClient(ctx context.Context, endpoint string) *Client {
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("ap-southeast-1"))
 	if err != nil {
 		return nil
 	}
