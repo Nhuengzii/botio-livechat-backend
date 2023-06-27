@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
-	"os"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -126,7 +126,7 @@ func getAndUploadMessageContent(bot *linebot.Client, uploader amazons3.Uploader,
 		return "", err
 	}
 	file := response.Content
-	location, err := uploader.UploadFile(os.Getenv("S3_BUCKET_NAME"), file)
+	location, err := uploader.UploadFile(file)
 	if err != nil {
 		return "", err
 	}

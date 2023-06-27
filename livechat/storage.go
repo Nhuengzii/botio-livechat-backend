@@ -10,5 +10,5 @@ type StorageUploader interface {
 	// Return an error if it occurs.
 	//
 	// If implements by s3 storage name should be bucket name
-	UploadFile(storageName string, file io.Reader) (string, error)
+	UploadFile(file io.Reader) (string, error)
 }

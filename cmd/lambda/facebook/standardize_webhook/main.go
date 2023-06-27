@@ -12,6 +12,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -22,6 +23,7 @@ var (
 	errUnknownWebhookType   = errors.New("error! unknown webhook type found")
 	errUnknownWebhookObject = errors.New("error! unknown webhook Object found")
 	errUnknownTemplateType  = errors.New("error! unknown attachment template type")
+	errBadImageURL          = errors.New("error! cannot make provided image URL's GET request")
 )
 
 func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
@@ -56,6 +58,7 @@ func main() {
 		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
 		snsTopicARN       = os.Getenv("SNS_TOPIC_ARN")
 		awsRegion         = os.Getenv("AWS_REGION")
+		s3BucketName      = os.Getenv("S3_BUCKET_NAME")
 	)
 
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
@@ -65,11 +68,18 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
+	uploader := amazons3.NewUploader(awsRegion, s3BucketName)
+	if err != nil {
+		logMessage := "cmd/lambda/facebook/standardize_webhook/main.main: " + err.Error()
+		discord.Log(discordWebhookURL, logMessage)
+		log.Fatalln(logMessage)
+	}
 	c := config{
 		discordWebhookURL: discordWebhookURL,
 		snsTopicARN:       snsTopicARN,
 		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
+		uploader:          *uploader,
 	}
 	if err != nil {
 		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))

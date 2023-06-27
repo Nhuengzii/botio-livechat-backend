@@ -19,9 +19,77 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+# Create S3 bucket for platform
+resource "aws_s3_bucket" "bucket" {
+  bucket = format("botio-livechat-bucket-%s", var.platform)
+}
+
 resource "aws_iam_role" "assume_role_lambda" {
   name               = format("%s_assume_role_lambda", var.platform)
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+data "aws_iam_policy_document" "s3" {
+  statement {
+    actions = [
+      "s3:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.bucket.arn}/*"
+    ]
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_policy" "public_read" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.bucket
+  ]
+  bucket = aws_s3_bucket.bucket.id
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "PublicReadGetObject",
+          "Effect" : "Allow",
+          "Principal" : "*",
+          "Action" : [
+            "s3:GetObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
+          ]
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_s3_bucket_public_access_block" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+
+  block_public_policy = false
+}
+
+resource "aws_iam_policy" "s3" {
+  name   = format("%s_s3", var.platform)
+  policy = data.aws_iam_policy_document.s3.json
+}
+
+resource "aws_iam_policy_attachment" "s3" {
+  name = format("%s_s3", var.platform)
+  roles = [
+    aws_iam_role.assume_role_lambda.name
+  ]
+  policy_arn = aws_iam_policy.s3.arn
 }
 
 # Define Queue
@@ -221,7 +289,8 @@ locals {
       SQS_QUEUE_ARN = aws_sqs_queue.webhook_standardizer.arn
     }
     standardize_webhook = {
-      SNS_TOPIC_ARN = aws_sns_topic.save_and_relay_received_message.arn
+      SNS_TOPIC_ARN  = aws_sns_topic.save_and_relay_received_message.arn
+      S3_BUCKET_NAME = aws_s3_bucket.bucket.id
     }
     get_page_id           = {}
     save_received_message = {}
