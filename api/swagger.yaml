@@ -238,7 +238,6 @@ paths:
           description: "Unauthorized"
         503:
           description: "Service Unavailable"
-  # TODO from here ↓
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -248,25 +247,23 @@ paths:
         By passing in appropriate path parameters, you can list
         all messages of a specific instagram conversation,
       operationId: listInstagramMessages
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
     post:
       tags:
         - instagram
@@ -275,25 +272,19 @@ paths:
         By passing in appropriate path parameters body and query string parameters, 
         you can send an instagram message to a specific instagram conversation,
       operationId: postInstagramMessage
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PostMessage"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
       tags:
@@ -303,20 +294,20 @@ paths:
         By passing in appropriate path parameters, you can list
         all conversations of a specific facebook page,
       operationId: listFacebookConversations
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/line/{page_id}:
     get:
       tags:
@@ -327,20 +318,18 @@ paths:
         a page's line conversation statuses, such as number of
         currently unread conversations
       operationId: getLinePageStatus
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -350,25 +339,23 @@ paths:
         By passing in appropriate path parameters, you can list
         all messages of a specific line conversation,
       operationId: listLineMessages
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
     post:
       tags:
         - line
@@ -377,25 +364,19 @@ paths:
         By passing in appropriate path parameters body and query string parameters, 
         you can send a line message to a specific line conversation,
       operationId: postLineMessage
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PostMessage"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/instagram/{page_id}:
     get:
       tags:
@@ -406,20 +387,18 @@ paths:
         a page's instagram conversation statuses, such as number of
         currently unread conversations
       operationId: getInstagramPageStatus
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
       tags:
@@ -429,20 +408,20 @@ paths:
         By passing in appropriate path parameters, you can list
         all conversations of a specific line page,
       operationId: listLineConversations
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -452,25 +431,19 @@ paths:
         By passing in appropriate path parameters, you can search for
         an instagram conversation of specific shop and page that matches the conversation_id
       operationId: getInstagramConversation
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
     patch:
       tags:
         - instagram
@@ -479,25 +452,19 @@ paths:
         By passing in appropriate path parameters and request body, you can update 
         instagram conversation's fields of specific shop and page that matches the conversation_id,
       operationId: patchInstagramConversation
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -507,25 +474,19 @@ paths:
         By passing in appropriate path parameters, you can search for
         a line conversation of specific shop and page that matches the conversation_id
       operationId: getLineConversation
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
     patch:
       tags:
         - line
@@ -534,26 +495,19 @@ paths:
         By passing in appropriate path parameters and request body, you can update 
         line conversation's fields of specific shop and page that matches the conversation_id,
       operationId: patchLineConversation
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "conversation_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-  # TODO to here ↑
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
 components:
   schemas:
     Message:
