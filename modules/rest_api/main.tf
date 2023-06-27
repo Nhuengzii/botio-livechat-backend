@@ -49,6 +49,9 @@ resource "aws_s3_bucket_ownership_controls" "bucket" {
 }
 
 resource "aws_s3_bucket_policy" "public_read" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.bucket
+  ]
   bucket = aws_s3_bucket.bucket.id
   policy = jsonencode(
     {
