@@ -149,7 +149,6 @@ paths:
           description: "OK"
         503:
           description: "Service Unavailable"
-  # TODO from here ↓
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
@@ -160,20 +159,19 @@ paths:
         a page's facebook conversation statuses, such as number of
         currently unread conversations
       operationId: getFacebookPageStatus
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+  # TODO from here ↓
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
       tags:
@@ -1079,6 +1077,16 @@ components:
       properties:
         url:
           type: string
+    PageStatus:
+      type: object
+      required:
+        - unreadConversations
+        - allConversations
+      properties:
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
   parameters:
     ShopID:
       name: shop_id
