@@ -4,5 +4,7 @@ package livechat
 type MessageQueueClient interface {
 	// SendMessage recieve a message string and send the message into specific message queue.
 	// Return an error if it occurs.
-	SendMessage(queueURL string, message string) error
+	//
+	// If implements by SQS services queueAddress should be queueURL.
+	SendMessage(queueAddress string, message string) error
 }
