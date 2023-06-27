@@ -194,23 +194,17 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
-  # TODO from here ↓
   /shops/{shop_id}/facebook/{page_id}/webhook:
     get:
-      responses:
-        "200":
-          description: successful
       parameters:
-        - name: "shop_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "page_id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        503:
+            description: "Service Unavailable"
+    # TODO from here ↓
     post:
       responses:
         "200":
