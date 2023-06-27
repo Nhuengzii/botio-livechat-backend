@@ -1005,8 +1005,82 @@ components:
             tel:
     FacebookTemplateGeneric:
       type: object
+      required:
+        - title
+        - default_action
+        - oneOf:
+            - message
+            - picture
+            - buttons
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        picture:
+          type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacebookButton"
+        default_action:
+          $ref: "#/components/schemas/FacebookDefaultAction"
+    FacebookButton:
+      type: object
+      required:
+        - url
+        - title
+      properties:
+        url:
+          type: string
+        title:
+            type: string
+    FacebookDefaultAction:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
     InstagramTemplateGeneric:
       type: object
+      required:
+        - title
+        - default_action
+        - oneOf:
+            - message
+            - picture
+            - buttons
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        picture:
+          type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstagramButton"
+        default_action:
+          $ref: "#/components/schemas/InstagramDefaultAction"
+    InstagramButton:
+      type: object
+      required:
+        - url
+        - title
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+    InstagramDefaultAction:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
   parameters:
     ShopID:
       name: shop_id
