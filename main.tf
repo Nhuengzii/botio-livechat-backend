@@ -16,9 +16,19 @@ resource "aws_api_gateway_rest_api" "rest_api" {
 }
 
 module "shops" {
-  source             = "./modules/shop_rest_api"
-  rest_api_id        = aws_api_gateway_rest_api.rest_api.id
-  parent_resource_id = aws_api_gateway_rest_api.rest_api.root_resource_id
+  source                 = "./modules/shop_rest_api"
+  rest_api_id            = aws_api_gateway_rest_api.rest_api.id
+  rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
+  parent_resource_id     = aws_api_gateway_rest_api.rest_api.root_resource_id
+  handlers = {
+    post_shop_id = {
+      handler_name = "post_shop_id"
+      handler_path = format("%s/cmd/lambda/shops/post_shop_id", path.root)
+      environment_variables = {
+        yee = "wwww"
+      }
+    }
+  }
 }
 
 resource "aws_apigatewayv2_api" "botio_livechat_websocket" {
