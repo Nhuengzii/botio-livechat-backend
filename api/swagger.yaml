@@ -567,6 +567,7 @@ paths:
           description: "Internal Server Error"
 components:
   schemas:
+    # core data models
     Message:
       required:
         - shopID
@@ -687,6 +688,7 @@ components:
           type: string
         profilePic:
           $ref: "#/components/schemas/Payload"
+    # response data models
     ConversationArray:
       required:
         - conversations
@@ -719,6 +721,17 @@ components:
       properties:
         message:
           $ref: "#/components/schemas/Message"
+    PageStatus:
+      type: object
+      required:
+        - unreadConversations
+        - allConversations
+      properties:
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
+    # post message attachment
     PostMessageAttachment:
       type: object
       required:
@@ -749,6 +762,7 @@ components:
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+    # line post template message
     PostMessageAttachmentPayloadImage:
       type: object
       required:
@@ -809,20 +823,6 @@ components:
       properties:
         line_template_image_carousel:
           $ref: "#/components/schemas/LineTemplateImageCarousel"
-    PostMessageAttachmentPayloadFacebookTemplateGeneric:
-      type: object
-      required:
-        - fb_template_generic
-      properties:
-        fb_template_generic:
-          $ref: "#/components/schemas/FacebookTemplateGeneric"
-    PostMessageAttachmentPayloadInstagramGeneric:
-      type: object
-      required:
-        - ig_template_generic
-      properties:
-        ig_template_generic:
-          $ref: "#/components/schemas/InstagramTemplateGeneric"
     LineTemplateButtons:
       type: object
       required:
@@ -992,6 +992,15 @@ components:
             http(s)://
             line://
             tel:
+
+    # facebook post template message
+    PostMessageAttachmentPayloadFacebookTemplateGeneric:
+      type: object
+      required:
+        - fb_template_generic
+      properties:
+        fb_template_generic:
+          $ref: "#/components/schemas/FacebookTemplateGeneric"
     FacebookTemplateGeneric:
       type: object
       required:
@@ -1027,6 +1036,14 @@ components:
       properties:
         url:
           type: string
+    # instagram post template message
+    PostMessageAttachmentPayloadInstagramGeneric:
+      type: object
+      required:
+        - ig_template_generic
+      properties:
+        ig_template_generic:
+          $ref: "#/components/schemas/InstagramTemplateGeneric"
     InstagramTemplateGeneric:
       type: object
       required:
@@ -1062,16 +1079,6 @@ components:
       properties:
         url:
           type: string
-    PageStatus:
-      type: object
-      required:
-        - unreadConversations
-        - allConversations
-      properties:
-        unreadConversations:
-          type: integer
-        allConversations:
-          type: integer
   parameters:
     ShopID:
       name: shop_id
