@@ -92,6 +92,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -119,6 +121,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     post:
       tags:
         - facebook
@@ -141,6 +145,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       parameters:
@@ -151,8 +157,8 @@ paths:
           description: "OK"
         401:
           description: "Unauthorized"
-        503:
-          description: "Service Unavailable"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
@@ -175,6 +181,8 @@ paths:
                 $ref: "#/components/schemas/PageStatus"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
       tags:
@@ -198,6 +206,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/webhook:
     get:
       parameters:
@@ -206,8 +216,8 @@ paths:
       responses:
         200:
           description: "OK"
-        503:
-          description: "Service Unavailable"
+        500:
+          description: "Internal Server Error"
     post:
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -217,8 +227,8 @@ paths:
           description: "OK"
         401:
           description: "Unauthorized"
-        503:
-          description: "Service Unavailable"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/webhook:
     get:
       parameters:
@@ -227,8 +237,8 @@ paths:
       responses:
         200:
           description: "OK"
-        503:
-          description: "Service Unavailable"
+        500:
+          description: "Internal Server Error"
     post:
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -238,8 +248,8 @@ paths:
           description: "OK"
         401:
           description: "Unauthorized"
-        503:
-          description: "Service Unavailable"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -266,6 +276,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     post:
       tags:
         - instagram
@@ -287,6 +299,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
       tags:
@@ -310,6 +324,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}:
     get:
       tags:
@@ -332,6 +348,8 @@ paths:
                 $ref: "#/components/schemas/PageStatus"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
@@ -358,6 +376,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     post:
       tags:
         - line
@@ -379,6 +399,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}:
     get:
       tags:
@@ -401,6 +423,8 @@ paths:
                 $ref: "#/components/schemas/PageStatus"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
       tags:
@@ -424,6 +448,8 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -446,6 +472,8 @@ paths:
                 $ref: "#/components/schemas/ConversationWrapper"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     patch:
       tags:
         - instagram
@@ -467,6 +495,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -489,6 +519,8 @@ paths:
                 $ref: "#/components/schemas/ConversationWrapper"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
     patch:
       tags:
         - line
@@ -510,6 +542,8 @@ paths:
           description: "Bad Request"
         404:
           description: "Not Found"
+        500:
+          description: "Internal Server Error"
 components:
   schemas:
     Message:
