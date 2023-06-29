@@ -15,16 +15,10 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   name = "botio_rest_api"
 }
 
-resource "aws_api_gateway_resource" "shops" {
-  rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  parent_id   = aws_api_gateway_rest_api.rest_api.root_resource_id
-  path_part   = "shops"
-}
-
-resource "aws_api_gateway_resource" "shop_id" {
-  rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  parent_id   = aws_api_gateway_resource.shops.id
-  path_part   = "{shop_id}"
+module "shops" {
+  source             = "./modules/shop_rest_api"
+  rest_api_id        = aws_api_gateway_rest_api.rest_api.id
+  parent_resource_id = aws_api_gateway_rest_api.rest_api.root_resource_id
 }
 
 resource "aws_apigatewayv2_api" "botio_livechat_websocket" {
@@ -93,7 +87,7 @@ module "facebook" {
   platform                       = "facebook"
   rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
-  parent_id                      = aws_api_gateway_resource.shop_id.id
+  parent_id                      = module.shops.shop_id_resource_id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
     get_page_id = {
@@ -374,7 +368,7 @@ module "line" {
   platform                       = "line"
   rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
-  parent_id                      = aws_api_gateway_resource.shop_id.id
+  parent_id                      = module.shops.shop_id_resource_id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   handlers = {
     get_page_id = {
@@ -485,7 +479,7 @@ module "line" {
       method  = "GET"
       handler = "get_conversation"
     }
-        patch_conversation = {
+    patch_conversation = {
       method  = "PATCH"
       handler = "patch_conversation"
     }
@@ -504,7 +498,7 @@ module "all_platform_rest_api" {
   source                 = "./modules/all_platform_rest_api"
   rest_api_id            = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
-  parent_id              = aws_api_gateway_resource.shop_id.id
+  parent_id              = module.shops.shop_id_resource_id
   get_conversations_handler = {
     handler_path = format("%s/cmd/lambda/all/get_conversations", path.root)
     handler_name = "all_platform_get_conversations"
