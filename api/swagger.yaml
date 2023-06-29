@@ -14,15 +14,45 @@ servers:
       stage:
         default: "dev"
 tags:
-  - name: all
-    description: Operations that involve all platforms this api supports
   - name: facebook
-    description: Operations that involve facebook platform
+    description: "Operations that involve facebook platform"
   - name: instagram
-    description: Operations that involve instagram platform
+    description: "Operations that involve instagram platform"
   - name: line
-    description: Operations that involve line platform
+    description: "Operations that involve line platform"
+  - name: all
+    description: "Operations that involve all platforms this api supports"
+  - name: webhook
+    description: "Social media platforms endpoints"
 paths:
+  # facebook
+  /shops/{shop_id}/facebook/{page_id}/webhook:
+    get:
+      tags:
+        - facebook
+        - webhook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - facebook
+        - webhook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -70,17 +100,18 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /shops/{shop_id}/all/conversations:
+  /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
       tags:
-        - all
-      summary: list all conversations of a specific shop
+        - facebook
+      summary: list all conversations of a specific facebook page
       description: |
-        By passing in appropriate path parameter shop_id, you can list
-        all conversations of a specific shop that matches the shop_id,
-      operationId: listAllConversations
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific facebook page,
+      operationId: listFacebookConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
       responses:
         200:
           description: "OK"
@@ -147,18 +178,6 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /shops/{shop_id}/line/{page_id}/webhook:
-    post:
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
@@ -179,6 +198,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # instagram
+  /shops/{shop_id}/instagram/{page_id}/webhook:
+    get:
+      tags:
+        - instagram
+        - webhook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - instagram
+        - webhook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
+    get:
+      tags:
+        - instagram
+      summary: get an instagram conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        an instagram conversation of specific shop and page that matches the conversation_id
+      operationId: getInstagramConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - instagram
+      summary: update an instagram conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        instagram conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchInstagramConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
         404:
           description: "Not Found"
         500:
@@ -206,48 +300,6 @@ paths:
           description: "No Content"
         404:
           description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /shops/{shop_id}/facebook/{page_id}/webhook:
-    get:
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-        500:
-          description: "Internal Server Error"
-    post:
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal Server Error"
-  /shops/{shop_id}/instagram/{page_id}/webhook:
-    get:
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-        500:
-          description: "Internal Server Error"
-    post:
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
         500:
           description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
@@ -301,15 +353,102 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /shops/{shop_id}/facebook/{page_id}/conversations:
+  /shops/{shop_id}/instagram/{page_id}:
     get:
       tags:
-        - facebook
-      summary: list all conversations of a specific facebook page
+        - instagram
+      summary: get a specific page's instagram conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's instagram conversation statuses, such as number of
+        currently unread conversations
+      operationId: getInstagramPageStatus
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # line
+  /shops/{shop_id}/line/{page_id}/webhook:
+    post:
+      tags:
+        - line
+        - webhook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
+    get:
+      tags:
+        - line
+      summary: get a line conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        a line conversation of specific shop and page that matches the conversation_id
+      operationId: getLineConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - line
+      summary: update a line conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        line conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchLineConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}/conversations:
+    get:
+      tags:
+        - line
+      summary: list all conversations of a specific line page
       description: |
         By passing in appropriate path parameters, you can list
-        all conversations of a specific facebook page,
-      operationId: listFacebookConversations
+        all conversations of a specific line page,
+      operationId: listLineConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -322,30 +461,6 @@ paths:
                 $ref: "#/components/schemas/ConversationArray"
         204:
           description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /shops/{shop_id}/line/{page_id}:
-    get:
-      tags:
-        - line
-      summary: get a specific page's line conversation statuses
-      description: |
-        By passing in appropriate path parameters, you can get
-        a page's line conversation statuses, such as number of
-        currently unread conversations
-      operationId: getLinePageStatus
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-      responses:
-        200:
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PageStatus"
         404:
           description: "Not Found"
         500:
@@ -401,16 +516,16 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /shops/{shop_id}/instagram/{page_id}:
+  /shops/{shop_id}/line/{page_id}:
     get:
       tags:
-        - instagram
-      summary: get a specific page's instagram conversation statuses
+        - line
+      summary: get a specific page's line conversation statuses
       description: |
         By passing in appropriate path parameters, you can get
-        a page's instagram conversation statuses, such as number of
+        a page's line conversation statuses, such as number of
         currently unread conversations
-      operationId: getInstagramPageStatus
+      operationId: getLinePageStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -425,18 +540,18 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /shops/{shop_id}/line/{page_id}/conversations:
+  # all
+  /shops/{shop_id}/all/conversations:
     get:
       tags:
-        - line
-      summary: list all conversations of a specific line page
+        - all
+      summary: list all conversations of a specific shop
       description: |
-        By passing in appropriate path parameters, you can list
-        all conversations of a specific line page,
-      operationId: listLineConversations
+        By passing in appropriate path parameter shop_id, you can list
+        all conversations of a specific shop that matches the shop_id,
+      operationId: listAllConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
       responses:
         200:
           description: "OK"
@@ -446,100 +561,6 @@ paths:
                 $ref: "#/components/schemas/ConversationArray"
         204:
           description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
-    get:
-      tags:
-        - instagram
-      summary: get an instagram conversation by its conversation_id
-      description: |
-        By passing in appropriate path parameters, you can search for
-        an instagram conversation of specific shop and page that matches the conversation_id
-      operationId: getInstagramConversation
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-      responses:
-        200:
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConversationWrapper"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-    patch:
-      tags:
-        - instagram
-      summary: update an instagram conversation's fields with matching conversation_id
-      description: |
-        By passing in appropriate path parameters and request body, you can update 
-        instagram conversation's fields of specific shop and page that matches the conversation_id,
-      operationId: patchInstagramConversation
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-      requestBody:
-        $ref: "#/components/requestBodies/PatchConversation"
-      responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
-    get:
-      tags:
-        - line
-      summary: get a line conversation by its conversation_id
-      description: |
-        By passing in appropriate path parameters, you can search for
-        a line conversation of specific shop and page that matches the conversation_id
-      operationId: getLineConversation
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-      responses:
-        200:
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConversationWrapper"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-    patch:
-      tags:
-        - line
-      summary: update a line conversation's fields with matching conversation_id
-      description: |
-        By passing in appropriate path parameters and request body, you can update 
-        line conversation's fields of specific shop and page that matches the conversation_id,
-      operationId: patchLineConversation
-      parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-      requestBody:
-        $ref: "#/components/requestBodies/PatchConversation"
-      responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
         404:
           description: "Not Found"
         500:
