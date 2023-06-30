@@ -28,6 +28,13 @@ module "shops" {
         yee = "wwww"
       }
     }
+    get_shop_id = {
+      handler_name = "get_shop_id"
+      handler_path = format("%s/cmd/lambda/shops/get_shop_id", path.root)
+      environment_variables = {
+        yee = "wwww"
+      }
+    }
   }
 }
 
