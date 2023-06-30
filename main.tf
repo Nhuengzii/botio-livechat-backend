@@ -21,9 +21,9 @@ module "shops" {
   rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
   parent_resource_id     = aws_api_gateway_rest_api.rest_api.root_resource_id
   handlers = {
-    post_shop_id = {
-      handler_name = "post_shop_id"
-      handler_path = format("%s/cmd/lambda/shops/post_shop_id", path.root)
+    post_shops = {
+      handler_name = "post_shops"
+      handler_path = format("%s/cmd/lambda/shops/post_shops", path.root)
       environment_variables = {
         yee = "wwww"
       }
