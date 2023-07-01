@@ -21,16 +21,15 @@ tags:
   - name: line
     description: "Operations that involve line platform"
   - name: all
-    description: "Operations that involve all platforms this api supports"
-  - name: webhook
-    description: "Social media platforms endpoints"
+    description: "Operations that involve all platforms"
+  - name: shop
+    description: "Operations that involve shop meta information"
 paths:
   # facebook
   /shops/{shop_id}/facebook/{page_id}/webhook:
     get:
       tags:
         - facebook
-        - webhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -42,7 +41,6 @@ paths:
     post:
       tags:
         - facebook
-        - webhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -207,7 +205,6 @@ paths:
     get:
       tags:
         - instagram
-        - webhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -219,7 +216,6 @@ paths:
     post:
       tags:
         - instagram
-        - webhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -382,7 +378,6 @@ paths:
     post:
       tags:
         - line
-        - webhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -565,9 +560,44 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
+  # shop
+  /shops:
+    post:
+      tags:
+        - shop
+      summary: create a new shop
+      description: create a new shop with the information provided
+      operationId: postShop
+      requestBody:
+        $ref: "#/components/schemas/ShopInfo"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}:
+    get:
+      tags:
+        - shop
+      summary: list platforms of a shop
+      operationId: listShopPlatforms
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopPlatforms"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
 components:
   schemas:
-    # core data models
     Message:
       required:
         - shopID
@@ -688,7 +718,6 @@ components:
           type: string
         profilePic:
           $ref: "#/components/schemas/Payload"
-    # response data models
     ConversationArray:
       required:
         - conversations
@@ -731,6 +760,66 @@ components:
           type: integer
         allConversations:
           type: integer
+    ShopInfo:
+      type: object
+      required:
+        - shopID
+      properties:
+        shopID:
+          type: string
+        facebookPageID:
+          type: string
+        facebookAuthentication:
+          $ref: "#/components/schemas/FacebookAuthentication"
+        instagramPageID:
+          type: string
+        instagramAuthentication:
+          $ref: "#/components/schemas/InstagramAuthentication"
+        linePageID:
+          type: string
+        lineAuthentication:
+          $ref: "#/components/schemas/LineAuthentication"
+    ShopPlatforms:
+      type: object
+      properties:
+        available_pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformPageID"
+    PlatformPageID:
+      type: object
+      required:
+        - platform_name
+        - page_id
+      properties:
+        platform_name:
+          type: string
+        page_id:
+          type: string
+    FacebookAuthentication:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+    InstagramAuthentication:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+    LineAuthentication:
+      type: object
+      required:
+        - accessToken
+        - secret
+      properties:
+        accessToken:
+          type: string
+        secret:
+          type: string
     # post message attachment
     PostMessageAttachment:
       type: object
@@ -762,7 +851,7 @@ components:
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
-    # line post template message
+    # common attachment types
     PostMessageAttachmentPayloadImage:
       type: object
       required:
@@ -795,6 +884,7 @@ components:
         src:
           type: string
           description: "URL of the file"
+    # line post template message
     PostMessageAttachmentPayloadLineTemplateButtons:
       type: object
       required:
