@@ -11,18 +11,19 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
-resource "aws_api_gateway_rest_api" "rest_api" {
-  name = "botio_rest_api"
+module "rest_api" {
+  source        = "./modules/root_rest_api"
+  rest_api_name = "botio_livechat_rest_api"
 }
 
 resource "aws_api_gateway_resource" "shops" {
-  rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  parent_id   = aws_api_gateway_rest_api.rest_api.root_resource_id
+  rest_api_id = module.rest_api.id
+  parent_id   = module.rest_api.root_resource_id
   path_part   = "shops"
 }
 
 resource "aws_api_gateway_resource" "shop_id" {
-  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  rest_api_id = module.rest_api.id
   parent_id   = aws_api_gateway_resource.shops.id
   path_part   = "{shop_id}"
 }
@@ -65,7 +66,7 @@ module "websocket_api" {
 }
 
 resource "aws_api_gateway_deployment" "rest_api" {
-  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  rest_api_id = module.rest_api.id
   lifecycle {
     create_before_destroy = true
   }
@@ -76,14 +77,14 @@ resource "aws_api_gateway_deployment" "rest_api" {
 }
 
 resource "aws_api_gateway_stage" "dev" {
-  rest_api_id   = aws_api_gateway_rest_api.rest_api.id
+  rest_api_id   = module.rest_api.id
   deployment_id = aws_api_gateway_deployment.rest_api.id
   stage_name    = "dev"
 }
 
 output "rest_api" {
   value = {
-    id = aws_api_gateway_rest_api.rest_api.id
+    id = module.rest_api.id
   }
 }
 
@@ -96,8 +97,8 @@ output "websocket_api" {
 module "facebook" {
   source                         = "./modules/platform_rest_api"
   platform                       = "facebook"
-  rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
-  rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
+  rest_api_id                    = module.rest_api.id
+  rest_api_execution_arn         = module.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   bucket_name                    = module.bucket.bucket_name
@@ -238,8 +239,8 @@ module "facebook" {
 module "instagram" {
   source                         = "./modules/platform_rest_api"
   platform                       = "instagram"
-  rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
-  rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
+  rest_api_id                    = module.rest_api.id
+  rest_api_execution_arn         = module.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   bucket_arn                     = module.bucket.bucket_arn
@@ -381,8 +382,8 @@ module "instagram" {
 module "line" {
   source                         = "./modules/platform_rest_api"
   platform                       = "line"
-  rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
-  rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
+  rest_api_id                    = module.rest_api.id
+  rest_api_execution_arn         = module.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   bucket_name                    = module.bucket.bucket_name
@@ -513,8 +514,8 @@ module "line" {
 
 module "all_platform_rest_api" {
   source                 = "./modules/all_platform_rest_api"
-  rest_api_id            = aws_api_gateway_rest_api.rest_api.id
-  rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
+  rest_api_id            = module.rest_api.id
+  rest_api_execution_arn = module.rest_api.execution_arn
   parent_id              = aws_api_gateway_resource.shop_id.id
   get_conversations_handler = {
     handler_path = format("%s/cmd/lambda/all/get_conversations", path.root)
