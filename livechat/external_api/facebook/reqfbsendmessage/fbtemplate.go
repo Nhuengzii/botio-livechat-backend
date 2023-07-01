@@ -20,6 +20,7 @@ type Button struct {
 	Title string `json:"title"` // title of the button will be show as a text on the button
 }
 
+// Interface for various facebook templates
 type Template interface {
 	Template()
 }
