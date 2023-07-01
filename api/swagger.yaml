@@ -1,0 +1,1247 @@
+openapi: "3.0.1"
+info:
+  title: "Botio Live Chat API"
+  description: "This is an API for Botio livechat system."
+  version: "1.0.0"
+  contact:
+    email: "admin@botio.io"
+servers:
+  # id is subject to change
+  - url: "https://{id}.execute-api.ap-southeast-1.amazonaws.com/{stage}"
+    variables:
+      id:
+        default: "oq0hx8j60a"
+      stage:
+        default: "dev"
+tags:
+  - name: facebook
+    description: "Operations that involve facebook platform"
+  - name: instagram
+    description: "Operations that involve instagram platform"
+  - name: line
+    description: "Operations that involve line platform"
+  - name: all
+    description: "Operations that involve all platforms"
+  - name: shop
+    description: "Operations that involve shop meta information"
+  - name: root
+    description: "Top-level operations"
+paths:
+  # facebook
+  /shops/{shop_id}/facebook/{page_id}/webhook:
+    get:
+      tags:
+        - facebook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - facebook
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
+    get:
+      tags:
+        - facebook
+      summary: get a facebook conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        a facebook conversation of specific shop and page that matches the conversation_id
+      operationId: getFacebookConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - facebook
+      summary: update a facebook conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        facebook conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchFacebookConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/facebook/{page_id}/conversations:
+    get:
+      tags:
+        - facebook
+      summary: list all conversations of a specific facebook page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific facebook page,
+      operationId: listFacebookConversations
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      tags:
+        - facebook
+      summary: list all messages in a specific facebook conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific conversation,
+        the conversation has to be a facebook conversation
+      operationId: listFacebookMessages
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - facebook
+      summary: send a facebook message to specific conversation
+      description: |
+        By passing in appropriate path parameters request body and query string parameter
+        , you can send a facebook message to a specific conversation,
+        the target conversation has to be a facebook conversation
+      operationId: postFacebookMessage
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PostMessage"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/facebook/{page_id}:
+    get:
+      tags:
+        - facebook
+      summary: get a specific page's facebook conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's facebook conversation statuses, such as number of
+        currently unread conversations
+      operationId: getFacebookPageStatus
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # instagram
+  /shops/{shop_id}/instagram/{page_id}/webhook:
+    get:
+      tags:
+        - instagram
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - instagram
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
+    get:
+      tags:
+        - instagram
+      summary: get an instagram conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        an instagram conversation of specific shop and page that matches the conversation_id
+      operationId: getInstagramConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - instagram
+      summary: update an instagram conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        instagram conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchInstagramConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/instagram/{page_id}/conversations:
+    get:
+      tags:
+        - instagram
+      summary: list all conversations of a specific instagram page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific instagram page,
+      operationId: listInstagramConversations
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      tags:
+        - instagram
+      summary: list all messages in a specific instagram conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific instagram conversation,
+      operationId: listInstagramMessages
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - instagram
+      summary: send an instagram message to specific instagram conversation
+      description: |
+        By passing in appropriate path parameters body and query string parameters, 
+        you can send an instagram message to a specific instagram conversation,
+      operationId: postInstagramMessage
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PostMessage"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/instagram/{page_id}:
+    get:
+      tags:
+        - instagram
+      summary: get a specific page's instagram conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's instagram conversation statuses, such as number of
+        currently unread conversations
+      operationId: getInstagramPageStatus
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # line
+  /shops/{shop_id}/line/{page_id}/webhook:
+    post:
+      tags:
+        - line
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
+    get:
+      tags:
+        - line
+      summary: get a line conversation by its conversation_id
+      description: |
+        By passing in appropriate path parameters, you can search for
+        a line conversation of specific shop and page that matches the conversation_id
+      operationId: getLineConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWrapper"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - line
+      summary: update a line conversation's fields with matching conversation_id
+      description: |
+        By passing in appropriate path parameters and request body, you can update 
+        line conversation's fields of specific shop and page that matches the conversation_id,
+      operationId: patchLineConversation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchConversation"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}/conversations:
+    get:
+      tags:
+        - line
+      summary: list all conversations of a specific line page
+      description: |
+        By passing in appropriate path parameters, you can list
+        all conversations of a specific line page,
+      operationId: listLineConversations
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
+    get:
+      tags:
+        - line
+      summary: list all messages in a specific line conversation
+      description: |
+        By passing in appropriate path parameters, you can list
+        all messages of a specific line conversation,
+      operationId: listLineMessages
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - line
+      summary: send a line message to specific line conversation
+      description: |
+        By passing in appropriate path parameters body and query string parameters, 
+        you can send a line message to a specific line conversation,
+      operationId: postLineMessage
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/ConversationID"
+      requestBody:
+        $ref: "#/components/requestBodies/PostMessage"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}/line/{page_id}:
+    get:
+      tags:
+        - line
+      summary: get a specific page's line conversation statuses
+      description: |
+        By passing in appropriate path parameters, you can get
+        a page's line conversation statuses, such as number of
+        currently unread conversations
+      operationId: getLinePageStatus
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/PageID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageStatus"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # all
+  /shops/{shop_id}/all/conversations:
+    get:
+      tags:
+        - all
+      summary: list all conversations of a specific shop
+      description: |
+        By passing in appropriate path parameter shop_id, you can list
+        all conversations of a specific shop that matches the shop_id,
+      operationId: listAllConversations
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationArray"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # shop
+  /shops:
+    post:
+      tags:
+        - shop
+      summary: create a new shop
+      description: create a new shop with the information provided
+      operationId: postShop
+      requestBody:
+        $ref: "#/components/schemas/Shop"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+  /shops/{shop_id}:
+    get:
+      tags:
+        - shop
+      summary: list platforms of a shop
+      operationId: listShopPlatforms
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopPlatforms"
+        204:
+          description: "No Content"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  # root
+  /upload_url:
+    get:
+      tags:
+        - root
+      summary: get a presigned url for uploading to s3
+      operationId: getS3PresignedUploadURL
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresignedURL"
+        500:
+          description: "Internal Server Error"
+components:
+  schemas:
+    Message:
+      required:
+        - shopID
+        - platform
+        - pageID
+        - conversationID
+        - messageID
+        - timestamp
+        - source
+        - message
+        - attachments
+        - isDeleted
+      type: object
+      properties:
+        shopID:
+          type: string
+        platform:
+          type: string
+        pageID:
+          type: string
+        conversationID:
+          type: string
+        messageID:
+          type: string
+        timestamp:
+          type: integer
+          format: int64
+        source:
+          $ref: "#/components/schemas/Source"
+        message:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        replyTo:
+          $ref: "#/components/schemas/RepliedMessage"
+        isDeleted:
+          type: boolean
+    Source:
+      required:
+        - userID
+        - userType
+      type: object
+      properties:
+        userID:
+          type: string
+        userType:
+          type: string
+    Attachment:
+      required:
+        - attachmentType
+        - payload
+      type: object
+      properties:
+        attachmentType:
+          type: string
+        payload:
+          $ref: "#/components/schemas/Payload"
+    Payload:
+      required:
+        - src
+      type: object
+      properties:
+        src:
+          type: string
+    RepliedMessage:
+      required:
+        - messageID
+      type: object
+      properties:
+        messageID:
+          type: string
+    Conversation:
+      required:
+        - shopID
+        - platform
+        - pageID
+        - conversationID
+        - conversationPic
+        - updatedTime
+        - participants
+        - lastActivity
+        - unread
+      type: object
+      properties:
+        shopID:
+          type: string
+        platform:
+          type: string
+        pageID:
+          type: string
+        conversationID:
+          type: string
+        conversationPic:
+          $ref: "#/components/schemas/Payload"
+        updatedTime:
+          type: integer
+          format: int64
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/Participant"
+        lastActivity:
+          type: string
+        unread:
+          type: integer
+    Participant:
+      required:
+        - userID
+        - username
+        - profilePic
+      type: object
+      properties:
+        userID:
+          type: string
+        username:
+          type: string
+        profilePic:
+          $ref: "#/components/schemas/Payload"
+    ConversationArray:
+      required:
+        - conversations
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Conversation"
+    MessageArray:
+      required:
+        - messages
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+    ConversationWrapper:
+      required:
+        - conversation
+      type: object
+      properties:
+        conversation:
+          $ref: "#/components/schemas/Conversation"
+    MessageWrapper:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          $ref: "#/components/schemas/Message"
+    PageStatus:
+      type: object
+      required:
+        - unreadConversations
+        - allConversations
+      properties:
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
+    Shop:
+      type: object
+      required:
+        - shopID
+      properties:
+        shopID:
+          type: string
+        facebookPageID:
+          type: string
+        facebookAuthentication:
+          $ref: "#/components/schemas/FacebookAuthentication"
+        instagramPageID:
+          type: string
+        instagramAuthentication:
+          $ref: "#/components/schemas/InstagramAuthentication"
+        linePageID:
+          type: string
+        lineAuthentication:
+          $ref: "#/components/schemas/LineAuthentication"
+    ShopPlatforms:
+      type: object
+      properties:
+        available_pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformPageID"
+    PlatformPageID:
+      type: object
+      required:
+        - platform_name
+        - page_id
+      properties:
+        platform_name:
+          type: string
+        page_id:
+          type: string
+    FacebookAuthentication:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+    InstagramAuthentication:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+    LineAuthentication:
+      type: object
+      required:
+        - accessToken
+        - secret
+      properties:
+        accessToken:
+          type: string
+        secret:
+          type: string
+    PresignedURL:
+      type: object
+      required:
+        - presignedURL
+      properties:
+        presignedURL:
+          type: string
+    # post message attachment
+    PostMessageAttachment:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+            - "file"
+            - "line-template-buttons"
+            - "line-template-confirm"
+            - "line-template-carousel"
+            - "line-template-image-carousel"
+            - "facebook-template-generic"
+        payload:
+          oneOf:
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+    # common attachment types
+    PostMessageAttachmentPayloadImage:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the image"
+    PostMessageAttachmentPayloadVideo:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the video"
+    PostMessageAttachmentPayloadAudio:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the audio"
+    PostMessageAttachmentPayloadFile:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: "URL of the file"
+    # line post template message
+    PostMessageAttachmentPayloadLineTemplateButtons:
+      type: object
+      required:
+        - line_template_buttons
+      properties:
+        line_template_buttons:
+          $ref: "#/components/schemas/LineTemplateButtons"
+    PostMessageAttachmentPayloadLineTemplateConfirm:
+      type: object
+      required:
+        - line_template_confirm
+      properties:
+        line_template_confirm:
+          $ref: "#/components/schemas/LineTemplateConfirm"
+    PostMessageAttachmentPayloadLineTemplateCarousel:
+      type: object
+      required:
+        - line_template_carousel
+      properties:
+        line_template_carousel:
+          $ref: "#/components/schemas/LineTemplateCarousel"
+    PostMessageAttachmentPayloadLineTemplateImageCarousel:
+      type: object
+      required:
+        - line_template_image_carousel
+      properties:
+        line_template_image_carousel:
+          $ref: "#/components/schemas/LineTemplateImageCarousel"
+    LineTemplateButtons:
+      type: object
+      required:
+        - altText
+        - text
+        - actions
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        thumbnailImageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1:1
+            Max width: 1024px
+            Max file size: 10 MB
+        text:
+          type: string
+          description: |
+            Text displayed in the template
+            Max character limit: 160 (no image or title)
+            Max character limit: 60 (message with an image or title)
+        defaultAction:
+          $ref: "#/components/schemas/LineTemplateAction"
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            Max objects: 4
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateConfirm:
+      type: object
+      required:
+        - altText
+        - text
+        - actions
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        text:
+          type: string
+          description: |
+            Text displayed in the template
+            Max character limit: 240
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            2 objects only
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateCarousel:
+      type: object
+      required:
+        - altText
+        - columns
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        columns:
+          type: array
+          description: |
+            Array of columns
+            Max objects: 10
+          items:
+            $ref: "#/components/schemas/LineTemplateCarouselColumn"
+    LineTemplateCarouselColumn:
+      type: object
+      required:
+        - text
+        - actions
+      properties:
+        thumbnailImageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1.51:1 (width:height)
+            Max width: 1024px
+            Max file size: 10 MB
+        title:
+          type: string
+          description: |
+            Title
+            Max character limit: 40
+        text:
+          type: string
+          description: |
+            Message text
+            Max character limit: 120 (no image or title)
+            Max character limit: 60 (message with an image or title)
+        defaultAction:
+          $ref: "#/components/schemas/LineTemplateAction"
+        actions:
+          type: array
+          description: |
+            Action when tapped
+            Max objects: 3
+          items:
+            $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateImageCarousel:
+      type: object
+      required:
+        - altText
+        - columns
+      properties:
+        altText:
+          type: string
+          description: |
+            Text displayed in notification and chat list of the recipient
+            Max character limit: 400
+        columns:
+          type: array
+          description: |
+            Array of columns
+            Max objects: 10
+          items:
+            $ref: "#/components/schemas/LineTemplateImageCarouselColumn"
+    LineTemplateImageCarouselColumn:
+      type: object
+      required:
+        - imageUrl
+        - action
+      properties:
+        imageUrl:
+          type: string
+          description: |
+            Image URL
+            Max character limit: 2000
+            HTTPS overTLS 1.2 or later
+            JPEG or PNG
+            Aspect ratio: 1:1
+            Max width: 1024px
+            Max file size: 10 MB
+        action:
+          $ref: "#/components/schemas/LineTemplateAction"
+    LineTemplateAction:
+      type: object
+      required:
+        - uri
+      properties:
+        label:
+          type: string
+          description: |
+            Label for the action
+            Max character limit: 12 (Image carousel template)
+            Max character limit: 20 (Other than image carousel)
+        uri:
+          type: string
+          description: |
+            URI opened when the action is performed (Max character limit: 1000)
+            http(s)://
+            line://
+            tel:
+
+    # facebook post template message
+    PostMessageAttachmentPayloadFacebookTemplateGeneric:
+      type: object
+      required:
+        - fb_template_generic
+      properties:
+        fb_template_generic:
+          $ref: "#/components/schemas/FacebookTemplateGeneric"
+    FacebookTemplateGeneric:
+      type: object
+      required:
+        - title
+        - default_action
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        picture:
+          type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacebookButton"
+        default_action:
+          $ref: "#/components/schemas/FacebookDefaultAction"
+    FacebookButton:
+      type: object
+      required:
+        - url
+        - title
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+    FacebookDefaultAction:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+    # instagram post template message
+    PostMessageAttachmentPayloadInstagramGeneric:
+      type: object
+      required:
+        - ig_template_generic
+      properties:
+        ig_template_generic:
+          $ref: "#/components/schemas/InstagramTemplateGeneric"
+    InstagramTemplateGeneric:
+      type: object
+      required:
+        - title
+        - default_action
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        picture:
+          type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstagramButton"
+        default_action:
+          $ref: "#/components/schemas/InstagramDefaultAction"
+    InstagramButton:
+      type: object
+      required:
+        - url
+        - title
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+    InstagramDefaultAction:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+  parameters:
+    ShopID:
+      name: shop_id
+      in: path
+      required: true
+      schema:
+        type: string
+    PageID:
+      name: page_id
+      in: path
+      required: true
+      schema:
+        type: string
+    ConversationID:
+      name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+    Skip:
+      name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+  requestBodies:
+    PatchConversation:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              unread:
+                type: integer
+    PostMessage:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: "text message"
+                properties:
+                  message:
+                    type: string
+              - $ref: "#/components/schemas/PostMessageAttachment"
