@@ -20,11 +20,11 @@ type FBDefaultAction struct {
 //
 // multiple buttons will align as a row
 type FBTemplateGeneric struct {
-	Title         string          `json:"title"`          // title of the template
-	Message       string          `json:"message"`        // text message on the template
-	Picture       string          `json:"picture"`        // image show on the template
-	Button        []FBButton      `json:"buttons"`        // buttons shows on the template, maximum 3 buttons allow for a template
-	DefaultAction FBDefaultAction `json:"default_action"` // the default action of the template
+	Title         string           `json:"title"`                    // title of the template
+	Message       string           `json:"message,omitempty"`        // text message on the template
+	Picture       string           `json:"picture,omitempty"`        // image show on the template
+	Button        []FBButton       `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
+	DefaultAction *FBDefaultAction `json:"default_action,omitempty"` // the default action of the template
 }
 
 type FBTemplateButton struct{}
