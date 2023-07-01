@@ -55,7 +55,7 @@ module "shops" {
 
 module "bucket" {
   source      = "./modules/bucket"
-  bucket_name = "botio-livechat-bucket"
+  bucket_name = var.s3_bucket_name
 }
 
 resource "aws_api_gateway_deployment" "rest_api" {
