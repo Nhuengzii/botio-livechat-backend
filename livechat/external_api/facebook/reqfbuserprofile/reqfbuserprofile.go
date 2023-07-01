@@ -1,4 +1,4 @@
-// Package reqfbuserprofile implement a function to call facebook api request for a UserProfile information.
+// Package reqfbuserprofile implement a function to call graph api request for a UserProfile information.
 //
 // # Uses Graph API v16.0
 package reqfbuserprofile
@@ -18,7 +18,7 @@ type UserProfile struct {
 	Gender     string `json:"gender"`      // gender of the user
 }
 
-// GetUserProfile makes a faceook API call and returns a UserProfile of facebook specific facebook's user,If there is a user with matching PSID.
+// GetUserProfile makes a graph API call and returns a UserProfile of facebook specific facebook's user,If there is a user with matching PSID.
 // Only return the user of a specific page.
 // Return an error if it occurs.
 //

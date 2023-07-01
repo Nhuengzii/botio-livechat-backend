@@ -1,3 +1,6 @@
+// Package reqiguserprofile implement a function to call graph api request for a UserProfile information.
+//
+// # Uses Graph API v16.0
 package reqiguserprofile
 
 import (
@@ -6,11 +9,17 @@ import (
 	"net/http"
 )
 
+// A UserProfile contains information about specific instagram user.
 type UserProfile struct {
-	Name       string `json:"name"`
-	ProfilePic string `json:"profile_pic"`
+	Name       string `json:"name"`        // name of the user. It is the firstname combines with the lastname
+	ProfilePic string `json:"profile_pic"` // profile picture of the user contains a URL to that picture
 }
 
+// GetUserProfile makes a graph API call and returns a UserProfile of instagram specific instagram's user,If there is a user with matching IGSID.
+// Only return the user of a specific page.
+// Return an error if it occurs.
+//
+// Use instagram page accessToken.
 func GetUserProfile(accessToken string, psid string) (_ *UserProfile, err error) {
 	defer func() {
 		if err != nil {
