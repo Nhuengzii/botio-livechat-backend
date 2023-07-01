@@ -2,6 +2,7 @@ package livechat
 
 import (
 	"context"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -192,4 +193,9 @@ type DBClient interface {
 	// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
 	// otherwise returns error.
 	CheckShopExists(ctx context.Context, shopID string) error
+
+	// ListShopPlatforms returns a slice of all shop's platforms and corresponding pageID.
+	// If the operation is successful, a slice will be returned and err will be nil,
+	// otherwise nil, nil are returned
+	ListShopPlatforms(ctx context.Context, shopID string) (_ []getshop.Platform, err error)
 }

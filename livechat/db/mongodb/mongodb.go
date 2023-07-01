@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 	"strings"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
@@ -910,7 +911,7 @@ func (c *Client) GetPage(ctx context.Context, shopID string, platform stdconvers
 // InsertShop creates a document in the mongodb "shops" collection with the information provided .
 // It returns nil if the operation is successful, otherwise returns error.
 func (c *Client) InsertShop(ctx context.Context, shop shops.Shop) error {
-	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	_, err := coll.InsertOne(ctx, shop)
 	if err != nil {
 		return fmt.Errorf("mongodb.Client.InsertShop: %w", err)
@@ -920,17 +921,65 @@ func (c *Client) InsertShop(ctx context.Context, shop shops.Shop) error {
 
 // CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
 // otherwise returns error.
-func (c *Client) CheckShopExists(ctx context.Context, shopID string) error {
+func (c *Client) CheckShopExists(ctx context.Context, shopID string) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.CheckShopExists: %w", err)
+		}
+	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 	}
-	err := coll.FindOne(ctx, filter).Err()
+	err = coll.FindOne(ctx, filter).Err()
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("mongodb.Client.CheckShopExists %w", ErrNoDocuments)
+			return ErrNoDocuments
 		}
 		return err
 	}
 	return nil
+}
+
+// ListShopPlatforms returns a slice of all shop's platforms and corresponding pageID.
+// If the operation is successful, a slice will be returned and err will be nil,
+// otherwise nil, nil are returned
+func (c *Client) ListShopPlatforms(ctx context.Context, shopID string) (_ []getshop.Platform, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.ListShopPlatforms: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	shop := shops.Shop{}
+	err = coll.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	result := []getshop.Platform{}
+	if shop.FacebookPageID != "" {
+		result = append(result, getshop.Platform{
+			PlatformName: shops.PlatformFacebook,
+			PageID:       shop.FacebookPageID,
+		})
+	}
+	if shop.InstagramPageID != "" {
+		result = append(result, getshop.Platform{
+			PlatformName: shops.PlatformInstagram,
+			PageID:       shop.InstagramPageID,
+		})
+	}
+	if shop.LinePageID != "" {
+		result = append(result, getshop.Platform{
+			PlatformName: shops.PlatformLine,
+			PageID:       shop.LinePageID,
+		})
+	}
+	return result, nil
 }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
@@ -21,8 +23,17 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+	pathParameters := req.PathParameters
+	shopID := pathParameters["shop_id"]
+	availablePages, err := c.dbClient.ListShopPlatforms(ctx, shopID)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+	response := getshop.Response{
+		AvailablePages: availablePages,
+	}
+	responseJSON, err := json.Marshal(response)
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {

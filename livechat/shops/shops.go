@@ -26,3 +26,11 @@ type LineAuthentication struct {
 type InstagramAuthentication struct {
 	AccessToken string `bson:"accessToken"` // instagram's page access token
 }
+
+type Platform string
+
+const (
+	PlatformFacebook  Platform = "facebook"
+	PlatformInstagram Platform = "instagram"
+	PlatformLine      Platform = "line"
+)
