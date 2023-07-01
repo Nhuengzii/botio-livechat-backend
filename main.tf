@@ -94,7 +94,7 @@ output "websocket_api" {
 }
 
 module "facebook" {
-  source                         = "./modules/rest_api"
+  source                         = "./modules/platform_rest_api"
   platform                       = "facebook"
   rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
@@ -236,7 +236,7 @@ module "facebook" {
 }
 
 module "instagram" {
-  source                         = "./modules/rest_api"
+  source                         = "./modules/platform_rest_api"
   platform                       = "instagram"
   rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
@@ -379,14 +379,14 @@ module "instagram" {
 }
 
 module "line" {
-  source                         = "./modules/rest_api"
+  source                         = "./modules/platform_rest_api"
   platform                       = "line"
   rest_api_id                    = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
-  bucket_name = module.bucket.bucket_name
-  bucket_arn = module.bucket.bucket_arn
+  bucket_name                    = module.bucket.bucket_name
+  bucket_arn                     = module.bucket.bucket_arn
   handlers = {
     get_page_id = {
       handler_name = "line_get_page_id"
