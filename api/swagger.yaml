@@ -24,6 +24,8 @@ tags:
     description: "Operations that involve all platforms"
   - name: shop
     description: "Operations that involve shop meta information"
+  - name: root
+    description: "Top-level operations"
 paths:
   # facebook
   /shops/{shop_id}/facebook/{page_id}/webhook:
@@ -596,6 +598,22 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
+  # root
+  /upload_url:
+    get:
+      tags:
+        - root
+      summary: get a presigned url for uploading to s3
+      operationId: getS3PresignedUploadURL
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresignedURL"
+        500:
+          description: "Internal Server Error"
 components:
   schemas:
     Message:
@@ -819,6 +837,13 @@ components:
         accessToken:
           type: string
         secret:
+          type: string
+    PresignedURL:
+      type: object
+      required:
+        - presignedURL
+      properties:
+        presignedURL:
           type: string
     # post message attachment
     PostMessageAttachment:
