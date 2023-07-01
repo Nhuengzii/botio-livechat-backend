@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "assume_role_lambda" {
-  name               = format("%s_assume_role_lambda", var.platform)
+  name               = "assume_role_lambda_for_root_handler"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -52,6 +52,6 @@ module "get_upload_url" {
   resource_path          = aws_api_gateway_resource.upload_url.path
   rest_api_id            = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
-  lambda_invoke_arn      = module.get_upload_url_handler.lambda_invoke_arn
-  lambda_function_name   = module.get_upload_url_handler.lambda_function_name
+  lambda_invoke_arn      = module.get_upload_url_handler.lambda.lambda_invoke_arn
+  lambda_function_name   = module.get_upload_url_handler.lambda.function_name
 }
