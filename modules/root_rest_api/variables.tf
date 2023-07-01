@@ -11,3 +11,6 @@ variable "get_upload_url_handler" {
   })
 }
 
+variable "s3_bucket_arn" {
+  type = string
+}

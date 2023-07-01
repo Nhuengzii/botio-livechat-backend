@@ -33,6 +33,31 @@ resource "aws_iam_role" "assume_role_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
+data "aws_iam_policy_document" "s3" {
+  statement {
+    actions = [
+      "s3:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "${var.bucket_arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "s3" {
+  name   = format("%s_s3", var.platform)
+  policy = data.aws_iam_policy_document.s3.json
+}
+
+resource "aws_iam_policy_attachment" "s3" {
+  name = format("%s_s3", var.platform)
+  roles = [
+    aws_iam_role.assume_role_lambda.name
+  ]
+  policy_arn = aws_iam_policy.s3.arn
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role_lambda" {
   role       = aws_iam_role.assume_role_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

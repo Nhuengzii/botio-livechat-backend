@@ -12,15 +12,17 @@ provider "aws" {
 }
 
 module "rest_api" {
-  source        = "./modules/root_rest_api"
-  rest_api_name = "botio_livechat_rest_api"
+  source         = "./modules/root_rest_api"
+  rest_api_name  = "botio_livechat_rest_api"
+  s3_bucket_name = module.bucket.bucket_name
+  s3_bucket_arn  = module.bucket.bucket_arn
   get_upload_url_handler = {
     handler_name = "get_upload_url"
     handler_path = format("%s/cmd/lambda/root/get_upload_url", path.root)
     dependencies = ""
     environment_variables = {
       DISCORD_WEBHOOK_URL = var.discord_webhook_url
-      S3_BUCKET_NAME = module.bucket.bucket_name
+      S3_BUCKET_NAME      = module.bucket.bucket_name
     }
   }
 }
