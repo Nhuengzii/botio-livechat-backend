@@ -20,11 +20,11 @@ type IGDefaultAction struct {
 //
 // multiple buttons will align as a row
 type IGTemplateGeneric struct {
-	Title         string          `json:"title"`                    // title of the template
-	Message       string          `json:"message,omitempty"`        // text message on the template
-	Picture       string          `json:"picture,omitempty"`        // image show on the template
-	Button        []IGButton      `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
-	DefaultAction IGDefaultAction `json:"default_action,omitempty"` // the default action of the template
+	Title         string           `json:"title"`                    // title of the template
+	Message       string           `json:"message,omitempty"`        // text message on the template
+	Picture       string           `json:"picture,omitempty"`        // image show on the template
+	Button        []IGButton       `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
+	DefaultAction *IGDefaultAction `json:"default_action,omitempty"` // the default action of the template
 }
 
 type IGTemplateButton struct{}

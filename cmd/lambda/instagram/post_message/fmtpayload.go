@@ -29,15 +29,20 @@ func fmtGenericTemplatePayload(payload postmessage.Payload) (*reqigsendmessage.A
 				Title: button.Title,
 			})
 		}
-		genericTemplate = append(genericTemplate, reqigsendmessage.GenericTemplate{
-			Title:    element.Title,
-			Subtitle: element.Message,
-			DefaultAction: reqigsendmessage.DefaultAction{
+
+		var defaultAction *reqigsendmessage.DefaultAction
+		if element.DefaultAction != nil {
+			defaultAction = &reqigsendmessage.DefaultAction{
 				Type: templateButtonURLType,
 				URL:  element.DefaultAction.URL,
-			},
-			Buttons:  buttons,
-			ImageURL: element.Picture,
+			}
+		}
+		genericTemplate = append(genericTemplate, reqigsendmessage.GenericTemplate{
+			Title:         element.Title,
+			Subtitle:      element.Message,
+			DefaultAction: defaultAction,
+			Buttons:       buttons,
+			ImageURL:      element.Picture,
 		})
 	}
 	return &reqigsendmessage.AttachmentInstagramPayload{
