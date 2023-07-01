@@ -569,7 +569,7 @@ paths:
       description: create a new shop with the information provided
       operationId: postShop
       requestBody:
-        $ref: "#/components/schemas/ShopInfo"
+        $ref: "#/components/schemas/Shop"
       responses:
         200:
           description: "OK"
@@ -760,7 +760,7 @@ components:
           type: integer
         allConversations:
           type: integer
-    ShopInfo:
+    Shop:
       type: object
       required:
         - shopID
