@@ -485,7 +485,7 @@ module "line" {
       method  = "GET"
       handler = "get_conversation"
     }
-        patch_conversation = {
+    patch_conversation = {
       method  = "PATCH"
       handler = "patch_conversation"
     }
@@ -508,6 +508,16 @@ module "all_platform_rest_api" {
   get_conversations_handler = {
     handler_path = format("%s/cmd/lambda/all/get_conversations", path.root)
     handler_name = "all_platform_get_conversations"
+    environment_variables = {
+      DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      MONGODB_URI         = var.mongo_uri
+      MONGODB_DATABASE    = var.mongo_database
+    },
+    dependencies = "{discord,db,stdconversation,stdmessage}/**/*.go"
+  }
+  get_all = {
+    handler_path = format("%s/cmd/lambda/all/get_all", path.root)
+    handler_name = "all_platform_get_all"
     environment_variables = {
       DISCORD_WEBHOOK_URL = var.discord_webhook_url
       MONGODB_URI         = var.mongo_uri
