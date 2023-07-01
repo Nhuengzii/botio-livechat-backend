@@ -906,3 +906,31 @@ func (c *Client) GetPage(ctx context.Context, shopID string, platform stdconvers
 
 	return unreadConversations, allConversations, nil
 }
+
+// InsertShop creates a document in the mongodb "shops" collection with the information provided .
+// It returns nil if the operation is successful, otherwise returns error.
+func (c *Client) InsertShop(ctx context.Context, shop shops.Shop) error {
+	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
+	_, err := coll.InsertOne(ctx, shop)
+	if err != nil {
+		return fmt.Errorf("mongodb.Client.InsertShop: %w", err)
+	}
+	return nil
+}
+
+// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
+// otherwise returns error.
+func (c *Client) CheckShopExists(ctx context.Context, shopID string) error {
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	err := coll.FindOne(ctx, filter).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return fmt.Errorf("mongodb.Client.CheckShopExists %w", ErrNoDocuments)
+		}
+		return err
+	}
+	return nil
+}

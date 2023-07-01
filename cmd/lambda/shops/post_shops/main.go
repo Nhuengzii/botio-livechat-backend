@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"log"
 	"os"
 	"time"
@@ -15,8 +17,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var errConversationNotExist = errors.New("err conversation does not exist")
-
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
@@ -25,6 +25,26 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
+	reqBody := req.Body
+	shop := shops.Shop{}
+	err = json.Unmarshal([]byte(reqBody), &shop)
+	if err != nil {
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+	}
+
+	err = c.dbClient.CheckShopExists(ctx, shop.ShopID)
+	if err == nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+		}
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
+	err = c.dbClient.InsertShop(ctx, shop)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
 	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
 

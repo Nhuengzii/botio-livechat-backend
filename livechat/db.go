@@ -184,4 +184,12 @@ type DBClient interface {
 	// GetPage return number of unread conversations and total conversations of the specified page.
 	// Return an error if it occurs.
 	GetPage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string) (unreadConversations int64, allConversations int64, err error)
+
+	// InsertShop creates a document in the mongodb "shops" collection with the information provided .
+	// It returns nil if the operation is successful, otherwise returns error.
+	InsertShop(ctx context.Context, shop shops.Shop) error
+
+	// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
+	// otherwise returns error.
+	CheckShopExists(ctx context.Context, shopID string) error
 }
