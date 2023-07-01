@@ -26,14 +26,18 @@ module "shops" {
       handler_name = "post_shops"
       handler_path = format("%s/cmd/lambda/shops/post_shops", path.root)
       environment_variables = {
-        yee = "wwww"
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI = var.mongo_uri
+        MONGODB_DATABASE = var.mongo_database
       }
     }
     get_shop_id = {
       handler_name = "get_shop_id"
       handler_path = format("%s/cmd/lambda/shops/get_shop_id", path.root)
       environment_variables = {
-        yee = "wwww"
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI = var.mongo_uri
+        MONGODB_DATABASE = var.mongo_database
       }
     }
   }

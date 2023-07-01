@@ -4,11 +4,11 @@ package shops
 type Shop struct {
 	ShopID                  string                  `bson:"shopID"`                  // identified specific shop
 	FacebookPageID          string                  `bson:"facebookPageID"`          // identified specific facebook page
-	LinePageID              string                  `bson:"linePageID"`              // identified specific line page
-	InstagramPageID         string                  `bson:"instagramPageID"`         // identified specific instagram page
 	FacebookAuthentication  FacebookAuthentication  `bson:"facebookAuthentication"`  // store page's facebook authentication variables
-	LineAuthentication      LineAuthentication      `bson:"lineAuthentication"`      // store page's line authentication variables
+	InstagramPageID         string                  `bson:"instagramPageID"`         // identified specific instagram page
 	InstagramAuthentication InstagramAuthentication `bson:"instagramAuthentication"` // store page's instagram authentication variables
+	LinePageID              string                  `bson:"linePageID"`              // identified specific line page
+	LineAuthentication      LineAuthentication      `bson:"lineAuthentication"`      // store page's line authentication variables
 }
 
 // A FacebookAuthentication store page's facebook authentication variables

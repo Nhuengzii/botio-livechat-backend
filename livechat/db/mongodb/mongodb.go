@@ -941,7 +941,7 @@ func (c *Client) CheckShopExists(ctx context.Context, shopID string) (err error)
 	return nil
 }
 
-// ListShopPlatforms returns a slice of all shop's platforms and corresponding pageID.
+// ListShopPlatforms returns a slice of a shop's platforms and corresponding pageIDs.
 // If the operation is successful, a slice will be returned and err will be nil,
 // otherwise nil, nil are returned
 func (c *Client) ListShopPlatforms(ctx context.Context, shopID string) (_ []getshop.Platform, err error) {
