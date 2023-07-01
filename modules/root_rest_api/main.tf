@@ -39,10 +39,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role
 }
 
 module "get_upload_url_handler" {
-  source       = "../lambda_handler"
-  handler_name = "get_upload_url"
-  handler_path = format("%s/cmd/lambda/root/get_upload_url", path.root)
-  role_arn     = aws_iam_role.assume_role_lambda.arn
+  source                = "../lambda_handler"
+  handler_name          = var.get_upload_url_handler.handler_name
+  handler_path          = var.get_upload_url_handler.handler_path
+  role_arn              = aws_iam_role.assume_role_lambda.arn
+  environment_variables = merge(var.get_upload_url_handler.environment_variables, {})
+  dependencies          = var.get_upload_url_handler.dependencies
 }
 
 module "get_upload_url" {
