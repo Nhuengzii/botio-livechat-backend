@@ -1,4 +1,4 @@
-// Package reqiguserprofile implement a function to call graph api request for a UserProfile information.
+// Package reqiguserprofile implement a function to make a graph api request for a UserProfile information.
 //
 // # Uses Graph API v16.0
 package reqiguserprofile

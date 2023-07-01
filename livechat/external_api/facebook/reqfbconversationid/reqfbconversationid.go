@@ -1,4 +1,4 @@
-// Package reqfbconversationid implement a function to call graph API request for a conversationID.
+// Package reqfbconversationid implement a function to make a graph API request for a conversationID.
 //
 // # Uses Graph API v16.0
 package reqfbconversationid

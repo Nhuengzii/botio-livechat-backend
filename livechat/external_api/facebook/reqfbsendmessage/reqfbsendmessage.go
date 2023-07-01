@@ -1,4 +1,4 @@
-// Package reqfbsendmessage implement a function to call graph API request for sending message.
+// Package reqfbsendmessage implement a function to make a graph API request for sending message.
 //
 // # Uses Graph API v16.0
 package reqfbsendmessage
