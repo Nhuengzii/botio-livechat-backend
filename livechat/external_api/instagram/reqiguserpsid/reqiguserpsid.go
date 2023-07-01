@@ -1,3 +1,6 @@
+// Package reqiguserpsid implement a function to make a graph api request for a user's psid in specific conversation.
+//
+// # Uses Graph API v16.0
 package reqiguserpsid
 
 import (
@@ -6,20 +9,29 @@ import (
 	"net/http"
 )
 
+// A ParticipantsResponse is a response body recieved from graph API request which contains a Particiapants object
 type ParticipantsResponse struct {
-	Participants Participants `json:"participants"`
+	Participants Participants `json:"participants"` // Participants of the conversation
 }
+
+// A Participants contains a slice of Participant object in a specific conversation
 type Participants struct {
-	Data []Participant `json:"data"`
+	Data []Participant `json:"data"` // data of the participant
 }
 
+// A Participant contains a partcipant's information
 type Participant struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Id    string `json:"id"`
+	Name  string `json:"name"`  // name of the participant
+	Email string `json:"email"` // email of the participant
+	Id    string `json:"id"`    // IGSID of the participant
 }
 
-func GetUserPSID(accessToken string, pageID string, conversationID string) (_ string, err error) {
+// GetUserIGSID makes a graph API call and returns a string of specific conversation's participant user psid.
+// Only return IGSID for a conversation in the specify page.
+// Return an error if it occurs.
+//
+// Use instagram page accessToken.
+func GetUserIGSID(accessToken string, pageID string, conversationID string) (_ string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("reqiguserprofile.GetUserPSID: %w", err)

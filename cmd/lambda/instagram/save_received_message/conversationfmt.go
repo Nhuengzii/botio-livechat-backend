@@ -34,7 +34,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 
 	} else if message.Source.UserType == stdmessage.UserTypeAdmin {
 		// query for user's psid from pageID
-		psid, err := reqiguserpsid.GetUserPSID(instagramCredentials.AccessToken, message.PageID, message.ConversationID)
+		psid, err := reqiguserpsid.GetUserIGSID(instagramCredentials.AccessToken, message.PageID, message.ConversationID)
 		if err != nil {
 			return nil, err
 		} else if psid == "" {
