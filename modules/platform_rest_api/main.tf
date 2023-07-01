@@ -19,11 +19,6 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-# Create S3 bucket for platform
-resource "aws_s3_bucket" "bucket" {
-  bucket = format("botio-livechat-bucket-%s", var.platform)
-}
-
 resource "aws_iam_role" "assume_role_lambda" {
   name               = format("%s_assume_role_lambda", var.platform)
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -36,47 +31,9 @@ data "aws_iam_policy_document" "s3" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.bucket.arn}/*"
+      "${var.bucket_arn}/*"
     ]
   }
-}
-
-resource "aws_s3_bucket_ownership_controls" "bucket" {
-  bucket = aws_s3_bucket.bucket.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_policy" "public_read" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.bucket
-  ]
-  bucket = aws_s3_bucket.bucket.id
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Sid" : "PublicReadGetObject",
-          "Effect" : "Allow",
-          "Principal" : "*",
-          "Action" : [
-            "s3:GetObject"
-          ],
-          "Resource" : [
-            "arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
-          ]
-        }
-      ]
-    }
-  )
-}
-
-resource "aws_s3_bucket_public_access_block" "bucket" {
-  bucket = aws_s3_bucket.bucket.id
-
-  block_public_policy = false
 }
 
 resource "aws_iam_policy" "s3" {
@@ -290,7 +247,7 @@ locals {
     }
     standardize_webhook = {
       SNS_TOPIC_ARN  = aws_sns_topic.save_and_relay_received_message.arn
-      S3_BUCKET_NAME = aws_s3_bucket.bucket.id
+      S3_BUCKET_NAME = var.bucket_name
     }
     get_page_id           = {}
     save_received_message = {}
