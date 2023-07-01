@@ -50,6 +50,11 @@ resource "aws_apigatewayv2_deployment" "botio_livechat_websocket_dev" {
   }
 }
 
+module "bucket" {
+  source      = "./modules/bucket"
+  bucket_name = "botio-livechat-bucket"
+}
+
 module "websocket_api" {
   source                      = "./modules/websocket_api"
   websocket_api_id            = aws_apigatewayv2_api.botio_livechat_websocket.id
@@ -95,6 +100,8 @@ module "facebook" {
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
+  bucket_name                    = module.bucket.bucket_name
+  bucket_arn                     = module.bucket.bucket_arn
   handlers = {
     get_page_id = {
       handler_name = "facebook_get_page_id"
@@ -235,6 +242,8 @@ module "instagram" {
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
+  bucket_arn                     = module.bucket.bucket_arn
+  bucket_name                    = module.bucket.bucket_name
   handlers = {
     get_page_id = {
       handler_name = "instagram_get_page_id"
@@ -376,6 +385,8 @@ module "line" {
   rest_api_execution_arn         = aws_api_gateway_rest_api.rest_api.execution_arn
   parent_id                      = aws_api_gateway_resource.shop_id.id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
+  bucket_name = module.bucket.bucket_name
+  bucket_arn = module.bucket.bucket_arn
   handlers = {
     get_page_id = {
       handler_name = "line_get_page_id"
@@ -485,7 +496,7 @@ module "line" {
       method  = "GET"
       handler = "get_conversation"
     }
-        patch_conversation = {
+    patch_conversation = {
       method  = "PATCH"
       handler = "patch_conversation"
     }
