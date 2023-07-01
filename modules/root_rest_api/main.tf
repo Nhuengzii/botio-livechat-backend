@@ -51,7 +51,7 @@ resource "aws_iam_policy" "s3" {
 }
 
 resource "aws_iam_policy_attachment" "s3" {
-  name = format("%s_s3", var.platform)
+  name = "s3_policy_attachment_for_root_handler"
   roles = [
     aws_iam_role.assume_role_lambda.name
   ]
