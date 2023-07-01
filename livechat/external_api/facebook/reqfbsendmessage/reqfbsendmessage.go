@@ -1,4 +1,4 @@
-// Package reqfbsendmessage implement a function to call facebook api request for sending message.
+// Package reqfbsendmessage implement a function to call graph API request for sending message.
 //
 // # Uses Graph API v16.0
 package reqfbsendmessage
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// SendMessage makes a facebook API call to send message to target recipient and return SendingMessageResponse which is facebook response to the message sending request.
+// SendMessage makes a graph API call to send message to target recipient and return SendingMessageResponse which is facebook response to the message sending request.
 // Return an error if it occurs.
 //
 // # Allow sending one text message or one attachment message. Cannot be send together.
@@ -45,7 +45,7 @@ func SendMessage(accessToken string, message SendingMessage, pageID string) (_ *
 	return &response, nil
 }
 
-// SendingMessageResponse contains facebook send message via api response
+// SendingMessageResponse contains facebook's send message via api response
 type SendingMessageResponse struct {
 	RecipientID string `json:"recipient_id"` // psid of the recipient
 	MessageID   string `json:"message_id"`   // sent message's ID
@@ -56,7 +56,7 @@ type SendingMessageResponse struct {
 //
 // [facebook Send API doc] : https://developers.facebook.com/docs/messenger-platform/reference/send-api/
 type SendingMessage struct {
-	Recipient Recipient `json:"recipient"` // target user psid
+	Recipient Recipient `json:"recipient"` // target user PSID
 	Message   Message   `json:"message"`   // message body contains either text message or attachment message
 	// The type of message being sent
 	//
