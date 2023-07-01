@@ -33,16 +33,43 @@ resource "aws_iam_role" "assume_role_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
+data "aws_iam_policy_document" "s3" {
+  statement {
+    actions = [
+      "s3:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "${var.bucket_arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "s3" {
+  name   = format("%s_s3", var.platform)
+  policy = data.aws_iam_policy_document.s3.json
+}
+
+resource "aws_iam_policy_attachment" "s3" {
+  name = format("%s_s3", var.platform)
+  roles = [
+    aws_iam_role.assume_role_lambda.name
+  ]
+  policy_arn = aws_iam_policy.s3.arn
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution_to_assume_role_lambda" {
   role       = aws_iam_role.assume_role_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 module "get_upload_url_handler" {
-  source       = "../lambda_handler"
-  handler_name = "get_upload_url"
-  handler_path = format("%s/cmd/lambda/root/get_upload_url", path.root)
-  role_arn     = aws_iam_role.assume_role_lambda.arn
+  source                = "../lambda_handler"
+  handler_name          = var.get_upload_url_handler.handler_name
+  handler_path          = var.get_upload_url_handler.handler_path
+  role_arn              = aws_iam_role.assume_role_lambda.arn
+  environment_variables = merge(var.get_upload_url_handler.environment_variables, {})
+  dependencies          = var.get_upload_url_handler.dependencies
 }
 
 module "get_upload_url" {
