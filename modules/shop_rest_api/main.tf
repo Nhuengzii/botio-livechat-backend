@@ -71,13 +71,13 @@ resource "aws_api_gateway_method" "get_shop_id" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "post_shop_id" {
+resource "aws_api_gateway_integration" "post_shops" {
   http_method             = aws_api_gateway_method.post_shops.http_method
   integration_http_method = "POST"
   resource_id             = aws_api_gateway_resource.shops.id
   rest_api_id             = var.rest_api_id
   type                    = "AWS_PROXY"
-  uri                     = module.post_shop_id.lambda.invoke_arn
+  uri                     = module.post_shops.lambda.invoke_arn
 }
 
 resource "aws_api_gateway_integration" "get_shop_id" {
