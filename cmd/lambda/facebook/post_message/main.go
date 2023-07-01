@@ -70,6 +70,11 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
+	fmt.Printf(request.Body)
+	fmt.Println("==============")
+	fmt.Printf("%+v\n", requestMessage)
+	fmt.Println("==============")
+
 	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
