@@ -3,7 +3,7 @@ module "instagram" {
   platform                       = "instagram"
   rest_api_id                    = module.rest_api.id
   rest_api_execution_arn         = module.rest_api.execution_arn
-  parent_id                      = aws_api_gateway_resource.shop_id.id
+  parent_id                      = module.shops.shop_id_resource_id
   relay_received_message_handler = module.websocket_api.relay_received_message_handler.function_name
   bucket_arn                     = module.bucket.bucket_arn
   bucket_name                    = module.bucket.bucket_name
