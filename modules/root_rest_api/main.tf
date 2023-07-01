@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "s3" {
 }
 
 resource "aws_iam_policy" "s3" {
-  name   = format("%s_s3", var.platform)
+  name   = "s3_policy_for_root_handler"
   policy = data.aws_iam_policy_document.s3.json
 }
 
