@@ -52,6 +52,6 @@ module "get_upload_url" {
   resource_path          = aws_api_gateway_resource.upload_url.path
   rest_api_id            = aws_api_gateway_rest_api.rest_api.id
   rest_api_execution_arn = aws_api_gateway_rest_api.rest_api.execution_arn
-  lambda_invoke_arn      = module.get_upload_url_handler.lambda.invole_arn
+  lambda_invoke_arn      = module.get_upload_url_handler.lambda.invoke_arn
   lambda_function_name   = module.get_upload_url_handler.lambda.function_name
 }
