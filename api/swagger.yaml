@@ -10,7 +10,7 @@ servers:
   - url: "https://{id}.execute-api.ap-southeast-1.amazonaws.com/{stage}"
     variables:
       id:
-        default: "oq0hx8j60a"
+        default: "1ai1vqnymh"
       stage:
         default: "dev"
 tags:
