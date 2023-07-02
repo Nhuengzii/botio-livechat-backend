@@ -2,6 +2,7 @@ package livechat
 
 import (
 	"context"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
@@ -197,5 +198,10 @@ type DBClient interface {
 	// ListShopPlatforms returns a slice of a shop's platforms and corresponding pageIDs.
 	// If the operation is successful, a slice will be returned and err will be nil,
 	// otherwise nil, nil are returned
-	ListShopPlatforms(ctx context.Context, shopID string) (_ []getshop.Platform, err error)
+	ListShopPlatforms(ctx context.Context, shopID string) (_ []getshop.PlatformPageID, err error)
+
+	// ListShopPlatformsStatuses returns a slice of a shop's platforms statuses (unread and all conversations counts)
+	// Returns a slice and error = nil if successful.
+	// Otherwise,  returns a nil slice and an error.
+	ListShopPlatformsStatuses(ctx context.Context, shopID string) (_ []getall.Status, err error)
 }

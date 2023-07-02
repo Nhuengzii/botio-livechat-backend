@@ -22,6 +22,8 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}
 	}()
 
+	// TODO implement
+
 	return apigateway.NewProxyResponse(200, "OK", "*"), nil
 }
 
