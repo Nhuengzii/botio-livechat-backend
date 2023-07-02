@@ -523,10 +523,10 @@ paths:
     get:
       tags:
         - all
-      summary: List shop's all platforms' information.
+      summary: List shop's all platforms' statuses.
       description: |
         List shop's all platforms' unread and all conversations counts.
-      operationId: ListShopAllPlatformsInformation
+      operationId: ListShopAllPlatformsStatuses
       parameters:
         - $ref: "#/components/parameters/ShopID"
       responses:
@@ -535,7 +535,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PlatformsInformationArray"
+                $ref: "#/components/schemas/PlatformsStatuses"
         "204":
           description: "No Content: No platforms information found"
         "404":
@@ -842,16 +842,16 @@ components:
           type: string
         page_id:
           type: string
-    PlatformsInformationArray:
+    PlatformsStatuses:
       type: object
       required:
-        - informations
+        - statuses
       properties:
-        informations:
+        statuses:
           type: array
           items:
-            $ref: "#/components/schemas/PlatformInformation"
-    PlatformInformation:
+            $ref: "#/components/schemas/PlatformStatus"
+    PlatformStatus:
       type: object
       required:
         - platform
