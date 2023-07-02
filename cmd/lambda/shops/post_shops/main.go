@@ -65,7 +65,7 @@ func main() {
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		logMessage := "cmd/lambda/line/post_shops/main.main: " + err.Error()
+		logMessage := "cmd/lambda/shops/post_shops/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
 		log.Fatalln(logMessage)
 	}

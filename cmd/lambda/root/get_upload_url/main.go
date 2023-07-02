@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
+	"time"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getuploadurl"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/uuid"
-	"log"
-	"os"
-	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/aws/aws-lambda-go/events"
@@ -21,7 +22,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/line/get_upload_url/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/root/get_upload_url/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
