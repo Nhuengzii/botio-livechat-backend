@@ -2,8 +2,10 @@
 package amazons3
 
 import (
+	"bytes"
 	"fmt"
-	"io"
+	"log"
+	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -32,11 +34,14 @@ func NewUploader(awsRegion string, bucketName string) *Uploader {
 
 // UploadFile upload input file into the specified bucket and return a location string if the operations was a success.
 // Return an error if it occurs.
-func (u *Uploader) UploadFile(file io.Reader) (string, error) {
+func (u *Uploader) UploadFile(file []byte) (string, error) {
+	log.Println(http.DetectContentType(file))
+
 	result, err := u.uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(u.bucketName),
-		Key:    aws.String(uuid.New().String()),
-		Body:   file,
+		Bucket:      aws.String(u.bucketName),
+		Key:         aws.String(uuid.New().String()),
+		ContentType: aws.String(http.DetectContentType(file)),
+		Body:        bytes.NewReader(file),
 	})
 	if err != nil {
 		return "", fmt.Errorf("amazons3.Upload: %w", err)

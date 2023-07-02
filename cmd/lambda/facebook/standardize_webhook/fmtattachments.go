@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
@@ -116,7 +117,8 @@ func getAndUploadMessageContent(uploader amazons3.Uploader, src string) (_ strin
 		return "", errBadImageURL
 	}
 
-	location, err := uploader.UploadFile(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	location, err := uploader.UploadFile(body)
 	if err != nil {
 		return "", err
 	}
