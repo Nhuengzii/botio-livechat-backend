@@ -90,7 +90,7 @@ module "facebook" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
-      dependencies = "{discord,db,snswrapper,stdmessage,external_api}/**/*.go"
+      dependencies = "{discord,db,snswrapper,stdmessage,external_api,storage}/**/*.go"
     }
     save_received_message = {
       handler_name = "facebook_save_received_message"
