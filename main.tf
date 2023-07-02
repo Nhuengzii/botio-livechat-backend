@@ -14,6 +14,16 @@ provider "aws" {
 module "rest_api" {
   source        = "./modules/root_rest_api"
   rest_api_name = "botio_livechat_rest_api"
+  s3_bucket_arn = module.bucket.bucket_arn
+  get_upload_url_handler = {
+    handler_name = "get_upload_url"
+    handler_path = format("%s/cmd/lambda/root/get_upload_url", path.root)
+    dependencies = ""
+    environment_variables = {
+      DISCORD_WEBHOOK_URL = var.discord_webhook_url
+      S3_BUCKET_NAME      = module.bucket.bucket_name
+    }
+  }
 }
 
 module "shops" {
@@ -26,14 +36,18 @@ module "shops" {
       handler_name = "post_shops"
       handler_path = format("%s/cmd/lambda/shops/post_shops", path.root)
       environment_variables = {
-        yee = "wwww"
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
     get_shop_id = {
       handler_name = "get_shop_id"
       handler_path = format("%s/cmd/lambda/shops/get_shop_id", path.root)
       environment_variables = {
-        yee = "wwww"
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
       }
     }
   }
@@ -41,7 +55,7 @@ module "shops" {
 
 module "bucket" {
   source      = "./modules/bucket"
-  bucket_name = "botio-livechat-bucket"
+  bucket_name = var.s3_bucket_name
 }
 
 resource "aws_api_gateway_deployment" "rest_api" {

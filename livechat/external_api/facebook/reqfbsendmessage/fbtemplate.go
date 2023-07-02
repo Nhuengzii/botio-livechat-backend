@@ -20,6 +20,7 @@ type Button struct {
 	Title string `json:"title"` // title of the button will be show as a text on the button
 }
 
+// Interface for various facebook templates
 type Template interface {
 	Template()
 }
@@ -30,11 +31,11 @@ type Template interface {
 //
 // [Facebook Generic Template doc] : https://developers.facebook.com/docs/messenger-platform/reference/templates/generic
 type GenericTemplate struct {
-	Title         string        `json:"title"`                    // title of the template will be show as big text on the template
-	ImageURL      string        `json:"image_url,omitempty"`      // imageURL of the template's image
-	Subtitle      string        `json:"subtitle,omitempty"`       // smaller text show on the template
-	DefaultAction DefaultAction `json:"default_action,omitempty"` // default action is an action that will be trigger if user click on any space the template except for buttons.
-	Buttons       []Button      `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
+	Title         string         `json:"title"`                    // title of the template will be show as big text on the template
+	ImageURL      string         `json:"image_url,omitempty"`      // imageURL of the template's image
+	Subtitle      string         `json:"subtitle,omitempty"`       // smaller text show on the template
+	DefaultAction *DefaultAction `json:"default_action,omitempty"` // default action is an action that will be trigger if user click on any space the template except for buttons.
+	Buttons       []Button       `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
 }
 
 // TODO: define other template here

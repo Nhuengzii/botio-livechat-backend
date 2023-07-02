@@ -102,5 +102,5 @@ resource "aws_lambda_permission" "allow_api_gateway_to_invoke_get_shop_id" {
   action        = "lambda:InvokeFunction"
   function_name = module.get_shop_id.lambda.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, "POST", aws_api_gateway_resource.shop_id.path)
+  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, "GET", aws_api_gateway_resource.shop_id.path)
 }

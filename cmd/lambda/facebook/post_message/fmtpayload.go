@@ -29,15 +29,20 @@ func fmtGenericTemplatePayload(payload postmessage.Payload) (*reqfbsendmessage.A
 				Title: button.Title,
 			})
 		}
-		genericTemplate = append(genericTemplate, reqfbsendmessage.GenericTemplate{
-			Title:    element.Title,
-			Subtitle: element.Message,
-			DefaultAction: reqfbsendmessage.DefaultAction{
+
+		var defaultAction *reqfbsendmessage.DefaultAction
+		if element.DefaultAction != nil {
+			defaultAction = &reqfbsendmessage.DefaultAction{
 				Type: templateButtonURLType,
 				URL:  element.DefaultAction.URL,
-			},
-			Buttons:  buttons,
-			ImageURL: element.Picture,
+			}
+		}
+		genericTemplate = append(genericTemplate, reqfbsendmessage.GenericTemplate{
+			Title:         element.Title,
+			Subtitle:      element.Message,
+			DefaultAction: defaultAction,
+			Buttons:       buttons,
+			ImageURL:      element.Picture,
 		})
 	}
 

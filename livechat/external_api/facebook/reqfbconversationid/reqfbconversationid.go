@@ -1,4 +1,4 @@
-// Package reqfbconversationid implement a function to call facebook api request for a conversationID.
+// Package reqfbconversationid implement a function to make a graph API request for a conversationID.
 //
 // # Uses Graph API v16.0
 package reqfbconversationid
@@ -13,7 +13,7 @@ import (
 // "No conversationID were found after making request"
 var errNoConversationIDFound = errors.New("No conversationID were found after making request")
 
-// Conversations is a response body recieved from facebook request which contains a slice of Conversation
+// Conversations is a response body recieved from graph API request which contains a slice of Conversation
 type Conversations struct {
 	Data []*Conversation `json:"data"` // slice of Conversation
 }
@@ -23,7 +23,7 @@ type Conversation struct {
 	ID string `json:"id"` //
 }
 
-// GetConversationID makes a faceook API call and returns a string of facebook conversationID,If there is a participants with matching PSID in the conversation.
+// GetConversationID makes a graph API call and returns a string of facebook conversationID,If there is a participants with matching PSID in the conversation.
 // Only return conversation in a specify page.
 // Return an error if it occurs.
 //
