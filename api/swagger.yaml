@@ -36,9 +36,9 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
-        500:
+        "500":
           description: "Internal Server Error"
     post:
       tags:
@@ -47,11 +47,11 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
-        401:
+        "401":
           description: "Unauthorized"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
@@ -67,15 +67,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     patch:
       tags:
@@ -92,13 +92,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
@@ -113,17 +113,17 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
@@ -142,17 +142,17 @@ paths:
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     post:
       tags:
@@ -170,13 +170,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PostMessage"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}:
     get:
@@ -192,15 +192,15 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   # instagram
   /shops/{shop_id}/instagram/{page_id}/webhook:
@@ -211,9 +211,9 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
-        500:
+        "500":
           description: "Internal Server Error"
     post:
       tags:
@@ -222,11 +222,11 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
-        401:
+        "401":
           description: "Unauthorized"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
@@ -242,15 +242,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     patch:
       tags:
@@ -267,13 +267,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
@@ -288,17 +288,17 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
@@ -316,17 +316,17 @@ paths:
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     post:
       tags:
@@ -343,13 +343,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PostMessage"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}:
     get:
@@ -365,15 +365,15 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   # line
   /shops/{shop_id}/line/{page_id}/webhook:
@@ -384,11 +384,11 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
-        401:
+        "401":
           description: "Unauthorized"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
@@ -404,15 +404,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     patch:
       tags:
@@ -429,13 +429,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
@@ -450,17 +450,17 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
@@ -478,17 +478,17 @@ paths:
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
     post:
       tags:
@@ -505,13 +505,13 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PostMessage"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}:
     get:
@@ -527,15 +527,15 @@ paths:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   # all
   /shops/{shop_id}/all/conversations:
@@ -550,17 +550,17 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ShopID"
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   # shop
   /shops:
@@ -573,11 +573,11 @@ paths:
       requestBody:
         $ref: "#/components/schemas/Shop"
       responses:
-        200:
+        "200":
           description: "OK"
-        400:
+        "400":
           description: "Bad Request"
-        500:
+        "500":
           description: "Internal Server Error"
   /shops/{shop_id}:
     get:
@@ -586,17 +586,17 @@ paths:
       summary: list platforms of a shop
       operationId: listShopPlatforms
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ShopPlatforms"
-        204:
+        "204":
           description: "No Content"
-        404:
+        "404":
           description: "Not Found"
-        500:
+        "500":
           description: "Internal Server Error"
   # root
   /upload_url:
@@ -606,13 +606,13 @@ paths:
       summary: get a presigned url for uploading to s3
       operationId: getS3PresignedUploadURL
       responses:
-        200:
+        "200":
           description: "OK"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
-        500:
+        "500":
           description: "Internal Server Error"
 components:
   schemas:
