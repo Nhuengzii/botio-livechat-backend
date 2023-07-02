@@ -107,7 +107,7 @@ paths:
       tags:
         - facebook
       summary: List facebook page's conversations
-      operationId: listFacebookConversations
+      operationId: listFacebookPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -134,7 +134,7 @@ paths:
       tags:
         - facebook
       summary: List facebook conversation's messages
-      operationId: listFacebookMessages
+      operationId: listFacebookConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -277,7 +277,7 @@ paths:
       tags:
         - instagram
       summary: List instagram page's conversations
-      operationId: listInstagramConversations
+      operationId: listInstagramPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -302,7 +302,7 @@ paths:
       tags:
         - instagram
       summary: List instagram conversation's messages
-      operationId: listInstagramMessages
+      operationId: listInstagramConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -373,6 +373,7 @@ paths:
       summary: Line webhook
       description: |
         For use by line to send webhook events.
+      operationId: lineWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -429,7 +430,7 @@ paths:
       tags:
         - line
       summary: list all conversations of a specific line page
-      operationId: listLineConversations
+      operationId: listLinePageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -454,7 +455,7 @@ paths:
       tags:
         - line
       summary: list all messages in a specific line conversation
-      operationId: listLineMessages
+      operationId: listLineConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
@@ -518,12 +519,35 @@ paths:
         "500":
           description: "Internal Server Error: Unexpected error"
   # all
+  /shops/{shop_id}/all:
+    get:
+      tags:
+        - all
+      summary: List shop's all platforms' information.
+      description: |
+        List shop's all platforms' unread and all conversations counts.
+      operationId: ListShopAllPlatformsInformation
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        "200":
+          description: "OK: Platforms information found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformsInformationArray"
+        "204":
+          description: "No Content: No platforms information found"
+        "404":
+          description: "Not Found: Shop not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/all/conversations:
     get:
       tags:
         - all
-      summary: List shop's conversations (all platforms)
-      operationId: listAllConversations
+      summary: List shop's all platforms' conversations.
+      operationId: listShopAllPlatformsConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/Skip"
@@ -570,7 +594,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopPlatforms"
+                $ref: "#/components/schemas/ShopPlatformsPageIDs"
         "204":
           description: "No Content: No platforms found"
         "404":
@@ -801,7 +825,7 @@ components:
           type: string
         lineAuthentication:
           $ref: "#/components/schemas/LineAuthentication"
-    ShopPlatforms:
+    ShopPlatformsPageIDs:
       type: object
       properties:
         available_pages:
@@ -818,6 +842,28 @@ components:
           type: string
         page_id:
           type: string
+    PlatformsInformationArray:
+      type: object
+      required:
+        - informations
+      properties:
+        informations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformInformation"
+    PlatformInformation:
+      type: object
+      required:
+        - platform
+        - unreadConversations
+        - allConversations
+      properties:
+        platform:
+          type: string
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
     FacebookAuthentication:
       type: object
       required:
