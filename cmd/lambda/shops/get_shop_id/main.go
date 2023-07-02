@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
@@ -18,7 +19,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/line/get_shop_id/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/shops/get_shop_id/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}

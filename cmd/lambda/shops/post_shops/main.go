@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
@@ -20,7 +21,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/line/post_shops/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/shops/post_shops/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
