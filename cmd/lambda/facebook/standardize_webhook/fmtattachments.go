@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
 )
 
 func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, error) {
@@ -34,7 +34,7 @@ func (c *config) fmtAttachment(messaging Messaging) ([]stdmessage.Attachment, er
 }
 
 func (c *config) fmtBasicAttachments(attachment Attachment) (stdmessage.Attachment, error) {
-	location, err := getAndUploadMessageContent(c.uploader, attachment.Payload.Src)
+	location, err := getAndUploadMessageContent(c.storageClient, attachment.Payload.Src)
 	if err != nil {
 		return stdmessage.Attachment{}, err
 	}
@@ -51,7 +51,7 @@ func (c *config) fmtTemplateAttachments(attachment Attachment) (stdmessage.Attac
 	} else if attachment.Payload.TemplateType == "coupon" {
 		attachmentType = stdmessage.AttachmentTypeFBTemplateCoupon
 		if attachment.Payload.ImageURL != "" {
-			location, err := getAndUploadMessageContent(c.uploader, attachment.Payload.ImageURL)
+			location, err := getAndUploadMessageContent(c.storageClient, attachment.Payload.ImageURL)
 			if err != nil {
 				return stdmessage.Attachment{}, err
 			}
@@ -63,7 +63,7 @@ func (c *config) fmtTemplateAttachments(attachment Attachment) (stdmessage.Attac
 		attachmentType = stdmessage.AttachmentTypeFBTemplateGeneric
 		for index, element := range attachment.Payload.Elements {
 			if element.ImageURL != "" {
-				location, err := getAndUploadMessageContent(c.uploader, element.ImageURL)
+				location, err := getAndUploadMessageContent(c.storageClient, element.ImageURL)
 				if err != nil {
 					return stdmessage.Attachment{}, err
 				}
@@ -78,7 +78,7 @@ func (c *config) fmtTemplateAttachments(attachment Attachment) (stdmessage.Attac
 		attachmentType = stdmessage.AttachmentTypeFBTemplateReceipt
 		for index, element := range attachment.Payload.Elements {
 			if element.ImageURL != "" {
-				location, err := getAndUploadMessageContent(c.uploader, element.ImageURL)
+				location, err := getAndUploadMessageContent(c.storageClient, element.ImageURL)
 				if err != nil {
 					return stdmessage.Attachment{}, err
 				}
@@ -101,7 +101,7 @@ func (c *config) fmtTemplateAttachments(attachment Attachment) (stdmessage.Attac
 	}, nil
 }
 
-func getAndUploadMessageContent(uploader amazons3.Uploader, src string) (_ string, err error) {
+func getAndUploadMessageContent(storageClient livechat.StorageClient, src string) (_ string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("getAndUploadMessageContent: %w", err)
@@ -118,7 +118,7 @@ func getAndUploadMessageContent(uploader amazons3.Uploader, src string) (_ strin
 	}
 
 	body, err := io.ReadAll(resp.Body)
-	location, err := uploader.UploadFile(body)
+	location, err := storageClient.UploadFile(body)
 	if err != nil {
 		return "", err
 	}

@@ -13,32 +13,32 @@ import (
 	"github.com/google/uuid"
 )
 
-// An Uploader contains s3manager.Uploader used to do various s3 bucket operations.
-type Uploader struct {
-	uploader   *s3manager.Uploader // s3 sdk
-	bucketName string              // target bucket name
+// An Uploader contains S3's session used to do various s3 bucket operations.
+type Client struct {
+	session    *session.Session
+	bucketName string // target bucket name
 }
 
-// NewUploader returns a new Uploader which contains s3 uploader inside.
+// NewClient returns a new client which contains S3's session inside.
 // Return an error if it occurs.
-func NewUploader(awsRegion string, bucketName string) *Uploader {
+func NewClient(awsRegion string, bucketName string) *Client {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
 	}))
-	uploader := s3manager.NewUploader(sess)
-	return &Uploader{
-		uploader:   uploader,
+	return &Client{
+		session:    sess,
 		bucketName: bucketName,
 	}
 }
 
 // UploadFile upload input file into the specified bucket and return a location string if the operations was a success.
 // Return an error if it occurs.
-func (u *Uploader) UploadFile(file []byte) (string, error) {
+func (c *Client) UploadFile(file []byte) (string, error) {
 	log.Println(http.DetectContentType(file))
 
-	result, err := u.uploader.Upload(&s3manager.UploadInput{
-		Bucket:      aws.String(u.bucketName),
+	uploader := s3manager.NewUploader(c.session)
+	result, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket:      aws.String(c.bucketName),
 		Key:         aws.String(uuid.New().String()),
 		ContentType: aws.String(http.DetectContentType(file)),
 		Body:        bytes.NewReader(file),

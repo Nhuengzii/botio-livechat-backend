@@ -68,7 +68,7 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
 	})
-	uploader := amazons3.NewUploader(awsRegion, s3BucketName)
+	storageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	if err != nil {
 		logMessage := "cmd/lambda/facebook/standardize_webhook/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
@@ -79,7 +79,7 @@ func main() {
 		snsTopicARN:       snsTopicARN,
 		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
-		uploader:          *uploader,
+		storageClient:     storageClient,
 	}
 	if err != nil {
 		discord.Log(c.discordWebhookURL, fmt.Sprintln(err))

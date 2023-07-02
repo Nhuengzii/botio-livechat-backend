@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/storage/amazons3"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client, uploader amazons3.Uploader, event *linebot.Event) (_ *stdmessage.StdMessage, err error) {
+func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client, event *linebot.Event) (_ *stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("newStdMessage: %w", err)
@@ -44,7 +44,7 @@ func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client
 		}
 	case *linebot.ImageMessage:
 		messageID = msg.ID
-		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		location, err := getAndUploadMessageContent(bot, c.storageClient, messageID)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client
 		})
 	case *linebot.VideoMessage:
 		messageID = msg.ID
-		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		location, err := getAndUploadMessageContent(bot, c.storageClient, messageID)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +68,7 @@ func (c *config) newStdMessage(shopID string, pageID string, bot *linebot.Client
 		})
 	case *linebot.AudioMessage:
 		messageID = msg.ID
-		location, err := getAndUploadMessageContent(bot, uploader, messageID)
+		location, err := getAndUploadMessageContent(bot, c.storageClient, messageID)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func toStdMessageSource(s *linebot.EventSource) (*stdmessage.Source, error) {
 	}, nil
 }
 
-func getAndUploadMessageContent(bot *linebot.Client, uploader amazons3.Uploader, messageID string) (_ string, err error) {
+func getAndUploadMessageContent(bot *linebot.Client, uploader livechat.StorageClient, messageID string) (_ string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("getAndUploadMessageContent: %w", err)

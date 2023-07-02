@@ -44,7 +44,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		shopID := shop.ShopID
-		err = c.handleEvents(ctx, shopID, pageID, bot, c.uploader, hookBody)
+		err = c.handleEvents(ctx, shopID, pageID, bot, hookBody)
 		if err != nil {
 			return err
 		}
@@ -70,7 +70,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 	})
-	uploader := amazons3.NewUploader(awsRegion, s3BucketName)
+	stroageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	if err != nil {
 		logMessage := "cmd/lambda/line/standardize_webhook/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
@@ -82,7 +82,7 @@ func main() {
 		snsTopicARN:       snsTopicARN,
 		snsClient:         snswrapper.NewClient(awsRegion),
 		dbClient:          dbClient,
-		uploader:          *uploader,
+		storageClient:     stroageClient,
 	}
 	lambda.Start(c.handler)
 }
