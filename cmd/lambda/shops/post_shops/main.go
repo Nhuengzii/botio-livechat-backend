@@ -20,7 +20,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/line/post_shops/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/shops/post_shops/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
@@ -29,13 +29,13 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shop := shops.Shop{}
 	err = json.Unmarshal([]byte(reqBody), &shop)
 	if err != nil {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+		return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
 	}
 
 	err = c.dbClient.CheckShopExists(ctx, shop.ShopID)
 	if err == nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(400, "Bad Request", "*"), err
+			return apigateway.NewProxyResponse(404, "Not Found", "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
@@ -64,7 +64,7 @@ func main() {
 		CollectionShops:         "shops",
 	})
 	if err != nil {
-		logMessage := "cmd/lambda/line/post_shops/main.main: " + err.Error()
+		logMessage := "cmd/lambda/shops/post_shops/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
 		log.Fatalln(logMessage)
 	}

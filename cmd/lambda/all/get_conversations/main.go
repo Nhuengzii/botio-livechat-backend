@@ -88,6 +88,10 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}
 	}
 
+	if len(conversations) == 0 {
+		return apigateway.NewProxyResponse(204, "No Content", "*"), nil
+	}
+
 	response := getconversations.Response{
 		Conversations: conversations,
 	}
