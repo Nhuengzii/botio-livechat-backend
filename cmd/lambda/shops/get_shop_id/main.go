@@ -29,10 +29,16 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
+	if len(availablePages) == 0 {
+		return apigateway.NewProxyResponse(204, "No Content", "*"), nil
+	}
 	response := getshop.Response{
 		AvailablePages: availablePages,
 	}
 	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
 	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
