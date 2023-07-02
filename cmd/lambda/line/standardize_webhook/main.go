@@ -70,12 +70,13 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 	})
-	stroageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	if err != nil {
 		logMessage := "cmd/lambda/line/standardize_webhook/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
 		log.Fatalln(logMessage)
 	}
+
+	stroageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	defer dbClient.Close(ctx)
 	c := &config{
 		discordWebhookURL: discordWebhookURL,
