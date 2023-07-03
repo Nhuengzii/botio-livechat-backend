@@ -610,28 +610,10 @@ paths:
       operationId: getS3PresignedUploadURL
       parameters:
         - in: query
-          name: filename
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: contentType
-          schema:
-            type: string
-          required: true
-        - in: query
           name: temporary
           schema:
             type: boolean
             default: false
-          required: false
-        - in: query
-          name: expiresIn
-          description: |
-            The number of seconds until the presigned URL expires. By default, the presigned URL is valid for 10 minutes.
-          schema:
-            type: integer
-            default: 600
           required: false
       responses:
         "200":
