@@ -622,6 +622,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
+        "400":
+          description: "Bad Request: Check 'temporary' query string parameter"
         "500":
           description: "Internal Server Error: Unexpected error"
 components:
