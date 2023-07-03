@@ -16,19 +16,21 @@ import (
 
 // An Uploader contains S3's session used to do various s3 bucket operations.
 type Client struct {
-	session    *session.Session
-	bucketName string // target bucket name
+	session        *session.Session
+	bucketName     string // target bucket name
+	tempBucketName string // temporary storage bucket name
 }
 
 // NewClient returns a new client which contains S3's session inside.
 // Return an error if it occurs.
-func NewClient(awsRegion string, bucketName string) *Client {
+func NewClient(awsRegion string, bucketName string, tempBucketName string) *Client {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
 	}))
 	return &Client{
-		session:    sess,
-		bucketName: bucketName,
+		session:        sess,
+		bucketName:     bucketName,
+		tempBucketName: tempBucketName,
 	}
 }
 
@@ -43,25 +45,30 @@ func (c *Client) UploadFile(file []byte) (string, error) {
 		Body:        bytes.NewReader(file),
 	})
 	if err != nil {
-		return "", fmt.Errorf("amazons3.Upload: %w", err)
+		return "", fmt.Errorf("amazons3.Client.UploadFile: %w", err)
 	}
 	return result.Location, nil
 }
 
 // RequestPutPresignedURL make a request to S3 and returns a PUT operation presigned URL.
-// Return an error if it occurs.
+// Returns URL for uploading to temporary storage s3 bucket if isTemporary is true.
+// Returns an error if it occurs.
 //
 // PUT operation presignedURL can be used to upload a file to Client's S3 bucket
 // The URL is only valid for the time specified.
-func (c *Client) RequestPutPresignedURL(validTime time.Duration) (string, error) {
+func (c *Client) RequestPutPresignedURL(isTemporary bool, validDuration time.Duration) (string, error) {
 	svc := s3.New(c.session)
+	bucketName := c.bucketName
+	if isTemporary {
+		bucketName = c.tempBucketName
+	}
 	putObjReq, _ := svc.PutObjectRequest(&s3.PutObjectInput{
-		Bucket: aws.String(c.bucketName),
+		Bucket: aws.String(bucketName),
 		Key:    aws.String(uuid.New().String()),
 	})
-	presignedURL, err := putObjReq.Presign(validTime)
+	presignedURL, err := putObjReq.Presign(validDuration)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("amazons3.Client.RequestPutPresignedURL: %w", err)
 	}
 	return presignedURL, nil
 }
