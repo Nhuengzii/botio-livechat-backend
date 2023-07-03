@@ -44,9 +44,25 @@ module "get_conversations_handler" {
   dependencies          = var.get_conversations_handler.dependencies
 }
 
+module "get_all_handler" {
+  source                = "../lambda_handler"
+  handler_name          = var.get_all.handler_name
+  handler_path          = var.get_all.handler_path
+  role_arn              = aws_iam_role.assume_role_lambda.arn
+  environment_variables = var.get_all.environment_variables
+  dependencies          = var.get_all.dependencies
+}
+
 resource "aws_api_gateway_method" "get_conversations" {
   rest_api_id   = var.rest_api_id
   resource_id   = aws_api_gateway_resource.conversations.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "get_all" {
+  rest_api_id   = var.rest_api_id
+  resource_id   = aws_api_gateway_resource.platform.id
   http_method   = "GET"
   authorization = "NONE"
 }
@@ -60,10 +76,27 @@ resource "aws_api_gateway_integration" "get_conversations" {
   uri                     = module.get_conversations_handler.lambda.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "get_all" {
+  http_method             = aws_api_gateway_method.get_all.http_method
+  resource_id             = aws_api_gateway_resource.platform.id
+  rest_api_id             = var.rest_api_id
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = module.get_all_handler.lambda.invoke_arn
+}
+
 resource "aws_lambda_permission" "endpoint_handler_permissions" {
   function_name = module.get_conversations_handler.lambda.function_name
   statement_id  = "AllowMethodExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   source_arn    = format("%s/*/GET%s", var.rest_api_execution_arn, aws_api_gateway_resource.conversations.path)
+}
+
+resource "aws_lambda_permission" "endpoint_handler_permissions2" {
+  function_name = module.get_all_handler.lambda.function_name
+  statement_id  = "AllowMethodExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = format("%s/*/GET%s", var.rest_api_execution_arn, aws_api_gateway_resource.platform.path)
 }
