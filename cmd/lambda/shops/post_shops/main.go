@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
