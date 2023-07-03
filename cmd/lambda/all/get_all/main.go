@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"log"
 	"os"
 	"time"
@@ -22,9 +25,29 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}
 	}()
 
-	// TODO implement
+	pathParameters := req.PathParameters
+	shopID := pathParameters["shop_id"]
 
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+	platformStatuses, err := c.dbClient.ListShopPlatformsStatuses(ctx, shopID)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return apigateway.NewProxyResponse(404, "Not Found", "*"), nil
+		}
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+	if len(platformStatuses) == 0 {
+		return apigateway.NewProxyResponse(204, "No Content", "*"), nil
+	}
+
+	response := getall.Response{
+		Statuses: platformStatuses,
+	}
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {

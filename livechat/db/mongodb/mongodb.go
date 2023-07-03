@@ -994,6 +994,53 @@ func (c *Client) ListShopPlatformsStatuses(ctx context.Context, shopID string) (
 			err = fmt.Errorf("mongodb.Client.ListShopPlatformsStatuses: %w", err)
 		}
 	}()
-	// TODO implement
-	return nil, nil
+	collShops := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	shop := shops.Shop{}
+	err = collShops.FindOne(ctx, filter).Decode(&shop)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	result := []getall.Status{}
+
+	if shop.FacebookPageID != "" {
+		fbUnread, fbAll, err := c.GetPage(ctx, shopID, stdconversation.PlatformFacebook, shop.FacebookPageID)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, getall.Status{
+			Platform:            shops.PlatformFacebook,
+			UnreadConversations: fbUnread,
+			AllConversations:    fbAll,
+		})
+	}
+	if shop.InstagramPageID != "" {
+		igUnread, igAll, err := c.GetPage(ctx, shopID, stdconversation.PlatformInstagram, shop.InstagramPageID)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, getall.Status{
+			Platform:            shops.PlatformInstagram,
+			UnreadConversations: igUnread,
+			AllConversations:    igAll,
+		})
+	}
+	if shop.LinePageID != "" {
+		lineUnread, lineAll, err := c.GetPage(ctx, shopID, stdconversation.PlatformLine, shop.LinePageID)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, getall.Status{
+			Platform:            shops.PlatformLine,
+			UnreadConversations: lineUnread,
+			AllConversations:    lineAll,
+		})
+	}
+
+	return result, nil
 }
