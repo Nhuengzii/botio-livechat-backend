@@ -85,6 +85,7 @@ module "line" {
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
+        S3_TEMP_BUCKET_NAME = module.bucket.bucket_name
       }
       dependencies = "{discord,db,snswrapper,storage,stdmessage}/**/*.go"
     }

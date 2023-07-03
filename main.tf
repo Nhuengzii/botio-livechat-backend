@@ -22,6 +22,7 @@ module "rest_api" {
     environment_variables = {
       DISCORD_WEBHOOK_URL = var.discord_webhook_url
       S3_BUCKET_NAME      = module.bucket.bucket_name
+      S3_TEMP_BUCKET_NAME = module.bucket.bucket_name
     }
   }
 }
