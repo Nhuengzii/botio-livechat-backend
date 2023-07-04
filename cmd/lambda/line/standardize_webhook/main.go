@@ -62,7 +62,6 @@ func main() {
 		snsTopicARN       = os.Getenv("SNS_TOPIC_ARN")
 		awsRegion         = os.Getenv("AWS_REGION")
 		s3BucketName      = os.Getenv("S3_BUCKET_NAME")
-		s3TempBucketName  = os.Getenv("S3_TEMP_BUCKET_NAME")
 	)
 	dbClient, err := mongodb.NewClient(ctx, mongodb.Target{
 		URI:                     mongodbURI,
@@ -77,7 +76,7 @@ func main() {
 		log.Fatalln(logMessage)
 	}
 
-	stroageClient := amazons3.NewClient(awsRegion, s3BucketName, s3TempBucketName)
+	stroageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	defer dbClient.Close(ctx)
 	c := &config{
 		discordWebhookURL: discordWebhookURL,

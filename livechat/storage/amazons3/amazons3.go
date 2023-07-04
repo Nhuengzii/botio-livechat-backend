@@ -16,21 +16,19 @@ import (
 
 // An Uploader contains S3's session used to do various s3 bucket operations.
 type Client struct {
-	session        *session.Session
-	bucketName     string // target bucket name
-	tempBucketName string // temporary storage bucket name
+	session    *session.Session
+	bucketName string // target bucket name
 }
 
 // NewClient returns a new client which contains S3's session inside.
 // Return an error if it occurs.
-func NewClient(awsRegion string, bucketName string, tempBucketName string) *Client {
+func NewClient(awsRegion string, bucketName string) *Client {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(awsRegion),
 	}))
 	return &Client{
-		session:        sess,
-		bucketName:     bucketName,
-		tempBucketName: tempBucketName,
+		session:    sess,
+		bucketName: bucketName,
 	}
 }
 
@@ -58,13 +56,13 @@ func (c *Client) UploadFile(file []byte) (string, error) {
 // The URL is only valid for the time specified.
 func (c *Client) RequestPutPresignedURL(isTemporary bool, validDuration time.Duration) (string, error) {
 	svc := s3.New(c.session)
-	bucketName := c.bucketName
+	key := uuid.New().String()
 	if isTemporary {
-		bucketName = c.tempBucketName
+		key = "tmp/" + key
 	}
 	putObjReq, _ := svc.PutObjectRequest(&s3.PutObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(uuid.New().String()),
+		Bucket: aws.String(c.bucketName),
+		Key:    aws.String(key),
 	})
 	presignedURL, err := putObjReq.Presign(validDuration)
 	if err != nil {

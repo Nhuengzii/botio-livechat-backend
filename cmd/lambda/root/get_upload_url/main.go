@@ -61,9 +61,8 @@ func main() {
 		discordWebhookURL = os.Getenv("DISCORD_WEBHOOK_URL")
 		awsRegion         = os.Getenv("AWS_REGION")
 		s3BucketName      = os.Getenv("S3_BUCKET_NAME")
-		s3TempBucketName  = os.Getenv("S3_TEMP_BUCKET_NAME")
 	)
-	storageClient := amazons3.NewClient(awsRegion, s3BucketName, s3TempBucketName)
+	storageClient := amazons3.NewClient(awsRegion, s3BucketName)
 	c := &config{
 		discordWebhookURL: discordWebhookURL,
 		awsRegion:         awsRegion,
