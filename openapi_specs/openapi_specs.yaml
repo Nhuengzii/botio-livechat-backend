@@ -124,7 +124,7 @@ paths:
         "204":
           description: "No Content: No conversations found"
         "400":
-          description: "Bad Request: Check query string parameters"
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
@@ -151,6 +151,8 @@ paths:
                 $ref: "#/components/schemas/MessageArray"
         "204":
           description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
         "500":
@@ -293,6 +295,8 @@ paths:
                 $ref: "#/components/schemas/ConversationArray"
         "204":
           description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
@@ -319,6 +323,8 @@ paths:
                 $ref: "#/components/schemas/MessageArray"
         "204":
           description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
         "500":
@@ -446,6 +452,8 @@ paths:
                 $ref: "#/components/schemas/ConversationArray"
         "204":
           description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
@@ -472,6 +480,8 @@ paths:
                 $ref: "#/components/schemas/MessageArray"
         "204":
           description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
         "500":
@@ -562,6 +572,8 @@ paths:
                 $ref: "#/components/schemas/ConversationArray"
         "204":
           description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
         "404":
           description: "Not Found: Shop not found. Check shop_id"
         "500":
@@ -623,7 +635,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
         "400":
-          description: "Bad Request: Check 'temporary' query string parameter"
+          description: "Bad Request: Check temporary"
         "500":
           description: "Internal Server Error: Unexpected error"
 components:
