@@ -59,6 +59,8 @@ func (c *Client) RequestPutPresignedURL(isTemporary bool, validDuration time.Dur
 	key := uuid.New().String()
 	if isTemporary {
 		key = "tmp/" + key
+	} else {
+		key = "files/" + key
 	}
 	putObjReq, _ := svc.PutObjectRequest(&s3.PutObjectInput{
 		Bucket: aws.String(c.bucketName),
