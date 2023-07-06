@@ -50,6 +50,15 @@ module "shops" {
         MONGODB_DATABASE    = var.mongo_database
       }
     }
+    patch_shop_id = {
+      handler_name = "patch_shop_id"
+      handler_path = format("%s/cmd/lambda/shops/patch_shop_id", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
   }
 }
 
