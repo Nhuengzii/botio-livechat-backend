@@ -10,10 +10,11 @@ type StorageClient interface {
 	// If implements by s3 storage name should be bucket name
 	UploadFile(file []byte) (string, error)
 
-	// RequestPutPresignedURL make a request to the storage and returns a PUT operation presigned URL.
-	// Return an error if it occurs.
+	// RequestPutPresignedURL make a request to S3 and returns a PUT operation presigned URL.
+	// Returns URL for uploading to temporary storage s3 bucket if isTemporary is true.
+	// Returns an error if it occurs.
 	//
-	// PUT operation presignedURL can be used to upload a file to storage.
+	// PUT operation presignedURL can be used to upload a file to Client's S3 bucket
 	// The URL is only valid for the time specified.
-	RequestPutPresignedURL(validTime time.Duration) (string, error)
+	RequestPutPresignedURL(isTemporary bool, validDuration time.Duration) (string, error)
 }

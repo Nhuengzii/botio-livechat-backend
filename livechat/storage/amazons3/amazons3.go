@@ -43,25 +43,32 @@ func (c *Client) UploadFile(file []byte) (string, error) {
 		Body:        bytes.NewReader(file),
 	})
 	if err != nil {
-		return "", fmt.Errorf("amazons3.Upload: %w", err)
+		return "", fmt.Errorf("amazons3.Client.UploadFile: %w", err)
 	}
 	return result.Location, nil
 }
 
 // RequestPutPresignedURL make a request to S3 and returns a PUT operation presigned URL.
-// Return an error if it occurs.
+// Returns URL for uploading to temporary storage s3 bucket if isTemporary is true.
+// Returns an error if it occurs.
 //
 // PUT operation presignedURL can be used to upload a file to Client's S3 bucket
 // The URL is only valid for the time specified.
-func (c *Client) RequestPutPresignedURL(validTime time.Duration) (string, error) {
+func (c *Client) RequestPutPresignedURL(isTemporary bool, validDuration time.Duration) (string, error) {
 	svc := s3.New(c.session)
+	key := uuid.New().String()
+	if isTemporary {
+		key = "tmp/" + key
+	} else {
+		key = "files/" + key
+	}
 	putObjReq, _ := svc.PutObjectRequest(&s3.PutObjectInput{
 		Bucket: aws.String(c.bucketName),
-		Key:    aws.String(uuid.New().String()),
+		Key:    aws.String(key),
 	})
-	presignedURL, err := putObjReq.Presign(validTime)
+	presignedURL, err := putObjReq.Presign(validDuration)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("amazons3.Client.RequestPutPresignedURL: %w", err)
 	}
 	return presignedURL, nil
 }

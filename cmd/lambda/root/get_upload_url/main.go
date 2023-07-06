@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getuploadurl"
@@ -16,6 +19,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+const putPresignedURLValidDuration time.Duration = 10 * time.Minute
+
+var errParsingTemporaryQueryParam = errors.New("temporary query string parameter must either be true or false")
+
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
@@ -24,7 +31,18 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	presignedURL, err := c.storageClient.RequestPutPresignedURL(10 * time.Minute)
+
+	queryStringParameters := req.QueryStringParameters
+	isTemporary := false
+	isTemporaryParamString, ok := queryStringParameters["temporary"]
+	if ok {
+		isTemporary, err = strconv.ParseBool(isTemporaryParamString)
+		if err != nil {
+			return apigateway.NewProxyResponse(400, fmt.Sprintf("Bad Request: %v", errParsingTemporaryQueryParam), "*"), nil
+		}
+	}
+
+	presignedURL, err := c.storageClient.RequestPutPresignedURL(isTemporary, putPresignedURLValidDuration)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
