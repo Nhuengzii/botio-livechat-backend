@@ -10,7 +10,7 @@ servers:
   - url: "https://{id}.execute-api.ap-southeast-1.amazonaws.com/{stage}"
     variables:
       id:
-        default: "oq0hx8j60a"
+        default: "1ai1vqnymh"
       stage:
         default: "dev"
 tags:
@@ -32,58 +32,60 @@ paths:
     get:
       tags:
         - facebook
+      summary: Facebook webhook verification
+      description: |
+        For use by facebook to verify webhook.
+      operationId: facebookWebhookVerify
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Webhook handler is up and running"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     post:
       tags:
         - facebook
+      summary: Facebook webhook
+      description: |
+        For use by facebook to send webhook events.
+      operationId: facebookWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Webhook events received"
+        "401":
+          description: "Unauthorized: Invalid signature"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
       tags:
         - facebook
-      summary: get a facebook conversation by its conversation_id
-      description: |
-        By passing in appropriate path parameters, you can search for
-        a facebook conversation of specific shop and page that matches the conversation_id
+      summary: Get a facebook conversation
       operationId: getFacebookConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversation found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     patch:
       tags:
         - facebook
-      summary: update a facebook conversation's fields with matching conversation_id
-      description: |
-        By passing in appropriate path parameters and request body, you can update 
-        facebook conversation's fields of specific shop and page that matches the conversation_id,
+      summary: Update a facebook conversation's field(s)
       operationId: patchFacebookConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -92,173 +94,170 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Conversation found and updated"
+        "400":
+          description: "Bad request: Check patch conversation request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
       tags:
         - facebook
-      summary: list all conversations of a specific facebook page
-      description: |
-        By passing in appropriate path parameters, you can list
-        all conversations of a specific facebook page,
-      operationId: listFacebookConversations
+      summary: List facebook page's conversations
+      operationId: listFacebookPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListConversationsFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversations found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - facebook
-      summary: list all messages in a specific facebook conversation
-      description: |
-        By passing in appropriate path parameters, you can list
-        all messages of a specific conversation,
-        the conversation has to be a facebook conversation
-      operationId: listFacebookMessages
+      summary: List facebook conversation's messages
+      operationId: listFacebookConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListMessagesFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Messages found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     post:
       tags:
         - facebook
-      summary: send a facebook message to specific conversation
-      description: |
-        By passing in appropriate path parameters request body and query string parameter
-        , you can send a facebook message to a specific conversation,
-        the target conversation has to be a facebook conversation
+      summary: Send a facebook message to a facebook conversation
       operationId: postFacebookMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PostMessage"
+        $ref: "#/components/requestBodies/FacebookPostMessage"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Message sent"
+        "400":
+          description: "Bad Request: Check post message request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
         - facebook
-      summary: get a specific page's facebook conversation statuses
+      summary: Get facebook page statuses
       description: |
-        By passing in appropriate path parameters, you can get
-        a page's facebook conversation statuses, such as number of
-        currently unread conversations
+        Get facebook page's unread and all conversations counts.
       operationId: getFacebookPageStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Page status found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # instagram
   /shops/{shop_id}/instagram/{page_id}/webhook:
     get:
       tags:
         - instagram
+      summary: Instagram webhook verification
+      description: |
+        For use by instagram to verify webhook.
+      operationId: instagramWebhookVerify
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Webhook handler is up and running"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     post:
       tags:
         - instagram
+      summary: Instagram webhook
+      description: |
+        For use by instagram to send webhook events.
+      operationId: instagramWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Webhook events received"
+        "401":
+          description: "Unauthorized: Invalid signature"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
       tags:
         - instagram
-      summary: get an instagram conversation by its conversation_id
-      description: |
-        By passing in appropriate path parameters, you can search for
-        an instagram conversation of specific shop and page that matches the conversation_id
+      summary: Get an instagram conversation
       operationId: getInstagramConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversation found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     patch:
       tags:
         - instagram
-      summary: update an instagram conversation's fields with matching conversation_id
-      description: |
-        By passing in appropriate path parameters and request body, you can update 
-        instagram conversation's fields of specific shop and page that matches the conversation_id,
+      summary: Update an instagram conversation's field(s)
       operationId: patchInstagramConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -267,160 +266,155 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Conversation found and updated"
+        "400":
+          description: "Bad Request: Check patch conversation request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
       tags:
         - instagram
-      summary: list all conversations of a specific instagram page
-      description: |
-        By passing in appropriate path parameters, you can list
-        all conversations of a specific instagram page,
-      operationId: listInstagramConversations
+      summary: List instagram page's conversations
+      operationId: listInstagramPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListConversationsFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversations found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - instagram
-      summary: list all messages in a specific instagram conversation
-      description: |
-        By passing in appropriate path parameters, you can list
-        all messages of a specific instagram conversation,
-      operationId: listInstagramMessages
+      summary: List instagram conversation's messages
+      operationId: listInstagramConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListMessagesFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Messages found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     post:
       tags:
         - instagram
-      summary: send an instagram message to specific instagram conversation
-      description: |
-        By passing in appropriate path parameters body and query string parameters, 
-        you can send an instagram message to a specific instagram conversation,
+      summary: Send an instagram message to an instagram conversation
       operationId: postInstagramMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PostMessage"
+        $ref: "#/components/requestBodies/InstagramPostMessage"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Message sent"
+        "400":
+          description: "Bad Request: Check post message request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/instagram/{page_id}:
     get:
       tags:
         - instagram
-      summary: get a specific page's instagram conversation statuses
+      summary: Get instagram page statuses
       description: |
-        By passing in appropriate path parameters, you can get
-        a page's instagram conversation statuses, such as number of
-        currently unread conversations
+        Get instagram page's unread and all conversation counts.
       operationId: getInstagramPageStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Page status found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # line
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       tags:
         - line
+      summary: Line webhook
+      description: |
+        For use by line to send webhook events.
+      operationId: lineWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Webhook event received"
+        "401":
+          description: "Unauthorized: Invalid signature"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
       tags:
         - line
-      summary: get a line conversation by its conversation_id
-      description: |
-        By passing in appropriate path parameters, you can search for
-        a line conversation of specific shop and page that matches the conversation_id
+      summary: Get a line conversation
       operationId: getLineConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversation found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     patch:
       tags:
         - line
-      summary: update a line conversation's fields with matching conversation_id
-      description: |
-        By passing in appropriate path parameters and request body, you can update 
-        line conversation's fields of specific shop and page that matches the conversation_id,
+      summary: Update a line conversation's field(s)
       operationId: patchLineConversation
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -429,191 +423,221 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Conversation found and updated"
+        "400":
+          description: "Bad Request: Check patch conversation request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
       tags:
         - line
       summary: list all conversations of a specific line page
-      description: |
-        By passing in appropriate path parameters, you can list
-        all conversations of a specific line page,
-      operationId: listLineConversations
+      operationId: listLinePageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListConversationsFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversations found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - line
       summary: list all messages in a specific line conversation
-      description: |
-        By passing in appropriate path parameters, you can list
-        all messages of a specific line conversation,
-      operationId: listLineMessages
+      operationId: listLineConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
         - $ref: "#/components/parameters/Skip"
         - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListMessagesFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Messages found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No messages found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
     post:
       tags:
         - line
-      summary: send a line message to specific line conversation
-      description: |
-        By passing in appropriate path parameters body and query string parameters, 
-        you can send a line message to a specific line conversation,
+      summary: Send a line message to a line conversation
       operationId: postLineMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PostMessage"
+        $ref: "#/components/requestBodies/LinePostMessage"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Message sent"
+        "400":
+          description: "Bad Request: Check post message request body"
+        "404":
+          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/line/{page_id}:
     get:
       tags:
         - line
-      summary: get a specific page's line conversation statuses
+      summary: Get line page status
       description: |
-        By passing in appropriate path parameters, you can get
-        a page's line conversation statuses, such as number of
-        currently unread conversations
+        Get line page's unread and all conversations counts.
       operationId: getLinePageStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Page status found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageStatus"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "404":
+          description: "Not Found: Page not found. Check shop_id and page_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # all
+  /shops/{shop_id}/all:
+    get:
+      tags:
+        - all
+      summary: List shop's all platforms' statuses.
+      description: |
+        List shop's all platforms' unread and all conversations counts.
+      operationId: ListShopAllPlatformsStatuses
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        "200":
+          description: "OK: Platforms information found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformsStatuses"
+        "204":
+          description: "No Content: No platforms information found"
+        "404":
+          description: "Not Found: Shop not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}/all/conversations:
     get:
       tags:
         - all
-      summary: list all conversations of a specific shop
-      description: |
-        By passing in appropriate path parameter shop_id, you can list
-        all conversations of a specific shop that matches the shop_id,
-      operationId: listAllConversations
+      summary: List shop's all platforms' conversations.
+      operationId: listShopAllPlatformsConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/ListConversationsFilter"
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Conversations found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+        "204":
+          description: "No Content: No conversations found"
+        "400":
+          description: "Bad Request: Check skip, limit, and filter"
+        "404":
+          description: "Not Found: Shop not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # shop
   /shops:
     post:
       tags:
         - shop
-      summary: create a new shop
-      description: create a new shop with the information provided
+      summary: Create a shop
       operationId: postShop
       requestBody:
-        $ref: "#/components/schemas/Shop"
+        $ref: "#/components/requestBodies/PostShop"
       responses:
-        200:
-          description: "OK"
-        400:
-          description: "Bad Request"
-        500:
-          description: "Internal Server Error"
+        "200":
+          description: "OK: Shop created"
+        "400":
+          description: "Bad Request: Check post shop request body"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   /shops/{shop_id}:
     get:
       tags:
         - shop
-      summary: list platforms of a shop
+      summary: List shop's platforms
       operationId: listShopPlatforms
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Platforms found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopPlatforms"
-        204:
-          description: "No Content"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
+                $ref: "#/components/schemas/ShopPlatformsPageIDs"
+        "204":
+          description: "No Content: No platforms found"
+        "404":
+          description: "Not Found: Shop not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # root
   /upload_url:
     get:
       tags:
         - root
-      summary: get a presigned url for uploading to s3
+      summary: Get S3 presigned upload URL
       operationId: getS3PresignedUploadURL
+      parameters:
+        - in: query
+          name: temporary
+          schema:
+            type: boolean
+            default: false
+          required: false
       responses:
-        200:
-          description: "OK"
+        "200":
+          description: "OK: Presigned URL created"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
-        500:
-          description: "Internal Server Error"
+        "400":
+          description: "Bad Request: Check temporary"
+        "500":
+          description: "Internal Server Error: Unexpected error"
 components:
   schemas:
     Message:
@@ -781,7 +805,7 @@ components:
     Shop:
       type: object
       required:
-        - shopID
+        - shop_id
       properties:
         shopID:
           type: string
@@ -797,7 +821,7 @@ components:
           type: string
         lineAuthentication:
           $ref: "#/components/schemas/LineAuthentication"
-    ShopPlatforms:
+    ShopPlatformsPageIDs:
       type: object
       properties:
         available_pages:
@@ -814,6 +838,28 @@ components:
           type: string
         page_id:
           type: string
+    PlatformsStatuses:
+      type: object
+      required:
+        - statuses
+      properties:
+        statuses:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformStatus"
+    PlatformStatus:
+      type: object
+      required:
+        - platform
+        - unreadConversations
+        - allConversations
+      properties:
+        platform:
+          type: string
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
     FacebookAuthentication:
       type: object
       required:
@@ -846,7 +892,7 @@ components:
         presignedURL:
           type: string
     # post message attachment
-    PostMessageAttachment:
+    FacebookPostMessageAttachment:
       type: object
       required:
         - type
@@ -859,10 +905,6 @@ components:
             - "video"
             - "audio"
             - "file"
-            - "line-template-buttons"
-            - "line-template-confirm"
-            - "line-template-carousel"
-            - "line-template-image-carousel"
             - "facebook-template-generic"
         payload:
           oneOf:
@@ -870,12 +912,53 @@ components:
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+    InstagramPostMessageAttachment:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+            - "file"
+            - "instagram-template-generic"
+        payload:
+          oneOf:
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+    LinePostMessageAttachment:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+            - "line-template-buttons"
+            - "line-template-confirm"
+            - "line-template-carousel"
+            - "line-template-image-carousel"
+        payload:
+          oneOf:
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
             - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
     # common attachment types
     PostMessageAttachmentPayloadImage:
       type: object
@@ -1107,7 +1190,6 @@ components:
             http(s)://
             line://
             tel:
-
     # facebook post template message
     PostMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
@@ -1118,9 +1200,10 @@ components:
           $ref: "#/components/schemas/FacebookTemplateGeneric"
     FacebookTemplateGeneric:
       type: object
+      description: |
+        Requires title and at least one of the following elements: message, picture, or buttons.
       required:
         - title
-        - default_action
       properties:
         title:
           type: string
@@ -1161,9 +1244,10 @@ components:
           $ref: "#/components/schemas/InstagramTemplateGeneric"
     InstagramTemplateGeneric:
       type: object
+      description: |
+        Requires title and at least one of the following elements: message, picture, or buttons.
       required:
         - title
-        - default_action
       properties:
         title:
           type: string
@@ -1196,35 +1280,62 @@ components:
           type: string
   parameters:
     ShopID:
+      in: path
       name: shop_id
-      in: path
-      required: true
       schema:
         type: string
+      required: true
     PageID:
+      in: path
       name: page_id
-      in: path
-      required: true
       schema:
         type: string
+      required: true
     ConversationID:
-      name: conversation_id
       in: path
-      required: true
+      name: conversation_id
       schema:
         type: string
+      required: true
     Skip:
+      in: query
       name: skip
-      in: query
-      required: false
       schema:
         type: integer
+        default: 0
+      required: false
     Limit:
-      name: limit
       in: query
-      required: false
+      name: limit
       schema:
         type: integer
+        default: 10
+      required: false
+    ListMessagesFilter:
+      in: query
+      name: filter
+      schema:
+        type: object
+        properties:
+          with_message:
+            type: string
+            description: Only list messages that contain this string.
+      required: false
+    ListConversationsFilter:
+      in: query
+      name: filter
+      description: |
+        Only one filter field can be provided at a time.
+      schema:
+        type: object
+        properties:
+          with_participants_username:
+            type: string
+            description: Only list conversations that contain this username (display name).
+          with_message:
+            type: string
+            description: Only list conversations that contain messages containing this string.
+      required: false
   requestBodies:
     PatchConversation:
       content:
@@ -1234,7 +1345,7 @@ components:
             properties:
               unread:
                 type: integer
-    PostMessage:
+    FacebookPostMessage:
       content:
         application/json:
           schema:
@@ -1244,4 +1355,31 @@ components:
                 properties:
                   message:
                     type: string
-              - $ref: "#/components/schemas/PostMessageAttachment"
+              - $ref: "#/components/schemas/FacebookPostMessageAttachment"
+    InstagramPostMessage:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: "text message"
+                properties:
+                  message:
+                    type: string
+              - $ref: "#/components/schemas/InstagramPostMessageAttachment"
+    LinePostMessage:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: "text message"
+                properties:
+                  message:
+                    type: string
+              - $ref: "#/components/schemas/LinePostMessageAttachment"
+    PostShop:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Shop"
