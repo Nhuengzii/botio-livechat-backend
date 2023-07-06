@@ -41,89 +41,45 @@ resource "aws_iam_role" "assume_role_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_lambda.json
 }
 
-module "post_shops" {
+
+module "handlers" {
   source                = "../lambda_handler"
-  handler_name          = var.handlers["post_shops"].handler_name
-  handler_path          = var.handlers["post_shops"].handler_path
+  for_each              = var.handlers
+  handler_name          = each.value.handler_name
+  handler_path          = each.value.handler_path
   role_arn              = aws_iam_role.assume_role_lambda.arn
-  environment_variables = var.handlers["post_shops"].environment_variables
+  environment_variables = each.value.environment_variables
 }
 
-module "get_shop_id" {
-  source                = "../lambda_handler"
-  handler_name          = var.handlers["get_shop_id"].handler_name
-  handler_path          = var.handlers["get_shop_id"].handler_path
-  role_arn              = aws_iam_role.assume_role_lambda.arn
-  environment_variables = var.handlers["get_shop_id"].environment_variables
+locals {
+  method_mapping = {
+    post_shops = {
+      method        = "POST"
+      resource_id   = aws_api_gateway_resource.shops.id
+      resource_path = aws_api_gateway_resource.shops.path
+    }
+    get_shop_id = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.shop_id.id
+      resource_path = aws_api_gateway_resource.shop_id.path
+    }
+    patch_shop_id = {
+      method        = "PATCH"
+      resource_id   = aws_api_gateway_resource.shop_id.id
+      resource_path = aws_api_gateway_resource.shop_id.path
+    }
+  }
 }
 
-module "patch_shop_id" {
-  source                = "../lambda_handler"
-  handler_name          = var.handlers["patch_shop_id"].handler_name
-  handler_path          = var.handlers["patch_shop_id"].handler_path
-  role_arn              = aws_iam_role.assume_role_lambda.arn
-  environment_variables = var.handlers["patch_shop_id"].environment_variables
+module "method_lambda_integration" {
+  source                 = "../method_lambda_integration"
+  for_each               = var.handlers
+  method                 = local.method_mapping[each.key].method
+  resource_id            = local.method_mapping[each.key].resource_id
+  resource_path          = local.method_mapping[each.key].resource_path
+  rest_api_id            = var.rest_api_id
+  rest_api_execution_arn = var.rest_api_execution_arn
+  lambda_invoke_arn      = module.handlers[each.key].lambda.invoke_arn
+  lambda_function_name   = module.handlers[each.key].lambda.function_name
 }
 
-resource "aws_api_gateway_method" "post_shops" {
-  http_method   = "POST"
-  rest_api_id   = var.rest_api_id
-  resource_id   = aws_api_gateway_resource.shops.id
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "get_shop_id" {
-  http_method   = "GET"
-  rest_api_id   = var.rest_api_id
-  resource_id   = aws_api_gateway_resource.shop_id.id
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "patch_shop_id" {
-  http_method   = "PATCH"
-  rest_api_id   = var.rest_api_id
-  resource_id   = aws_api_gateway_resource.shop_id.id
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "post_shops" {
-  http_method             = aws_api_gateway_method.post_shops.http_method
-  integration_http_method = "POST"
-  resource_id             = aws_api_gateway_resource.shops.id
-  rest_api_id             = var.rest_api_id
-  type                    = "AWS_PROXY"
-  uri                     = module.post_shops.lambda.invoke_arn
-}
-
-resource "aws_api_gateway_integration" "get_shop_id" {
-  http_method             = aws_api_gateway_method.get_shop_id.http_method
-  integration_http_method = "POST"
-  resource_id             = aws_api_gateway_resource.shop_id.id
-  rest_api_id             = var.rest_api_id
-  type                    = "AWS_PROXY"
-  uri                     = module.get_shop_id.lambda.invoke_arn
-}
-
-resource "aws_lambda_permission" "allow_api_gateway_to_invoke_post_shops" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.post_shops.lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, "POST", aws_api_gateway_resource.shops.path)
-}
-
-resource "aws_lambda_permission" "allow_api_gateway_to_invoke_get_shop_id" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.get_shop_id.lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, "GET", aws_api_gateway_resource.shop_id.path)
-}
-
-resource "aws_lambda_permission" "allow_api_gateway_to_invoke_patch_shop_id" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.patch_shop_id.lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/%s%s", var.rest_api_execution_arn, "PATCH", aws_api_gateway_resource.shop_id.path)
-}
