@@ -191,6 +191,9 @@ type DBClient interface {
 	// It returns nil if the operation is successful, otherwise returns error.
 	InsertShop(ctx context.Context, shop shops.Shop) error
 
+	// UpdateShop updates a shop with the given shopID with the information provided in the given shop shops.Shop.
+	UpdateShop(ctx context.Context, shopID string, shop shops.Shop) (err error)
+
 	// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
 	// otherwise returns error.
 	CheckShopExists(ctx context.Context, shopID string) error

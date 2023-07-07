@@ -613,6 +613,24 @@ paths:
           description: "Not Found: Shop not found. Check shop_id"
         "500":
           description: "Internal Server Error: Unexpected error"
+    patch:
+      tags:
+        - shop
+      summary: Update a shop's information
+      operationId: patchShop
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      requestBody:
+        $ref: "#/components/requestBodies/PatchShop"
+      responses:
+        "200":
+          description: "OK: Shop updated"
+        "400":
+          description: "Bad Request: Check shop_id and patch shop request body"
+        "404":
+          description: "Not Found: Shop not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
   # root
   /upload_url:
     get:
@@ -1379,6 +1397,11 @@ components:
                     type: string
               - $ref: "#/components/schemas/LinePostMessageAttachment"
     PostShop:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Shop"
+    PatchShop:
       content:
         application/json:
           schema:

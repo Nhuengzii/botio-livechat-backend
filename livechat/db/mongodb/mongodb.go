@@ -819,7 +819,7 @@ func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string)
 		}
 		return nil, err
 	}
-	return &shop.FacebookAuthentication, nil
+	return shop.FacebookAuthentication, nil
 }
 
 // QueryLineAuthentication return shops.QueryLineAuthentication that contains a matching pageID of line platform.
@@ -844,7 +844,7 @@ func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ 
 		}
 		return nil, err
 	}
-	return &shop.LineAuthentication, nil
+	return shop.LineAuthentication, nil
 }
 
 // QueryInstagramAuthentication return shops.QueryInstagramAuthentication that contains a matching pageID of instagram platform.
@@ -869,7 +869,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 		}
 		return nil, err
 	}
-	return &shop.InstagramAuthentication, nil
+	return shop.InstagramAuthentication, nil
 }
 
 // GetPage return number of unread conversations and total conversations of the specified page.
@@ -917,6 +917,55 @@ func (c *Client) InsertShop(ctx context.Context, shop shops.Shop) error {
 	if err != nil {
 		return fmt.Errorf("mongodb.Client.InsertShop: %w", err)
 	}
+	return nil
+}
+
+// UpdateShop updates a shop with the given shopID with the information provided in the given shop shops.Shop.
+func (c *Client) UpdateShop(ctx context.Context, shopID string, shop shops.Shop) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.UpdateShop: %w", err)
+		}
+	}()
+
+	setElements := bson.D{}
+	if shop.ShopID != "" {
+		setElements = append(setElements, bson.E{Key: "shopID", Value: shop.ShopID})
+	}
+	if shop.FacebookPageID != "" {
+		setElements = append(setElements, bson.E{Key: "facebookPageID", Value: shop.FacebookPageID})
+	}
+	if shop.FacebookAuthentication != nil {
+		setElements = append(setElements, bson.E{Key: "facebookAuthentication", Value: shop.FacebookAuthentication})
+	}
+	if shop.InstagramPageID != "" {
+		setElements = append(setElements, bson.E{Key: "instagramPageID", Value: shop.InstagramPageID})
+	}
+	if shop.InstagramAuthentication != nil {
+		setElements = append(setElements, bson.E{Key: "instagramAuthentication", Value: shop.InstagramAuthentication})
+	}
+	if shop.LinePageID != "" {
+		setElements = append(setElements, bson.E{Key: "linePageID", Value: shop.LinePageID})
+	}
+	if shop.LineAuthentication != nil {
+		setElements = append(setElements, bson.E{Key: "lineAuthentication", Value: shop.LineAuthentication})
+	}
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	update := bson.D{
+		{Key: "$set", Value: setElements},
+	}
+	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return ErrNoDocuments
+		}
+		return err
+	}
+
 	return nil
 }
 
