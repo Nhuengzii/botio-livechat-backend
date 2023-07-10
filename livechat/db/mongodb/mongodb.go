@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
 	"strings"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
@@ -33,6 +34,7 @@ type Target struct {
 	CollectionConversations string // Conversations collection name
 	CollectionMessages      string // Messages collection name
 	CollectionShops         string // Shops collection name
+	CollectionShopConfig    string // ShopConfig collection name
 }
 
 // NewClient returns a new Client which contains mongodb client inside.
@@ -1092,4 +1094,36 @@ func (c *Client) ListShopPlatformsStatuses(ctx context.Context, shopID string) (
 	}
 
 	return result, nil
+}
+
+// InsertShopConfig inserts a shop's config into the database.
+func (c *Client) InsertShopConfig(ctx context.Context, shopID string, config shopcfg.Config) error {
+	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
+	_, err := coll.InsertOne(ctx, config)
+	if err != nil {
+		return fmt.Errorf("mongodb.Client.InsertShopConfig: %w", err)
+	}
+	return nil
+}
+
+// GetShopConfig returns a shop's config.
+func (c *Client) GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.GetShopConfig: %w", err)
+		}
+	}()
+	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	config := shopcfg.Config{}
+	err = coll.FindOne(ctx, filter).Decode(&config)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrNoDocuments
+		}
+		return nil, err
+	}
+	return &config, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -207,4 +208,10 @@ type DBClient interface {
 	// Returns a slice and error = nil if successful.
 	// Otherwise,  returns a nil slice and an error.
 	ListShopPlatformsStatuses(ctx context.Context, shopID string) (_ []getall.Status, err error)
+
+	// InsertShopConfig inserts a shop's config into the database.
+	InsertShopConfig(ctx context.Context, shopID string, config shopcfg.Config) error
+
+	// GetShopConfig returns a shop's config.
+	GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error)
 }
