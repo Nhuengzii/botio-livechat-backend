@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log"
 	"os"
 	"time"
@@ -27,18 +26,23 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		}
 	}()
 	reqBody := req.Body
+	if reqBody == "" {
+		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty", "*"), nil
+	}
+
 	shop := shops.Shop{}
 	err = json.Unmarshal([]byte(reqBody), &shop)
 	if err != nil {
-		return apigateway.NewProxyResponse(400, "Bad Request", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad : Check request body format", "*"), nil
 	}
 
 	err = c.dbClient.CheckShopExists(ctx, shop.ShopID)
 	if err == nil {
-		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, "Not Found", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad Request: Shop already exists", "*"), nil
+	} else {
+		if err != mongodb.ErrNoDocuments {
+			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	err = c.dbClient.InsertShop(ctx, shop)
