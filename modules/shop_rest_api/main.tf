@@ -19,11 +19,24 @@ resource "aws_api_gateway_resource" "shop_id" {
   path_part   = "{shop_id}"
 }
 
+resource "aws_api_gateway_resource" "config" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.shop_id.id
+  path_part   = "config"
+}
+
 module "shop_id_enable_cors" {
   source          = "squidfunk/api-gateway-enable-cors/aws"
   version         = "0.3.3"
   api_id          = var.rest_api_id
   api_resource_id = aws_api_gateway_resource.shop_id.id
+}
+
+module "config_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.config.id
 }
 
 data "aws_iam_policy_document" "assume_role_lambda" {
@@ -67,6 +80,16 @@ locals {
       method        = "PATCH"
       resource_id   = aws_api_gateway_resource.shop_id.id
       resource_path = aws_api_gateway_resource.shop_id.path
+    }
+    get_config = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.config.id
+      resource_path = aws_api_gateway_resource.config.path
+    }
+    patch_config = {
+      method        = "PATCH"
+      resource_id   = aws_api_gateway_resource.config.id
+      resource_path = aws_api_gateway_resource.config.path
     }
   }
 }
