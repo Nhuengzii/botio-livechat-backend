@@ -39,10 +39,8 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	err = c.dbClient.CheckShopExists(ctx, shop.ShopID)
 	if err == nil {
 		return apigateway.NewProxyResponse(400, "Bad Request: Shop already exists", "*"), nil
-	} else {
-		if err != mongodb.ErrNoDocuments {
-			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
-		}
+	} else if err != mongodb.ErrNoDocuments {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
 	err = c.dbClient.InsertShop(ctx, shop)
