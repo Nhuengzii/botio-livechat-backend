@@ -27,7 +27,7 @@ tags:
   - name: root
     description: "Top-level operations"
 paths:
-  # facebook
+  # /{shop_id}/facebook/... endpoints
   /shops/{shop_id}/facebook/{page_id}/webhook:
     get:
       tags:
@@ -167,7 +167,35 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/FacebookPostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "file"
+                        - "facebook-template-generic"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
       responses:
         "200":
           description: "OK: Message sent"
@@ -199,7 +227,7 @@ paths:
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
           description: "Internal Server Error: Unexpected error"
-  # instagram
+  # /{shop_id}/instagram/... endpoints
   /shops/{shop_id}/instagram/{page_id}/webhook:
     get:
       tags:
@@ -339,7 +367,35 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/InstagramPostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "file"
+                        - "instagram-template-generic"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
       responses:
         "200":
           description: "OK: Message sent"
@@ -371,7 +427,7 @@ paths:
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
           description: "Internal Server Error: Unexpected error"
-  # line
+  # /{shop_id}/line/... endpoints
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       tags:
@@ -496,7 +552,39 @@ paths:
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/LinePostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "line-template-buttons"
+                        - "line-template-confirm"
+                        - "line-template-carousel"
+                        - "line-template-image-carousel"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
       responses:
         "200":
           description: "OK: Message sent"
@@ -528,7 +616,7 @@ paths:
           description: "Not Found: Page not found. Check shop_id and page_id"
         "500":
           description: "Internal Server Error: Unexpected error"
-  # all
+  # /{shop_id}/all/... endpoints
   /shops/{shop_id}/all:
     get:
       tags:
@@ -545,7 +633,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PlatformsStatuses"
+                $ref: "#/components/schemas/PlatformsStatusesArray"
         "204":
           description: "No Content: No platforms information found"
         "404":
@@ -578,18 +666,44 @@ paths:
           description: "Not Found: Shop not found. Check shop_id"
         "500":
           description: "Internal Server Error: Unexpected error"
-  # shop
+  # /shops/... endpoints
   /shops:
     post:
       tags:
         - shop
       summary: Create a shop
+      description: |
+        Create a shop  with the request body provided, and create an empty shop config together with it.
       operationId: postShop
       requestBody:
-        $ref: "#/components/requestBodies/PostShop"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                facebookPageID:
+                  type: string
+                facebookAuthentication:
+                  $ref: "#/components/schemas/FacebookAuthentication"
+                instagramPageID:
+                  type: string
+                instagramAuthentication:
+                  $ref: "#/components/schemas/InstagramAuthentication"
+                linePageID:
+                  type: string
+                lineAuthentication:
+                  $ref: "#/components/schemas/LineAuthentication"
       responses:
-        "200":
+        "200": # TODO return shopID in the implementation
           description: "OK: Shop created"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shopID:
+                    type: string
+                    description: ID of the created shop
         "400":
           description: "Bad Request: Check post shop request body"
         "500":
@@ -600,13 +714,15 @@ paths:
         - shop
       summary: List shop's platforms
       operationId: listShopPlatforms
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
       responses:
         "200":
           description: "OK: Platforms found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopPlatformsPageIDs"
+                $ref: "#/components/schemas/ShopPlatformsInfoArray"
         "204":
           description: "No Content: No platforms found"
         "404":
@@ -621,7 +737,23 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ShopID"
       requestBody:
-        $ref: "#/components/requestBodies/PatchShop"
+        content: # TODO add request type in the implementation instead of using raw shop type to make shopID not patchable
+          application/json:
+            schema:
+              type: object
+              properties:
+                facebookPageID:
+                  type: string
+                facebookAuthentication:
+                  $ref: "#/components/schemas/FacebookAuthentication"
+                instagramPageID:
+                  type: string
+                instagramAuthentication:
+                  $ref: "#/components/schemas/InstagramAuthentication"
+                linePageID:
+                  type: string
+                lineAuthentication:
+                  $ref: "#/components/schemas/LineAuthentication"
       responses:
         "200":
           description: "OK: Shop updated"
@@ -631,7 +763,64 @@ paths:
           description: "Not Found: Shop not found. Check shop_id"
         "500":
           description: "Internal Server Error: Unexpected error"
-  # root
+  /shops/{shop_id}/config:
+    get:
+      tags:
+        - shop
+      summary: Get a shop's config
+      operationId: getShopConfig
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        "200":
+          description: "OK: Shop config found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopConfigWrapper"
+        "404":
+          description: "Not Found: Shop config not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
+    patch:
+      tags:
+        - shop
+      summary: Update a shop's config
+      description: |
+        Add a new shop template message
+      operationId: patchShopConfig
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - templatePayload
+              properties:
+                templatePayload:
+                  type: string
+      responses:
+        "200":
+          description: "OK: Shop config updated"
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - templateID
+                properties:
+                  templateID:
+                    type: string
+                    description: ID of the created template message
+        "400":
+          description: "Bad Request: Check shop_id and patch shop config request body"
+        "404":
+          description: "Not Found: Shop config not found. Check shop_id"
+        "500":
+          description: "Internal Server Error: Unexpected error"
+  # /... endpoints
   /upload_url:
     get:
       tags:
@@ -820,43 +1009,8 @@ components:
           type: integer
         allConversations:
           type: integer
-    Shop:
-      type: object
-      required:
-        - shop_id
-      properties:
-        shopID:
-          type: string
-        facebookPageID:
-          type: string
-        facebookAuthentication:
-          $ref: "#/components/schemas/FacebookAuthentication"
-        instagramPageID:
-          type: string
-        instagramAuthentication:
-          $ref: "#/components/schemas/InstagramAuthentication"
-        linePageID:
-          type: string
-        lineAuthentication:
-          $ref: "#/components/schemas/LineAuthentication"
-    ShopPlatformsPageIDs:
-      type: object
-      properties:
-        available_pages:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlatformPageID"
-    PlatformPageID:
-      type: object
-      required:
-        - platform_name
-        - page_id
-      properties:
-        platform_name:
-          type: string
-        page_id:
-          type: string
-    PlatformsStatuses:
+    # /{shop_id}/all/... data models
+    PlatformsStatusesArray:
       type: object
       required:
         - statuses
@@ -878,6 +1032,26 @@ components:
           type: integer
         allConversations:
           type: integer
+    # /shops/... data models
+    Shop:
+      type: object
+      required:
+        - shopID
+      properties:
+        shopID:
+          type: string
+        facebookPageID:
+          type: string
+        facebookAuthentication:
+          $ref: "#/components/schemas/FacebookAuthentication"
+        instagramPageID:
+          type: string
+        instagramAuthentication:
+          $ref: "#/components/schemas/InstagramAuthentication"
+        linePageID:
+          type: string
+        lineAuthentication:
+          $ref: "#/components/schemas/LineAuthentication"
     FacebookAuthentication:
       type: object
       required:
@@ -902,6 +1076,60 @@ components:
           type: string
         secret:
           type: string
+    ShopWrapper: # TODO use this instead of Shop in response
+      type: object
+      required:
+        - shop
+      properties:
+        shop:
+          $ref: "#/components/schemas/Shop"
+    ShopPlatformsInfoArray:
+      type: object
+      properties:
+        available_pages: # TODO convert to camel case
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformInfo"
+    PlatformInfo:
+      type: object
+      required:
+        - platform_name # TODO convert to camel case
+        - page_id # TODO convert to camel case
+      properties:
+        platform_name:
+          type: string
+        page_id:
+          type: string
+    ShopConfig:
+      type: object
+      required:
+        - shopID
+        - templates
+      properties:
+        shopID:
+          type: string
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShopTemplate"
+    ShopTemplate:
+      type: object
+      required:
+        - id
+        - payload
+      properties:
+        id:
+          type: string
+        payload:
+          type: string
+    ShopConfigWrapper:
+      type: object
+      required:
+        - shopConfig
+      properties:
+        shopConfig:
+          $ref: "#/components/schemas/ShopConfig"
+    # /... data models
     PresignedURL:
       type: object
       required:
@@ -909,74 +1137,6 @@ components:
       properties:
         presignedURL:
           type: string
-    # post message attachment
-    FacebookPostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "file"
-            - "facebook-template-generic"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
-    InstagramPostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "file"
-            - "instagram-template-generic"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
-    LinePostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "line-template-buttons"
-            - "line-template-confirm"
-            - "line-template-carousel"
-            - "line-template-image-carousel"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
     # common attachment types
     PostMessageAttachmentPayloadImage:
       type: object
@@ -1010,7 +1170,7 @@ components:
         src:
           type: string
           description: "URL of the file"
-    # line post template message
+    # line template messages
     PostMessageAttachmentPayloadLineTemplateButtons:
       type: object
       required:
@@ -1208,7 +1368,7 @@ components:
             http(s)://
             line://
             tel:
-    # facebook post template message
+    # facebook template messages
     PostMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
       required:
@@ -1252,7 +1412,7 @@ components:
       properties:
         url:
           type: string
-    # instagram post template message
+    # instagram template messages
     PostMessageAttachmentPayloadInstagramGeneric:
       type: object
       required:
@@ -1297,6 +1457,7 @@ components:
         url:
           type: string
   parameters:
+    # path parameters
     ShopID:
       in: path
       name: shop_id
@@ -1315,6 +1476,7 @@ components:
       schema:
         type: string
       required: true
+    # query string parameters
     Skip:
       in: query
       name: skip
@@ -1363,46 +1525,3 @@ components:
             properties:
               unread:
                 type: integer
-    FacebookPostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/FacebookPostMessageAttachment"
-    InstagramPostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/InstagramPostMessageAttachment"
-    LinePostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/LinePostMessageAttachment"
-    PostShop:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Shop"
-    PatchShop:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Shop"
