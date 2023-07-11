@@ -1521,14 +1521,14 @@ components:
       name: skip
       schema:
         type: integer
-        default: # TODO what is the default?
+        default: 0
       required: false
     Limit:
       in: query
       name: limit
       schema:
         type: integer
-        default: # TODO what is the default?
+        default: infinity
       required: false
     ListMessagesFilter:
       in: query
