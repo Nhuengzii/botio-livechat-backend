@@ -34,6 +34,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 
 	reqBody := req.Body
+	if reqBody == "" {
+		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty.", "*"), nil
+	}
 
 	patchShopRequest := patchshop.Request{}
 	err = json.Unmarshal([]byte(reqBody), &patchShopRequest)
