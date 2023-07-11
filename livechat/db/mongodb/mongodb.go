@@ -1118,8 +1118,10 @@ func (c *Client) AddShopNewTemplateMessage(ctx context.Context, shopID string, t
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 	}
-	update := bson.D{
-		{Key: "$push", Value: bson.E{Key: "templates", Value: template}},
+	update := bson.D{ // TODO still fucked up!
+		{Key: "$push", Value: bson.D{
+			{Key: "templates", Value: template},
+		}},
 	}
 
 	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
