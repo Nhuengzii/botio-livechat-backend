@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshopcfg"
 	"log"
 	"os"
 	"time"
@@ -22,7 +25,30 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+
+	pathParameters := req.PathParameters
+	shopID, ok := pathParameters["shop_id"]
+	if !ok {
+		return apigateway.NewProxyResponse(400, "BadRequest: shop_id must not be empty.", "*"), nil
+	}
+
+	shopConfig, err := c.dbClient.GetShopConfig(ctx, shopID)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil
+		}
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
+	}
+
+	response := getshopcfg.Response{
+		ShopConfig: *shopConfig,
+	}
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
+	}
+
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {

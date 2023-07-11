@@ -210,4 +210,7 @@ type DBClient interface {
 
 	// GetShopConfig returns a shop's config.
 	GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error)
+
+	// AddShopNewTemplateMessage adds a new template message to a shop's config.
+	AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error)
 }

@@ -2,6 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchshopcfg"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"time"
@@ -22,7 +27,45 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
 	}()
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+
+	pathParameters := req.PathParameters
+	shopID, ok := pathParameters["shop_id"]
+	if !ok {
+		return apigateway.NewProxyResponse(400, "BadRequest: shop_id must not be empty.", "*"), nil
+	}
+
+	reqBody := req.Body
+	if reqBody == "" {
+		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty.", "*"), nil
+	}
+
+	patchShopCfgRequest := patchshopcfg.Request{}
+	err = json.Unmarshal([]byte(reqBody), &patchShopCfgRequest)
+	if err != nil {
+		return apigateway.NewProxyResponse(400, "Bad Request: Check request body.", "*"), nil
+	}
+
+	newTemplateID := uuid.New().String()
+	newTemplate := shopcfg.Template{
+		ID:      newTemplateID,
+		Payload: patchShopCfgRequest.TemplatePayload,
+	}
+	err = c.dbClient.AddShopNewTemplateMessage(ctx, shopID, newTemplate)
+	if err != nil {
+		if errors.Is(err, mongodb.ErrNoDocuments) {
+			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil
+		}
+		return apigateway.NewProxyResponse(500, "Internal Server Error: ", "*"), nil
+	}
+
+	response := patchshopcfg.Response{
+		TemplateID: newTemplateID,
+	}
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error: ", "*"), nil
+	}
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {

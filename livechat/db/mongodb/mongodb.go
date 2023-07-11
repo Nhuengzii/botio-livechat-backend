@@ -1105,3 +1105,30 @@ func (c *Client) GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.C
 	}
 	return &config, nil
 }
+
+// AddShopNewTemplateMessage adds a new template message to a shop's config.
+func (c *Client) AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.AddShopNewTemplateMessage: %w", err)
+		}
+	}()
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	update := bson.D{
+		{Key: "$push", Value: bson.E{Key: "templates", Value: template}},
+	}
+
+	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return ErrNoDocuments
+		}
+		return err
+	}
+
+	return nil
+}
