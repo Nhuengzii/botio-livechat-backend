@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postshop"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"time"
@@ -27,28 +30,54 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	reqBody := req.Body
 	if reqBody == "" {
-		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty.", "*"), nil
 	}
 
-	shop := shops.Shop{}
-	err = json.Unmarshal([]byte(reqBody), &shop)
+	postShopReq := postshop.Request{}
+	err = json.Unmarshal([]byte(reqBody), &postShopReq)
 	if err != nil {
-		return apigateway.NewProxyResponse(400, "Bad : Check request body format", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad Request: Check request body.", "*"), nil
 	}
 
-	err = c.dbClient.CheckShopExists(ctx, shop.ShopID)
-	if err == nil {
-		return apigateway.NewProxyResponse(400, "Bad Request: Shop already exists", "*"), nil
-	} else if err != mongodb.ErrNoDocuments {
+	newShopID := uuid.New().String()
+	newShop := shops.Shop{
+		ShopID:         newShopID,
+		FacebookPageID: postShopReq.FacebookPageID,
+		FacebookAuthentication: shops.FacebookAuthentication{
+			AccessToken: postShopReq.FacebookAccessToken,
+		},
+		InstagramPageID: postShopReq.InstagramPageID,
+		InstagramAuthentication: shops.InstagramAuthentication{
+			AccessToken: postShopReq.InstagramAccessToken,
+		},
+		LinePageID: postShopReq.LinePageID,
+		LineAuthentication: shops.LineAuthentication{
+			AccessToken: postShopReq.LineAccessToken,
+			Secret:      postShopReq.LineSecret,
+		},
+	}
+	err = c.dbClient.InsertShop(ctx, newShop)
+	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	err = c.dbClient.InsertShop(ctx, shop)
+	newShopConfig := shopcfg.Config{
+		ShopID:    newShopID,
+		Templates: []shopcfg.Template{},
+	}
+	err = c.dbClient.InsertShopConfig(ctx, newShopConfig)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+	resp := postshop.Response{
+		ShopID: newShopID,
+	}
+	respJSON, err := json.Marshal(resp)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+	return apigateway.NewProxyResponse(200, string(respJSON), "*"), nil
 }
 
 func main() {
@@ -65,6 +94,7 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
+		CollectionShopConfig:    "shop_config",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/post_shops/main.main: " + err.Error()

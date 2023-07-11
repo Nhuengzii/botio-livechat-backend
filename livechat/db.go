@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -194,10 +195,6 @@ type DBClient interface {
 	// UpdateShop updates a shop with the given shopID with the information provided in the given shop shops.Shop.
 	UpdateShop(ctx context.Context, shopID string, shop shops.Shop) (err error)
 
-	// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
-	// otherwise returns error.
-	CheckShopExists(ctx context.Context, shopID string) error
-
 	// ListShopPlatforms returns a slice of a shop's platforms and corresponding pageIDs.
 	// If the operation is successful, a slice will be returned and err will be nil,
 	// otherwise nil, nil are returned
@@ -207,4 +204,13 @@ type DBClient interface {
 	// Returns a slice and error = nil if successful.
 	// Otherwise,  returns a nil slice and an error.
 	ListShopPlatformsStatuses(ctx context.Context, shopID string) (_ []getall.Status, err error)
+
+	// InsertShopConfig inserts a shop's config into the database.
+	InsertShopConfig(ctx context.Context, config shopcfg.Config) error
+
+	// GetShopConfig returns a shop's config.
+	GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error)
+
+	// AddShopNewTemplateMessage adds a new template message to a shop's config.
+	AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error)
 }

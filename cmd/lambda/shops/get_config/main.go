@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchshop"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshopcfg"
 	"log"
 	"os"
 	"time"
@@ -21,7 +20,7 @@ import (
 func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest) (_ events.APIGatewayProxyResponse, err error) {
 	defer func() {
 		if err != nil {
-			logMessage := "cmd/lambda/shops/patch_shop_id/main.config.handler: " + err.Error()
+			logMessage := "cmd/lambda/shops/get_config/main.config.handler: " + err.Error()
 			log.Println(logMessage)
 			discord.Log(c.discordWebhookURL, logMessage)
 		}
@@ -30,36 +29,10 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	pathParameters := req.PathParameters
 	shopID, ok := pathParameters["shop_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request: shop_id must not be empty.", "*"), nil
+		return apigateway.NewProxyResponse(400, "BadRequest: shop_id must not be empty.", "*"), nil
 	}
 
-	reqBody := req.Body
-	if reqBody == "" {
-		return apigateway.NewProxyResponse(400, "Bad Request: Request body must not be empty.", "*"), nil
-	}
-
-	patchShopRequest := patchshop.Request{}
-	err = json.Unmarshal([]byte(reqBody), &patchShopRequest)
-	if err != nil {
-		return apigateway.NewProxyResponse(400, "Bad Request: Check request body.", "*"), nil
-	}
-
-	patchShopBody := shops.Shop{
-		FacebookPageID: patchShopRequest.FacebookPageID,
-		FacebookAuthentication: shops.FacebookAuthentication{
-			AccessToken: patchShopRequest.FacebookAccessToken,
-		},
-		InstagramPageID: patchShopRequest.InstagramPageID,
-		InstagramAuthentication: shops.InstagramAuthentication{
-			AccessToken: patchShopRequest.InstagramAccessToken,
-		},
-		LinePageID: patchShopRequest.LinePageID,
-		LineAuthentication: shops.LineAuthentication{
-			AccessToken: patchShopRequest.LineAccessToken,
-			Secret:      patchShopRequest.LineSecret,
-		},
-	}
-	err = c.dbClient.UpdateShop(ctx, shopID, patchShopBody)
+	shopConfig, err := c.dbClient.GetShopConfig(ctx, shopID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil
@@ -67,7 +40,15 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
 	}
 
-	return apigateway.NewProxyResponse(200, "OK: Shop patched", "*"), nil
+	response := getshopcfg.Response{
+		ShopConfig: *shopConfig,
+	}
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
+	}
+
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
@@ -84,9 +65,10 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
+		CollectionShopConfig:    "shop_config",
 	})
 	if err != nil {
-		logMessage := "cmd/lambda/shops/patch_shop_id/main.main: " + err.Error()
+		logMessage := "cmd/lambda/shops/get_config/main.main: " + err.Error()
 		discord.Log(discordWebhookURL, logMessage)
 		log.Fatalln(logMessage)
 	}

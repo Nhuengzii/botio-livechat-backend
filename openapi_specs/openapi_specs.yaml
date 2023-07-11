@@ -27,27 +27,31 @@ tags:
   - name: root
     description: "Top-level operations"
 paths:
-  # facebook
+  # /{shop_id}/facebook/...
   /shops/{shop_id}/facebook/{page_id}/webhook:
     get:
       tags:
         - facebook
       summary: Facebook webhook verification
       description: |
-        For use by facebook to verify webhook.
-      operationId: facebookWebhookVerify
+        For use by facebook to verify a webhook endpoint.
+      operationId: verifyFacebookWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Webhook handler is up and running"
+          description: "OK: Webhook handler is up and running."
+        "400":
+          description: "Bad Request: Check path parameters."
+        "404":
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     post:
       tags:
         - facebook
-      summary: Facebook webhook
+      summary: Facebook webhook events
       description: |
         For use by facebook to send webhook events.
       operationId: facebookWebhook
@@ -56,11 +60,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Webhook events received"
+          description: "OK: Webhook events received."
+        "400":
+          description: "Bad Request: Check path parameters."
         "401":
-          description: "Unauthorized: Invalid signature"
+          description: "Unauthorized: Invalid signature."
+        "404":
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -73,15 +81,17 @@ paths:
         - $ref: "#/components/parameters/ConversationID"
       responses:
         "200":
-          description: "OK: Conversation found"
+          description: "OK: Conversation found."
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
+        "400":
+          description: "Bad request: Check path parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     patch:
       tags:
         - facebook
@@ -95,18 +105,18 @@ paths:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
         "200":
-          description: "OK: Conversation found and updated"
+          description: "OK: Conversation updated."
         "400":
-          description: "Bad request: Check patch conversation request body"
+          description: "Bad request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations:
     get:
       tags:
         - facebook
-      summary: List facebook page's conversations
+      summary: List a facebook page's conversations
       operationId: listFacebookPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -124,16 +134,16 @@ paths:
         "204":
           description: "No Content: No conversations found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - facebook
-      summary: List facebook conversation's messages
+      summary: List a facebook conversation's messages
       operationId: listFacebookConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -152,74 +162,108 @@ paths:
         "204":
           description: "No Content: No messages found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     post:
       tags:
         - facebook
-      summary: Send a facebook message to a facebook conversation
+      summary: Send a message to a facebook conversation
       operationId: postFacebookMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/FacebookPostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "file"
+                        - "facebook-template-generic"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
       responses:
         "200":
           description: "OK: Message sent"
         "400":
-          description: "Bad Request: Check post message request body"
+          description: "Bad Request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/facebook/{page_id}:
     get:
       tags:
         - facebook
-      summary: Get facebook page statuses
+      summary: Get a facebook page's conversations status
       description: |
-        Get facebook page's unread and all conversations counts.
-      operationId: getFacebookPageStatus
+        Get a facebook page's unread and all conversations counts.
+      operationId: getFacebookPageConversationStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Page status found"
+          description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageStatus"
+                $ref: "#/components/schemas/PageConversationStatus"
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
-  # instagram
+          description: "Internal Server Error"
+  # /{shop_id}/instagram/...
   /shops/{shop_id}/instagram/{page_id}/webhook:
     get:
       tags:
         - instagram
       summary: Instagram webhook verification
       description: |
-        For use by instagram to verify webhook.
-      operationId: instagramWebhookVerify
+        For use by instagram to verify a webhook endpoint.
+      operationId: verifyInstagramWebhook
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Webhook handler is up and running"
+          description: "OK: Webhook handler is up and running."
+        "400":
+          description: "Bad Request: Check path parameters."
+        "404":
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     post:
       tags:
         - instagram
-      summary: Instagram webhook
+      summary: Instagram webhook events
       description: |
         For use by instagram to send webhook events.
       operationId: instagramWebhook
@@ -228,11 +272,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Webhook events received"
+          description: "OK: Webhook events received."
+        "400":
+          description: "Bad Request: Check path parameters."
         "401":
-          description: "Unauthorized: Invalid signature"
+          description: "Unauthorized: Invalid signature."
+        "404":
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -245,15 +293,17 @@ paths:
         - $ref: "#/components/parameters/ConversationID"
       responses:
         "200":
-          description: "OK: Conversation found"
+          description: "OK: Conversation found."
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
+        "400":
+          description: "Bad request: Check path parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     patch:
       tags:
         - instagram
@@ -267,18 +317,18 @@ paths:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
         "200":
-          description: "OK: Conversation found and updated"
+          description: "OK: Conversation updated."
         "400":
-          description: "Bad Request: Check patch conversation request body"
+          description: "Bad request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations:
     get:
       tags:
         - instagram
-      summary: List instagram page's conversations
+      summary: List an instagram page's conversations
       operationId: listInstagramPageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -296,16 +346,16 @@ paths:
         "204":
           description: "No Content: No conversations found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - instagram
-      summary: List instagram conversation's messages
+      summary: List an instagram conversation's messages
       operationId: listInstagramConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -324,59 +374,89 @@ paths:
         "204":
           description: "No Content: No messages found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     post:
       tags:
         - instagram
-      summary: Send an instagram message to an instagram conversation
+      summary: Send a message to an instagram conversation
       operationId: postInstagramMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/InstagramPostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "file"
+                        - "instagram-template-generic"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
       responses:
         "200":
           description: "OK: Message sent"
         "400":
-          description: "Bad Request: Check post message request body"
+          description: "Bad Request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/instagram/{page_id}:
     get:
       tags:
         - instagram
-      summary: Get instagram page statuses
+      summary: Get an instagram page's conversations status
       description: |
-        Get instagram page's unread and all conversation counts.
-      operationId: getInstagramPageStatus
+        Get an instagram page's unread and all conversation counts.
+      operationId: getInstagramPageConversationStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Page status found"
+          description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageStatus"
+                $ref: "#/components/schemas/PageConversationStatus"
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
-  # line
+          description: "Internal Server Error"
+  # /{shop_id}/line/...
   /shops/{shop_id}/line/{page_id}/webhook:
     post:
       tags:
         - line
-      summary: Line webhook
+      summary: Line webhook events
       description: |
         For use by line to send webhook events.
       operationId: lineWebhook
@@ -385,11 +465,15 @@ paths:
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Webhook event received"
+          description: "OK: Webhook events received."
+        "400":
+          description: "Bad Request: Check path parameters."
         "401":
-          description: "Unauthorized: Invalid signature"
+          description: "Unauthorized: Invalid signature."
+        "404":
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}:
     get:
       tags:
@@ -402,15 +486,17 @@ paths:
         - $ref: "#/components/parameters/ConversationID"
       responses:
         "200":
-          description: "OK: Conversation found"
+          description: "OK: Conversation found."
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConversationWrapper"
+        "400":
+          description: "Bad request: Check path parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     patch:
       tags:
         - line
@@ -424,18 +510,18 @@ paths:
         $ref: "#/components/requestBodies/PatchConversation"
       responses:
         "200":
-          description: "OK: Conversation found and updated"
+          description: "OK: Conversation updated."
         "400":
-          description: "Bad Request: Check patch conversation request body"
+          description: "Bad request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations:
     get:
       tags:
         - line
-      summary: list all conversations of a specific line page
+      summary: List a line page's conversations
       operationId: listLinePageConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -453,16 +539,16 @@ paths:
         "204":
           description: "No Content: No conversations found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}/conversations/{conversation_id}/messages:
     get:
       tags:
         - line
-      summary: list all messages in a specific line conversation
+      summary: List a line conversation's messages
       operationId: listLineConversationMessages
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -481,82 +567,116 @@ paths:
         "204":
           description: "No Content: No messages found"
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     post:
       tags:
         - line
-      summary: Send a line message to a line conversation
+      summary: Send a message to a line conversation
       operationId: postLineMessage
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
         - $ref: "#/components/parameters/ConversationID"
       requestBody:
-        $ref: "#/components/requestBodies/LinePostMessage"
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  description: "text message"
+                  properties:
+                    message:
+                      type: string
+                - type: object
+                  required:
+                    - type
+                    - payload
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "image"
+                        - "video"
+                        - "audio"
+                        - "line-template-buttons"
+                        - "line-template-confirm"
+                        - "line-template-carousel"
+                        - "line-template-image-carousel"
+                    payload:
+                      oneOf:
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
+                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
       responses:
         "200":
           description: "OK: Message sent"
         "400":
-          description: "Bad Request: Check post message request body"
+          description: "Bad Request: Check path parameters and request body."
         "404":
-          description: "Not Found: Conversation not found. Check shop_id, page_id, and conversation_id"
+          description: "Not Found: Conversation not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/line/{page_id}:
     get:
       tags:
         - line
-      summary: Get line page status
+      summary: Get a line page's conversations status
       description: |
-        Get line page's unread and all conversations counts.
-      operationId: getLinePageStatus
+        Get a line page's unread and all conversations counts.
+      operationId: getLinePageConversationStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
         - $ref: "#/components/parameters/PageID"
       responses:
         "200":
-          description: "OK: Page status found"
+          description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageStatus"
+                $ref: "#/components/schemas/PageConversationStatus"
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
-          description: "Not Found: Page not found. Check shop_id and page_id"
+          description: "Not Found: Page not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
-  # all
+          description: "Internal Server Error"
+  # /shops/{shop_id}/all/...
   /shops/{shop_id}/all:
     get:
       tags:
         - all
-      summary: List shop's all platforms' statuses.
-      description: |
-        List shop's all platforms' unread and all conversations counts.
-      operationId: ListShopAllPlatformsStatuses
+      summary: List a shop's all platforms' conversations status.
+      operationId: ListShopAllPlatformsConversationsStatus
       parameters:
         - $ref: "#/components/parameters/ShopID"
       responses:
         "200":
-          description: "OK: Platforms information found"
+          description: "OK: Status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PlatformsStatuses"
+                $ref: "#/components/schemas/ShopPlatformsConversationsStatusArray"
         "204":
-          description: "No Content: No platforms information found"
+          description: "No Content: No status found."
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
-          description: "Not Found: Shop not found. Check shop_id"
+          description: "Not Found: Shop not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}/all/conversations:
     get:
       tags:
         - all
-      summary: List shop's all platforms' conversations.
+      summary: List a shop's all platforms' conversations.
       operationId: listShopAllPlatformsConversations
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -571,48 +691,81 @@ paths:
               schema:
                 $ref: "#/components/schemas/ConversationArray"
         "204":
-          description: "No Content: No conversations found"
+          description: "No Content: No conversations found."
         "400":
-          description: "Bad Request: Check skip, limit, and filter"
+          description: "Bad Request: Check path parameters and query string parameters."
         "404":
-          description: "Not Found: Shop not found. Check shop_id"
+          description: "Not Found: Shop not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
-  # shop
+          description: "Internal Server Error"
+  # /shops/...
   /shops:
     post:
       tags:
         - shop
       summary: Create a shop
+      description: |
+        Create a shop  with the information provided in the request body.
+        Also creates an empty shop config of the shop.
       operationId: postShop
       requestBody:
-        $ref: "#/components/requestBodies/PostShop"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                facebookPageID:
+                  type: string
+                facebookAccessToken:
+                  type: string
+                instagramPageID:
+                  type: string
+                instagramAccessToken:
+                  type: string
+                linePageID:
+                  type: string
+                lineAccessToken:
+                  type: string
+                lineSecret:
+                  type: string
       responses:
         "200":
-          description: "OK: Shop created"
+          description: "OK: Shop created."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shopID:
+                    type: string
+                    description: ID of the created shop
         "400":
-          description: "Bad Request: Check post shop request body"
+          description: "Bad Request: Check request body."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
   /shops/{shop_id}:
     get:
       tags:
         - shop
-      summary: List shop's platforms
-      operationId: listShopPlatforms
+      summary: List a shop's available pages
+      operationId: listShopAvailablePages
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
       responses:
         "200":
-          description: "OK: Platforms found"
+          description: "OK: Pages found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopPlatformsPageIDs"
+                $ref: "#/components/schemas/ShopAvailablePagesArray"
         "204":
-          description: "No Content: No platforms found"
+          description: "No Content: No pages found."
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
-          description: "Not Found: Shop not found. Check shop_id"
+          description: "Not Found: Shop not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
     patch:
       tags:
         - shop
@@ -621,22 +774,97 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ShopID"
       requestBody:
-        $ref: "#/components/requestBodies/PatchShop"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                facebookPageID:
+                  type: string
+                facebookAccessToken:
+                  type: string
+                instagramPageID:
+                  type: string
+                instagramAccessToken:
+                  type: string
+                linePageID:
+                  type: string
+                lineAccessToken:
+                  type: string
+                lineSecret:
+                  type: string
       responses:
         "200":
-          description: "OK: Shop updated"
+          description: "OK: Shop patched."
         "400":
-          description: "Bad Request: Check shop_id and patch shop request body"
+          description: "Bad Request: Check path parameters and request body."
         "404":
-          description: "Not Found: Shop not found. Check shop_id"
+          description: "Not Found: Shop not found."
         "500":
-          description: "Internal Server Error: Unexpected error"
-  # root
+          description: "Internal Server Error"
+  /shops/{shop_id}/config:
+    get:
+      tags:
+        - shop
+      summary: Get a shop's config
+      operationId: getShopConfig
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        "200":
+          description: "OK: Config found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopConfigWrapper"
+        "400":
+          description: "Bad Request: Check path parameters."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - shop
+      summary: Add a new shop template message
+      operationId: patchShopConfig
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - templatePayload
+              properties:
+                templatePayload:
+                  type: string
+      responses:
+        "200":
+          description: "OK: Template message added."
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - templateID
+                properties:
+                  templateID:
+                    type: string
+                    description: ID of the created template message
+        "400":
+          description: "Bad Request: Check path parameters and request body."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+  # /...
   /upload_url:
     get:
       tags:
         - root
-      summary: Get S3 presigned upload URL
+      summary: Get an S3 presigned upload URL
       operationId: getS3PresignedUploadURL
       parameters:
         - in: query
@@ -647,15 +875,15 @@ paths:
           required: false
       responses:
         "200":
-          description: "OK: Presigned URL created"
+          description: "OK: Presigned upload URL created."
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
         "400":
-          description: "Bad Request: Check temporary"
+          description: "Bad Request: Check query string parameters."
         "500":
-          description: "Internal Server Error: Unexpected error"
+          description: "Internal Server Error"
 components:
   schemas:
     Message:
@@ -810,7 +1038,7 @@ components:
       properties:
         message:
           $ref: "#/components/schemas/Message"
-    PageStatus:
+    PageConversationStatus:
       type: object
       required:
         - unreadConversations
@@ -820,10 +1048,34 @@ components:
           type: integer
         allConversations:
           type: integer
+    # /{shop_id}/all/... data models
+    ShopPlatformsConversationsStatusArray:
+      type: object
+      required:
+        - statuses
+      properties:
+        statuses:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformConversationsStatus"
+    PlatformConversationsStatus:
+      type: object
+      required:
+        - platform
+        - unreadConversations
+        - allConversations
+      properties:
+        platform:
+          type: string
+        unreadConversations:
+          type: integer
+        allConversations:
+          type: integer
+    # /shops/... data models
     Shop:
       type: object
       required:
-        - shop_id
+        - shopID
       properties:
         shopID:
           type: string
@@ -839,45 +1091,6 @@ components:
           type: string
         lineAuthentication:
           $ref: "#/components/schemas/LineAuthentication"
-    ShopPlatformsPageIDs:
-      type: object
-      properties:
-        available_pages:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlatformPageID"
-    PlatformPageID:
-      type: object
-      required:
-        - platform_name
-        - page_id
-      properties:
-        platform_name:
-          type: string
-        page_id:
-          type: string
-    PlatformsStatuses:
-      type: object
-      required:
-        - statuses
-      properties:
-        statuses:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlatformStatus"
-    PlatformStatus:
-      type: object
-      required:
-        - platform
-        - unreadConversations
-        - allConversations
-      properties:
-        platform:
-          type: string
-        unreadConversations:
-          type: integer
-        allConversations:
-          type: integer
     FacebookAuthentication:
       type: object
       required:
@@ -902,6 +1115,60 @@ components:
           type: string
         secret:
           type: string
+    ShopWrapper:
+      type: object
+      required:
+        - shop
+      properties:
+        shop:
+          $ref: "#/components/schemas/Shop"
+    ShopAvailablePagesArray:
+      type: object
+      properties:
+        available_pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PageInfo"
+    PageInfo:
+      type: object
+      required:
+        - platform_name
+        - page_id
+      properties:
+        platform_name:
+          type: string
+        page_id:
+          type: string
+    ShopConfig:
+      type: object
+      required:
+        - shopID
+        - templates
+      properties:
+        shopID:
+          type: string
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShopTemplate"
+    ShopTemplate:
+      type: object
+      required:
+        - id
+        - payload
+      properties:
+        id:
+          type: string
+        payload:
+          type: string
+    ShopConfigWrapper:
+      type: object
+      required:
+        - shopConfig
+      properties:
+        shopConfig:
+          $ref: "#/components/schemas/ShopConfig"
+    # /... data models
     PresignedURL:
       type: object
       required:
@@ -909,74 +1176,6 @@ components:
       properties:
         presignedURL:
           type: string
-    # post message attachment
-    FacebookPostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "file"
-            - "facebook-template-generic"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
-    InstagramPostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "file"
-            - "instagram-template-generic"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
-    LinePostMessageAttachment:
-      type: object
-      required:
-        - type
-        - payload
-      properties:
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-            - "line-template-buttons"
-            - "line-template-confirm"
-            - "line-template-carousel"
-            - "line-template-image-carousel"
-        payload:
-          oneOf:
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
-            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
     # common attachment types
     PostMessageAttachmentPayloadImage:
       type: object
@@ -1010,7 +1209,7 @@ components:
         src:
           type: string
           description: "URL of the file"
-    # line post template message
+    # line template messages
     PostMessageAttachmentPayloadLineTemplateButtons:
       type: object
       required:
@@ -1049,8 +1248,9 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         thumbnailImageUrl:
           type: string
           description: |
@@ -1064,9 +1264,10 @@ components:
         text:
           type: string
           description: |
-            Text displayed in the template
-            Max character limit: 160 (no image or title)
-            Max character limit: 60 (message with an image or title)
+            Text displayed in the template  
+            Max character limit: 160 (no image or title)  
+            Max character limit: 60 (message with an image or title)  
+
         defaultAction:
           $ref: "#/components/schemas/LineTemplateAction"
         actions:
@@ -1086,18 +1287,21 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         text:
           type: string
           description: |
-            Text displayed in the template
-            Max character limit: 240
+            Text displayed in the template  
+            Max character limit: 240  
+
         actions:
           type: array
           description: |
-            Action when tapped
-            2 objects only
+            Action when tapped  
+            2 objects only  
+
           items:
             $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateCarousel:
@@ -1109,13 +1313,15 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         columns:
           type: array
           description: |
-            Array of columns
-            Max objects: 10
+            Array of columns  
+            Max objects: 10  
+
           items:
             $ref: "#/components/schemas/LineTemplateCarouselColumn"
     LineTemplateCarouselColumn:
@@ -1127,31 +1333,35 @@ components:
         thumbnailImageUrl:
           type: string
           description: |
-            Image URL
-            Max character limit: 2000
-            HTTPS overTLS 1.2 or later
-            JPEG or PNG
-            Aspect ratio: 1.51:1 (width:height)
-            Max width: 1024px
-            Max file size: 10 MB
+            Image URL  
+            Max character limit: 2000  
+            HTTPS overTLS 1.2 or later  
+            JPEG or PNG  
+            Aspect ratio: 1.51:1 (width:height)  
+            Max width: 1024px  
+            Max file size: 10 MB  
+
         title:
           type: string
           description: |
-            Title
-            Max character limit: 40
+            Title  
+            Max character limit: 40  
+
         text:
           type: string
           description: |
-            Message text
-            Max character limit: 120 (no image or title)
-            Max character limit: 60 (message with an image or title)
+            Message text  
+            Max character limit: 120 (no image or title)  
+            Max character limit: 60 (message with an image or title)  
+
         defaultAction:
           $ref: "#/components/schemas/LineTemplateAction"
         actions:
           type: array
           description: |
-            Action when tapped
-            Max objects: 3
+            Action when tapped  
+            Max objects: 3  
+
           items:
             $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateImageCarousel:
@@ -1163,13 +1373,15 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         columns:
           type: array
           description: |
-            Array of columns
-            Max objects: 10
+            Array of columns  
+            Max objects: 10  
+
           items:
             $ref: "#/components/schemas/LineTemplateImageCarouselColumn"
     LineTemplateImageCarouselColumn:
@@ -1181,13 +1393,14 @@ components:
         imageUrl:
           type: string
           description: |
-            Image URL
-            Max character limit: 2000
-            HTTPS overTLS 1.2 or later
-            JPEG or PNG
-            Aspect ratio: 1:1
-            Max width: 1024px
-            Max file size: 10 MB
+            Image URL  
+            Max character limit: 2000  
+            HTTPS overTLS 1.2 or later  
+            JPEG or PNG  
+            Aspect ratio: 1:1  
+            Max width: 1024px  
+            Max file size: 10 MB  
+
         action:
           $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateAction:
@@ -1198,17 +1411,19 @@ components:
         label:
           type: string
           description: |
-            Label for the action
-            Max character limit: 12 (Image carousel template)
-            Max character limit: 20 (Other than image carousel)
+            Label for the action  
+            Max character limit: 12 (Image carousel template)  
+            Max character limit: 20 (Other than image carousel)  
+
         uri:
           type: string
           description: |
-            URI opened when the action is performed (Max character limit: 1000)
-            http(s)://
-            line://
-            tel:
-    # facebook post template message
+            URI opened when the action is performed (Max character limit: 1000)  
+            http(s)://  
+            line://  
+            tel:  
+
+    # facebook template messages
     PostMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
       required:
@@ -1219,7 +1434,8 @@ components:
     FacebookTemplateGeneric:
       type: object
       description: |
-        Requires title and at least one of the following elements: message, picture, or buttons.
+        Requires title and at least one of the following elements: message, picture, or buttons.  
+
       required:
         - title
       properties:
@@ -1252,7 +1468,7 @@ components:
       properties:
         url:
           type: string
-    # instagram post template message
+    # instagram template messages
     PostMessageAttachmentPayloadInstagramGeneric:
       type: object
       required:
@@ -1263,7 +1479,8 @@ components:
     InstagramTemplateGeneric:
       type: object
       description: |
-        Requires title and at least one of the following elements: message, picture, or buttons.
+        Requires title and at least one of the following elements: message, picture, or buttons.  
+
       required:
         - title
       properties:
@@ -1297,6 +1514,7 @@ components:
         url:
           type: string
   parameters:
+    # path parameters
     ShopID:
       in: path
       name: shop_id
@@ -1315,6 +1533,7 @@ components:
       schema:
         type: string
       required: true
+    # query string parameters
     Skip:
       in: query
       name: skip
@@ -1327,7 +1546,7 @@ components:
       name: limit
       schema:
         type: integer
-        default: 10
+        default: infinity
       required: false
     ListMessagesFilter:
       in: query
@@ -1338,21 +1557,25 @@ components:
           with_message:
             type: string
             description: Only list messages that contain this string.
+
       required: false
     ListConversationsFilter:
       in: query
       name: filter
       description: |
-        Only one filter field can be provided at a time.
+        Only one filter field can be provided at a time.  
+
       schema:
         type: object
         properties:
           with_participants_username:
             type: string
             description: Only list conversations that contain this username (display name).
+
           with_message:
             type: string
             description: Only list conversations that contain messages containing this string.
+
       required: false
   requestBodies:
     PatchConversation:
@@ -1363,46 +1586,3 @@ components:
             properties:
               unread:
                 type: integer
-    FacebookPostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/FacebookPostMessageAttachment"
-    InstagramPostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/InstagramPostMessageAttachment"
-    LinePostMessage:
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - type: object
-                description: "text message"
-                properties:
-                  message:
-                    type: string
-              - $ref: "#/components/schemas/LinePostMessageAttachment"
-    PostShop:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Shop"
-    PatchShop:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Shop"
