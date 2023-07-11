@@ -821,7 +821,7 @@ func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string)
 		}
 		return nil, err
 	}
-	return shop.FacebookAuthentication, nil
+	return &shop.FacebookAuthentication, nil
 }
 
 // QueryLineAuthentication return shops.QueryLineAuthentication that contains a matching pageID of line platform.
@@ -846,7 +846,7 @@ func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ 
 		}
 		return nil, err
 	}
-	return shop.LineAuthentication, nil
+	return &shop.LineAuthentication, nil
 }
 
 // QueryInstagramAuthentication return shops.QueryInstagramAuthentication that contains a matching pageID of instagram platform.
@@ -871,7 +871,7 @@ func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string
 		}
 		return nil, err
 	}
-	return shop.InstagramAuthentication, nil
+	return &shop.InstagramAuthentication, nil
 }
 
 // GetPage return number of unread conversations and total conversations of the specified page.
@@ -931,26 +931,26 @@ func (c *Client) UpdateShop(ctx context.Context, shopID string, shop shops.Shop)
 	}()
 
 	setElements := bson.D{}
-	if shop.ShopID != "" {
-		setElements = append(setElements, bson.E{Key: "shopID", Value: shop.ShopID})
-	}
 	if shop.FacebookPageID != "" {
 		setElements = append(setElements, bson.E{Key: "facebookPageID", Value: shop.FacebookPageID})
 	}
-	if shop.FacebookAuthentication != nil {
-		setElements = append(setElements, bson.E{Key: "facebookAuthentication", Value: shop.FacebookAuthentication})
+	if shop.FacebookAuthentication.AccessToken != "" {
+		setElements = append(setElements, bson.E{Key: "facebookAuthentication.accessToken", Value: shop.FacebookAuthentication.AccessToken})
 	}
 	if shop.InstagramPageID != "" {
 		setElements = append(setElements, bson.E{Key: "instagramPageID", Value: shop.InstagramPageID})
 	}
-	if shop.InstagramAuthentication != nil {
-		setElements = append(setElements, bson.E{Key: "instagramAuthentication", Value: shop.InstagramAuthentication})
+	if shop.InstagramAuthentication.AccessToken != "" {
+		setElements = append(setElements, bson.E{Key: "instagramAuthentication.accessToken", Value: shop.InstagramAuthentication.AccessToken})
 	}
 	if shop.LinePageID != "" {
 		setElements = append(setElements, bson.E{Key: "linePageID", Value: shop.LinePageID})
 	}
-	if shop.LineAuthentication != nil {
-		setElements = append(setElements, bson.E{Key: "lineAuthentication", Value: shop.LineAuthentication})
+	if shop.LineAuthentication.AccessToken != "" {
+		setElements = append(setElements, bson.E{Key: "lineAuthentication.accessToken", Value: shop.LineAuthentication.AccessToken})
+	}
+	if shop.LineAuthentication.Secret != "" {
+		setElements = append(setElements, bson.E{Key: "lineAuthentication.secret", Value: shop.LineAuthentication.Secret})
 	}
 
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -968,28 +968,6 @@ func (c *Client) UpdateShop(ctx context.Context, shopID string, shop shops.Shop)
 		return err
 	}
 
-	return nil
-}
-
-// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
-// otherwise returns error.
-func (c *Client) CheckShopExists(ctx context.Context, shopID string) (err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("mongodb.Client.CheckShopExists: %w", err)
-		}
-	}()
-	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
-	filter := bson.D{
-		{Key: "shopID", Value: shopID},
-	}
-	err = coll.FindOne(ctx, filter).Err()
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrNoDocuments
-		}
-		return err
-	}
 	return nil
 }
 
@@ -1097,7 +1075,7 @@ func (c *Client) ListShopPlatformsStatuses(ctx context.Context, shopID string) (
 }
 
 // InsertShopConfig inserts a shop's config into the database.
-func (c *Client) InsertShopConfig(ctx context.Context, shopID string, config shopcfg.Config) error {
+func (c *Client) InsertShopConfig(ctx context.Context, config shopcfg.Config) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
 	_, err := coll.InsertOne(ctx, config)
 	if err != nil {

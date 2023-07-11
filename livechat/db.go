@@ -195,10 +195,6 @@ type DBClient interface {
 	// UpdateShop updates a shop with the given shopID with the information provided in the given shop shops.Shop.
 	UpdateShop(ctx context.Context, shopID string, shop shops.Shop) (err error)
 
-	// CheckShopExists returns nil if a shop with shopID already exists, if not returns error wrapping mongodb.ErrorNoDocuments,
-	// otherwise returns error.
-	CheckShopExists(ctx context.Context, shopID string) error
-
 	// ListShopPlatforms returns a slice of a shop's platforms and corresponding pageIDs.
 	// If the operation is successful, a slice will be returned and err will be nil,
 	// otherwise nil, nil are returned
@@ -210,7 +206,7 @@ type DBClient interface {
 	ListShopPlatformsStatuses(ctx context.Context, shopID string) (_ []getall.Status, err error)
 
 	// InsertShopConfig inserts a shop's config into the database.
-	InsertShopConfig(ctx context.Context, shopID string, config shopcfg.Config) error
+	InsertShopConfig(ctx context.Context, config shopcfg.Config) error
 
 	// GetShopConfig returns a shop's config.
 	GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error)

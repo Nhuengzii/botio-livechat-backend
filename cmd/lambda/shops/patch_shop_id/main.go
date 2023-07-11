@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchshop"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"log"
 	"os"
@@ -29,25 +30,41 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	pathParameters := req.PathParameters
 	shopID, ok := pathParameters["shop_id"]
 	if !ok {
-		return apigateway.NewProxyResponse(400, "Bad Request: Missing shop id", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad Request: shop_id must not be empty.", "*"), nil
 	}
 
 	reqBody := req.Body
-	patchShopBody := shops.Shop{}
-	err = json.Unmarshal([]byte(reqBody), &patchShopBody)
+
+	patchShopRequest := patchshop.Request{}
+	err = json.Unmarshal([]byte(reqBody), &patchShopRequest)
 	if err != nil {
-		return apigateway.NewProxyResponse(400, "Bad Request: Check patch shop request body", "*"), nil
+		return apigateway.NewProxyResponse(400, "Bad Request: Check request body.", "*"), nil
 	}
 
+	patchShopBody := shops.Shop{
+		FacebookPageID: patchShopRequest.FacebookPageID,
+		FacebookAuthentication: shops.FacebookAuthentication{
+			AccessToken: patchShopRequest.FacebookAccessToken,
+		},
+		InstagramPageID: patchShopRequest.InstagramPageID,
+		InstagramAuthentication: shops.InstagramAuthentication{
+			AccessToken: patchShopRequest.InstagramAccessToken,
+		},
+		LinePageID: patchShopRequest.LinePageID,
+		LineAuthentication: shops.LineAuthentication{
+			AccessToken: patchShopRequest.LineAccessToken,
+			Secret:      patchShopRequest.LineSecret,
+		},
+	}
 	err = c.dbClient.UpdateShop(ctx, shopID, patchShopBody)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, "Not Found: Shop not found", "*"), nil
+			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil
 		}
-		return apigateway.NewProxyResponse(500, "Internal Server Error: Unexpected error", "*"), nil
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
 	}
 
-	return apigateway.NewProxyResponse(200, "OK: Shop updated", "*"), nil
+	return apigateway.NewProxyResponse(200, "OK: Shop patched", "*"), nil
 }
 
 func main() {

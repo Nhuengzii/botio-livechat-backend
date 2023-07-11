@@ -716,16 +716,18 @@ paths:
               properties:
                 facebookPageID:
                   type: string
-                facebookAuthentication:
-                  $ref: "#/components/schemas/FacebookAuthentication"
+                facebookAccessToken:
+                  type: string
                 instagramPageID:
                   type: string
-                instagramAuthentication:
-                  $ref: "#/components/schemas/InstagramAuthentication"
+                instagramAccessToken:
+                  type: string
                 linePageID:
                   type: string
-                lineAuthentication:
-                  $ref: "#/components/schemas/LineAuthentication"
+                lineAccessToken:
+                  type: string
+                lineSecret:
+                  type: string
       responses:
         "200":
           description: "OK: Shop created."
@@ -779,19 +781,21 @@ paths:
               properties:
                 facebookPageID:
                   type: string
-                facebookAuthentication:
-                  $ref: "#/components/schemas/FacebookAuthentication"
+                facebookAccessToken:
+                  type: string
                 instagramPageID:
                   type: string
-                instagramAuthentication:
-                  $ref: "#/components/schemas/InstagramAuthentication"
+                instagramAccessToken:
+                  type: string
                 linePageID:
                   type: string
-                lineAuthentication:
-                  $ref: "#/components/schemas/LineAuthentication"
+                lineAccessToken:
+                  type: string
+                lineSecret:
+                  type: string
       responses:
         "200":
-          description: "OK: Shop updated."
+          description: "OK: Shop patched."
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
