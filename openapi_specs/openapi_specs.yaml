@@ -1248,8 +1248,9 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         thumbnailImageUrl:
           type: string
           description: |
@@ -1263,9 +1264,10 @@ components:
         text:
           type: string
           description: |
-            Text displayed in the template
-            Max character limit: 160 (no image or title)
-            Max character limit: 60 (message with an image or title)
+            Text displayed in the template  
+            Max character limit: 160 (no image or title)  
+            Max character limit: 60 (message with an image or title)  
+
         defaultAction:
           $ref: "#/components/schemas/LineTemplateAction"
         actions:
@@ -1285,18 +1287,21 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         text:
           type: string
           description: |
-            Text displayed in the template
-            Max character limit: 240
+            Text displayed in the template  
+            Max character limit: 240  
+
         actions:
           type: array
           description: |
-            Action when tapped
-            2 objects only
+            Action when tapped  
+            2 objects only  
+
           items:
             $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateCarousel:
@@ -1308,13 +1313,15 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         columns:
           type: array
           description: |
-            Array of columns
-            Max objects: 10
+            Array of columns  
+            Max objects: 10  
+
           items:
             $ref: "#/components/schemas/LineTemplateCarouselColumn"
     LineTemplateCarouselColumn:
@@ -1326,31 +1333,35 @@ components:
         thumbnailImageUrl:
           type: string
           description: |
-            Image URL
-            Max character limit: 2000
-            HTTPS overTLS 1.2 or later
-            JPEG or PNG
-            Aspect ratio: 1.51:1 (width:height)
-            Max width: 1024px
-            Max file size: 10 MB
+            Image URL  
+            Max character limit: 2000  
+            HTTPS overTLS 1.2 or later  
+            JPEG or PNG  
+            Aspect ratio: 1.51:1 (width:height)  
+            Max width: 1024px  
+            Max file size: 10 MB  
+
         title:
           type: string
           description: |
-            Title
-            Max character limit: 40
+            Title  
+            Max character limit: 40  
+
         text:
           type: string
           description: |
-            Message text
-            Max character limit: 120 (no image or title)
-            Max character limit: 60 (message with an image or title)
+            Message text  
+            Max character limit: 120 (no image or title)  
+            Max character limit: 60 (message with an image or title)  
+
         defaultAction:
           $ref: "#/components/schemas/LineTemplateAction"
         actions:
           type: array
           description: |
-            Action when tapped
-            Max objects: 3
+            Action when tapped  
+            Max objects: 3  
+
           items:
             $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateImageCarousel:
@@ -1362,13 +1373,15 @@ components:
         altText:
           type: string
           description: |
-            Text displayed in notification and chat list of the recipient
-            Max character limit: 400
+            Text displayed in notification and chat list of the recipient  
+            Max character limit: 400  
+
         columns:
           type: array
           description: |
-            Array of columns
-            Max objects: 10
+            Array of columns  
+            Max objects: 10  
+
           items:
             $ref: "#/components/schemas/LineTemplateImageCarouselColumn"
     LineTemplateImageCarouselColumn:
@@ -1380,13 +1393,14 @@ components:
         imageUrl:
           type: string
           description: |
-            Image URL
-            Max character limit: 2000
-            HTTPS overTLS 1.2 or later
-            JPEG or PNG
-            Aspect ratio: 1:1
-            Max width: 1024px
-            Max file size: 10 MB
+            Image URL  
+            Max character limit: 2000  
+            HTTPS overTLS 1.2 or later  
+            JPEG or PNG  
+            Aspect ratio: 1:1  
+            Max width: 1024px  
+            Max file size: 10 MB  
+
         action:
           $ref: "#/components/schemas/LineTemplateAction"
     LineTemplateAction:
@@ -1397,16 +1411,18 @@ components:
         label:
           type: string
           description: |
-            Label for the action
-            Max character limit: 12 (Image carousel template)
-            Max character limit: 20 (Other than image carousel)
+            Label for the action  
+            Max character limit: 12 (Image carousel template)  
+            Max character limit: 20 (Other than image carousel)  
+
         uri:
           type: string
           description: |
-            URI opened when the action is performed (Max character limit: 1000)
-            http(s)://
-            line://
-            tel:
+            URI opened when the action is performed (Max character limit: 1000)  
+            http(s)://  
+            line://  
+            tel:  
+
     # facebook template messages
     PostMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
@@ -1418,7 +1434,8 @@ components:
     FacebookTemplateGeneric:
       type: object
       description: |
-        Requires title and at least one of the following elements: message, picture, or buttons.
+        Requires title and at least one of the following elements: message, picture, or buttons.  
+
       required:
         - title
       properties:
@@ -1462,7 +1479,8 @@ components:
     InstagramTemplateGeneric:
       type: object
       description: |
-        Requires title and at least one of the following elements: message, picture, or buttons.
+        Requires title and at least one of the following elements: message, picture, or buttons.  
+
       required:
         - title
       properties:
@@ -1539,21 +1557,25 @@ components:
           with_message:
             type: string
             description: Only list messages that contain this string.
+
       required: false
     ListConversationsFilter:
       in: query
       name: filter
       description: |
-        Only one filter field can be provided at a time.
+        Only one filter field can be provided at a time.  
+
       schema:
         type: object
         properties:
           with_participants_username:
             type: string
             description: Only list conversations that contain this username (display name).
+
           with_message:
             type: string
             description: Only list conversations that contain messages containing this string.
+
       required: false
   requestBodies:
     PatchConversation:
