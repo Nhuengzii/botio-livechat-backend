@@ -4,12 +4,12 @@ package shopcfg
 
 // Config is a shop's config data model
 type Config struct {
-	ShopID    string     `bson:"shopID" json:"shopID"`
-	Templates []Template `bson:"templates" json:"templates"`
+	ShopID    string     `bson:"shopID"`
+	Templates []Template `bson:"templates"`
 }
 
 // Template is a shop's saved template message data model
 type Template struct {
-	ID      string `bson:"id" json:"id"`
-	Payload string `bson:"payload" json:"payload"`
+	ID      string `bson:"id"`
+	Payload string `bson:"payload"`
 }

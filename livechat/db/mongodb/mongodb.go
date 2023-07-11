@@ -1118,7 +1118,7 @@ func (c *Client) AddShopNewTemplateMessage(ctx context.Context, shopID string, t
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 	}
-	update := bson.D{ // TODO still fucked up!
+	update := bson.D{
 		{Key: "$push", Value: bson.D{
 			{Key: "templates", Value: template},
 		}},
