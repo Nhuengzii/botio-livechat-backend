@@ -70,7 +70,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
 
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+	resp := postshop.Response{
+		ShopID: newShopID,
+	}
+	respJSON, err := json.Marshal(resp)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+	return apigateway.NewProxyResponse(200, string(respJSON), "*"), nil
 }
 
 func main() {
