@@ -28,7 +28,7 @@ resource "aws_api_gateway_resource" "config" {
 resource "aws_api_gateway_resource" "templates" {
   rest_api_id = var.rest_api_id
   parent_id   = aws_api_gateway_resource.config.id
-  path_part   = "template"
+  path_part   = "templates"
 }
 
 resource "aws_api_gateway_resource" "template_id" {
