@@ -1037,7 +1037,7 @@ paths:
         - shop
       summary: Add a new shop config template message
       description: |
-        Use `POST /shop/{shop_id}/config/templates` to add a new shop config template instead.
+        Use `POST /shops/{shop_id}/config/templates` to add a new shop config template instead.
       operationId: patchShopConfig
       parameters:
         - $ref: "#/components/parameters/ShopID"
