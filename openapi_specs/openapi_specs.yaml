@@ -1139,6 +1139,24 @@ paths:
           description: "Not Found: Shop not found."
         "500":
           description: "Internal Server Error"
+  /shops/{shop_id}/config/templates/{template_id}:
+    delete:
+      tags:
+        - shop
+      summary: Delete a shop's saved template message
+      operationId: deleteShopTemplate
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/TemplateID"
+      responses:
+        "200":
+          description: "OK: Template message deleted."
+        "400":
+          description: "Bad Request: Check path parameters."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
   # /...
   /upload_url:
     get:
@@ -1820,6 +1838,12 @@ components:
     ConversationID:
       in: path
       name: conversation_id
+      schema:
+        type: string
+      required: true
+    TemplateID:
+      in: path
+      name: template_id
       schema:
         type: string
       required: true
