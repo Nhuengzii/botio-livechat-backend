@@ -129,6 +129,17 @@ resource "aws_iam_policy" "allow_execute_api" {
   })
 }
 
+resource "aws_apigatewayv2_deployment" "botio_livechat_websocket_dev" {
+  api_id      = var.websocket_api_id
+  description = "dev"
+  triggers = {
+    always_run = timestamp()
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [aws_apigatewayv2_route.routes_with_handler["connect"]]
+}
 
 module "relay_received_message" {
   source = "../lambda_handler"

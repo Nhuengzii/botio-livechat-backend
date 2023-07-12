@@ -10,16 +10,6 @@ resource "aws_apigatewayv2_stage" "botio_livechat_websocket_dev" {
   auto_deploy = true
 }
 
-resource "aws_apigatewayv2_deployment" "botio_livechat_websocket_dev" {
-  api_id      = aws_apigatewayv2_api.botio_livechat_websocket.id
-  description = "dev"
-  triggers = {
-    always_run = timestamp()
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 
 module "websocket_api" {
   source                      = "./modules/websocket_api"

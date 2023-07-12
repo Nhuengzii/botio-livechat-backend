@@ -82,3 +82,20 @@ module "get_upload_url" {
   lambda_invoke_arn      = module.get_upload_url_handler.lambda.invoke_arn
   lambda_function_name   = module.get_upload_url_handler.lambda.function_name
 }
+
+resource "aws_api_gateway_deployment" "rest_api" {
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  lifecycle {
+    create_before_destroy = true
+  }
+  triggers = {
+    always_run = timestamp()
+  }
+  depends_on = [module.get_upload_url.method, module.get_upload_url.integration]
+}
+
+resource "aws_api_gateway_stage" "dev" {
+  rest_api_id   = aws_api_gateway_rest_api.rest_api.id
+  deployment_id = aws_api_gateway_deployment.rest_api.id
+  stage_name    = "dev"
+}

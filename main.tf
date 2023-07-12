@@ -112,23 +112,6 @@ module "bucket" {
   bucket_name = var.s3_bucket_name
 }
 
-resource "aws_api_gateway_deployment" "rest_api" {
-  rest_api_id = module.rest_api.id
-  lifecycle {
-    create_before_destroy = true
-  }
-  triggers = {
-    always_run = timestamp()
-  }
-  # depends_on = [module.websocket_api]
-}
-
-resource "aws_api_gateway_stage" "dev" {
-  rest_api_id   = module.rest_api.id
-  deployment_id = aws_api_gateway_deployment.rest_api.id
-  stage_name    = "dev"
-}
-
 output "rest_api" {
   value = {
     id = module.rest_api.id
