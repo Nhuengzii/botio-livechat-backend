@@ -182,30 +182,80 @@ paths:
             schema:
               oneOf:
                 - type: object
-                  description: "text message"
+                  required:
+                    - message
                   properties:
                     message:
                       type: string
                 - type: object
                   required:
-                    - type
-                    - payload
+                    - attachment
                   properties:
-                    type:
-                      type: string
-                      enum:
-                        - "image"
-                        - "video"
-                        - "audio"
-                        - "file"
-                        - "facebook-template-generic"
+                    attachment:
+                      type: object
+                      required:
+                        - type
+                        - payload
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - "image"
+                            - "video"
+                            - "audio"
+                            - "file"
+                            - "facebook-template-generic"
+                        payload:
+                          oneOf:
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+            examples:
+              text:
+                value:
+                  message: "Hello, world!"
+              image:
+                value:
+                  attachment:
+                    type: "image"
                     payload:
-                      oneOf:
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+                      src: "https://example.com/image.jpg"
+              video:
+                value:
+                  attachment:
+                    type: "video"
+                    payload:
+                      src: "https://example.com/video.mp4"
+              audio:
+                value:
+                  attachment:
+                    type: "audio"
+                    payload:
+                      src: "https://example.com/audio.mp3"
+              file:
+                value:
+                  attachment:
+                    type: "file"
+                    payload:
+                      src: "https://example.com/file.pdf"
+              facebook template generic:
+                value:
+                  attachment:
+                    type: "facebook-template-generic"
+                    payload:
+                      fb_template_generic:
+                        title: "Your wishlist"
+                        message: "Take a look at these great deals!"
+                        picture: "https://example.com/image.jpg"
+                        buttons:
+                          - url: "https://example.com/product/1"
+                            title: "View Product"
+                          - url: "https://example.com/product/2"
+                            title: "View Product"
+
+              
       responses:
         "200":
           description: "OK: Message sent"
@@ -394,30 +444,79 @@ paths:
             schema:
               oneOf:
                 - type: object
-                  description: "text message"
+                  required:
+                    - message
                   properties:
                     message:
                       type: string
                 - type: object
                   required:
-                    - type
-                    - payload
+                    - attachment
                   properties:
-                    type:
-                      type: string
-                      enum:
-                        - "image"
-                        - "video"
-                        - "audio"
-                        - "file"
-                        - "instagram-template-generic"
+                    attachment:
+                      type: object
+                      required:
+                        - type
+                        - payload
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - "image"
+                            - "video"
+                            - "audio"
+                            - "file"
+                            - "instagram-template-generic"
+                        payload:
+                          oneOf:
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+            examples:
+              text:
+                value:
+                  message: "Hello, world!"
+              image:
+                value:
+                  attachment:
+                    type: "image"
                     payload:
-                      oneOf:
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+                      src: "https://example.com/image.jpg"
+              video:
+                value:
+                  attachment:
+                    type: "video"
+                    payload:
+                      src: "https://example.com/video.mp4"
+              audio:
+                value:
+                  attachment:
+                    type: "audio"
+                    payload:
+                      src: "https://example.com/audio.mp3"
+              file:
+                value:
+                  attachment:
+                    type: "file"
+                    payload:
+                      src: "https://example.com/file.pdf"
+              instagram template generic:
+                value:
+                  attachment:
+                    type: "instagram-template-generic"
+                    payload:
+                      ig_template_generic:
+                        title: "Your wishlist"
+                        message: "Take a look at these great deals!"
+                        picture: "https://example.com/image.jpg"
+                        buttons:
+                          - url: "https://example.com/product/1"
+                            title: "View Product"
+                          - url: "https://example.com/product/2"
+                            title: "View Product"
+
       responses:
         "200":
           description: "OK: Message sent"
@@ -587,34 +686,143 @@ paths:
             schema:
               oneOf:
                 - type: object
-                  description: "text message"
+                  required:
+                    - message
                   properties:
                     message:
                       type: string
                 - type: object
                   required:
-                    - type
-                    - payload
+                    - attachment
                   properties:
-                    type:
-                      type: string
-                      enum:
-                        - "image"
-                        - "video"
-                        - "audio"
-                        - "line-template-buttons"
-                        - "line-template-confirm"
-                        - "line-template-carousel"
-                        - "line-template-image-carousel"
+                    attachment:
+                      required:
+                        - type
+                        - payload
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - "image"
+                            - "video"
+                            - "audio"
+                            - "line-template-buttons"
+                            - "line-template-confirm"
+                            - "line-template-carousel"
+                            - "line-template-image-carousel"
+                        payload:
+                          oneOf:
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
+                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
+            examples:
+              text:
+                value:
+                  message: "Hello, world!"
+              image:
+                value:
+                  attachment:
+                    type: "image"
                     payload:
-                      oneOf:
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
-                        - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
+                      src: "https://example.com/image.jpg"
+              video:
+                value:
+                  attachment:
+                    type: "video"
+                    payload:
+                      src: "https://example.com/video.mp4"
+              audio:
+                value:
+                  attachment:
+                    type: "audio"
+                    payload:
+                      src: "https://example.com/audio.mp3"
+              line template buttons:
+                value:
+                  attachment:
+                    type: "line-template-buttons"
+                    payload:
+                      line_template_buttons:
+                        altText: "You have a new buttons template message!"
+                        text: "Please select an option."
+                        actions:
+                          - label: "Option 1"
+                            uri: "https://example.com/option1"
+                          - label: "Option 2"
+                            uri: "https://example.com/option2"
+                          - label: "Option 3"
+                            uri: "https://example.com/option3"
+                          - label: "Option 4"
+                            uri: "https://example.com/option4"
+              line template confirm:
+                value:
+                  attachment:
+                    type: "line-template-confirm"
+                    payload:
+                      line_template_confirm:
+                        altText: "You have a new confirm template message!"
+                        text: "Please select an option."
+                        actions:
+                          - label: "Yes"
+                            uri: "https://example.com/yes"
+                          - label: "No"
+                            uri: "https://example.com/no"
+              line template carousel:
+                value:
+                  attachment:
+                    type: "line-template-carousel"
+                    payload:
+                      line_template_carousel:
+                        altText: "You have a new carousel template message!"
+                        columns:
+                          - text: "Please select an option."
+                            actions:
+                              - label: "Option 1"
+                                uri: "https://example.com/option1"
+                              - label: "Option 2"
+                                uri: "https://example.com/option2"
+                              - label: "Option 3"
+                                uri: "https://example.com/option3"
+                          - text: "Please select an option."
+                            actions:
+                              - label: "Option 1"
+                                uri: "https://example.com/option1"
+                              - label: "Option 2"
+                                uri: "https://example.com/option2"
+                              - label: "Option 3"
+                                uri: "https://example.com/option3"
+                          - text: "Please select an option."
+                            actions:
+                              - label: "Option 1"
+                                uri: "https://example.com/option1"
+                              - label: "Option 2"
+                                uri: "https://example.com/option2"
+                              - label: "Option 3"
+                                uri: "https://example.com/option3"
+              line template image carousel:
+                value:
+                  attachment:
+                    type: "line-template-image-carousel"
+                    payload:
+                      line_template_image_carousel:
+                        altText: "You have a new image carousel template message!"
+                        columns:
+                          - imageUrl: "https://example.com/image1.jpg"
+                            action:
+                              label: "Option 1"
+                              uri: "https://example.com/option1"
+                          - imageUrl: "https://example.com/image2.jpg"
+                            action:
+                              label: "Option 2"
+                              uri: "https://example.com/option2"
+                          -  imageUrl: "https://example.com/image3.jpg"
+                             action:
+                               label: "Option 3"
+                               uri: "https://example.com/option3"
       responses:
         "200":
           description: "OK: Message sent"
@@ -840,6 +1048,12 @@ paths:
               properties:
                 templatePayload:
                   type: string
+            examples:
+              add a new template message:
+                value:
+                  templatePayload:
+                    "some template message payload"
+
       responses:
         "200":
           description: "OK: Template message added."
@@ -1557,7 +1771,10 @@ components:
           with_message:
             type: string
             description: Only list messages that contain this string.
-
+      examples:
+        messages containing "hello":
+          value:
+            with_message: hello
       required: false
     ListConversationsFilter:
       in: query
@@ -1575,6 +1792,13 @@ components:
           with_message:
             type: string
             description: Only list conversations that contain messages containing this string.
+      examples:
+        conversations containing user "john":
+          value:
+            with_participants_username: john
+        conversations containing message "hello":
+          value:
+            with_message: hello
 
       required: false
   requestBodies:
@@ -1586,3 +1810,7 @@ components:
             properties:
               unread:
                 type: integer
+          examples:
+            mark as read:
+              value:
+                unread: 0
