@@ -1134,3 +1134,34 @@ func (c *Client) AddShopNewTemplateMessage(ctx context.Context, shopID string, t
 
 	return nil
 }
+
+// DeleteShopTemplateMessage removes a template from a shop_config's templates
+func (c *Client) DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.DeleteShopTemplateMessage: %w", err)
+		}
+	}()
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	update := bson.D{
+		{Key: "$pull", Value: bson.D{
+			{Key: "templates", Value: bson.D{
+				{Key: "id", Value: templateID},
+			}},
+		}},
+	}
+
+	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return ErrNoDocuments
+		}
+		return err
+	}
+
+	return nil
+}
