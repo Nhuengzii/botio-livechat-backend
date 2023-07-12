@@ -25,6 +25,12 @@ resource "aws_api_gateway_resource" "config" {
   path_part   = "config"
 }
 
+resource "aws_api_gateway_resource" "template" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.config.id
+  path_part   = "template"
+}
+
 module "shop_id_enable_cors" {
   source          = "squidfunk/api-gateway-enable-cors/aws"
   version         = "0.3.3"
@@ -90,6 +96,11 @@ locals {
       method        = "PATCH"
       resource_id   = aws_api_gateway_resource.config.id
       resource_path = aws_api_gateway_resource.config.path
+    }
+    delete_template = {
+      method        = "DELETE"
+      resource_id   = aws_api_gateway_resource.template.id
+      resource_path = aws_api_gateway_resource.template.path
     }
   }
 }
