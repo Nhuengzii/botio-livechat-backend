@@ -1032,9 +1032,12 @@ paths:
         "500":
           description: "Internal Server Error"
     patch:
+      deprecated: true
       tags:
         - shop
-      summary: Add a new shop template message
+      summary: Add a new shop config template message
+      description: |
+        Use `POST /shop/{shop_id}/config/templates` to add a new shop config template instead.
       operationId: patchShopConfig
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -1053,7 +1056,48 @@ paths:
                 value:
                   templatePayload:
                     "some template message payload"
-
+      responses:
+        "200":
+          description: "OK: Template message added."
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - templateID
+                properties:
+                  templateID:
+                    type: string
+                    description: ID of the created template message
+        "400":
+          description: "Bad Request: Check path parameters and request body."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+  /shops/{shop_id}/config/templates:
+    post:
+      tags:
+        - shop
+      summary: Add a new shop config template message
+      operationId: postShopConfigTemplate
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - templatePayload
+              properties:
+                templatePayload:
+                  type: string
+            examples:
+              add a new template message:
+                value:
+                  templatePayload:
+                    "some template message payload"
       responses:
         "200":
           description: "OK: Template message added."
