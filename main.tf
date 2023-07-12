@@ -86,6 +86,24 @@ module "shops" {
         MONGODB_DATABASE    = var.mongo_database
       }
     }
+    get_templates = {
+      handler_name = "get_templates"
+      handler_path = format("%s/cmd/lambda/shops/get_templates", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
+    post_templates = {
+      handler_name = "post_templates"
+      handler_path = format("%s/cmd/lambda/shops/post_templates", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
   }
 }
 

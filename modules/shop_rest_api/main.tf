@@ -25,10 +25,16 @@ resource "aws_api_gateway_resource" "config" {
   path_part   = "config"
 }
 
-resource "aws_api_gateway_resource" "template" {
+resource "aws_api_gateway_resource" "templates" {
   rest_api_id = var.rest_api_id
   parent_id   = aws_api_gateway_resource.config.id
   path_part   = "template"
+}
+
+resource "aws_api_gateway_resource" "template_id" {
+  rest_api_id = var.rest_api_id
+  parent_id   = aws_api_gateway_resource.templates.id
+  path_part   = "{template_id}"
 }
 
 module "shop_id_enable_cors" {
@@ -43,6 +49,13 @@ module "config_enable_cors" {
   version         = "0.3.3"
   api_id          = var.rest_api_id
   api_resource_id = aws_api_gateway_resource.config.id
+}
+
+module "template_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.templates.id
 }
 
 data "aws_iam_policy_document" "assume_role_lambda" {
@@ -97,10 +110,20 @@ locals {
       resource_id   = aws_api_gateway_resource.config.id
       resource_path = aws_api_gateway_resource.config.path
     }
+    post_templates = {
+      method        = "POST"
+      resource_id   = aws_api_gateway_resource.templates.id
+      resource_path = aws_api_gateway_resource.templates.path
+    }
+    get_templates = {
+      method        = "GET"
+      resource_id   = aws_api_gateway_resource.templates.id
+      resource_path = aws_api_gateway_resource.templates.path
+    }
     delete_template = {
       method        = "DELETE"
-      resource_id   = aws_api_gateway_resource.template.id
-      resource_path = aws_api_gateway_resource.template.path
+      resource_id   = aws_api_gateway_resource.template_id.id
+      resource_path = aws_api_gateway_resource.template_id.path
     }
   }
 }
