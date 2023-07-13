@@ -255,7 +255,7 @@ paths:
                           - url: "https://example.com/product/2"
                             title: "View Product"
 
-              
+
       responses:
         "200":
           description: "OK: Message sent"
@@ -819,10 +819,10 @@ paths:
                             action:
                               label: "Option 2"
                               uri: "https://example.com/option2"
-                          -  imageUrl: "https://example.com/image3.jpg"
-                             action:
-                               label: "Option 3"
-                               uri: "https://example.com/option3"
+                          - imageUrl: "https://example.com/image3.jpg"
+                            action:
+                              label: "Option 3"
+                              uri: "https://example.com/option3"
       responses:
         "200":
           description: "OK: Message sent"
@@ -1032,9 +1032,12 @@ paths:
         "500":
           description: "Internal Server Error"
     patch:
+      deprecated: true
       tags:
         - shop
-      summary: Add a new shop template message
+      summary: Add a new shop's saved template message
+      description: |
+        Use `POST /shops/{shop_id}/config/templates` to add a new shop config template instead.
       operationId: patchShopConfig
       parameters:
         - $ref: "#/components/parameters/ShopID"
@@ -1053,7 +1056,6 @@ paths:
                 value:
                   templatePayload:
                     "some template message payload"
-
       responses:
         "200":
           description: "OK: Template message added."
@@ -1069,6 +1071,88 @@ paths:
                     description: ID of the created template message
         "400":
           description: "Bad Request: Check path parameters and request body."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+  /shops/{shop_id}/config/templates:
+    post:
+      tags:
+        - shop
+      summary: Add a new shop's saved template message
+      operationId: postShopTemplate
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - templatePayload
+              properties:
+                templatePayload:
+                  type: string
+            examples:
+              add a new template message:
+                value:
+                  templatePayload:
+                    "some template message payload"
+      responses:
+        "200":
+          description: "OK: Template message added."
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - templateID
+                properties:
+                  templateID:
+                    type: string
+                    description: ID of the created template message
+        "400":
+          description: "Bad Request: Check path parameters and request body."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+    get:
+      tags:
+        - shop
+      summary: List a shop's saved template messages
+      operationId: listShopTemplates
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+      responses:
+        "200":
+          description: "OK: Template messages found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopTemplateArray"
+        "204":
+          description: "No Content: No template messages found."
+        "400":
+          description: "Bad Request: Check path parameters."
+        "404":
+          description: "Not Found: Shop not found."
+        "500":
+          description: "Internal Server Error"
+  /shops/{shop_id}/config/templates/{template_id}:
+    delete:
+      tags:
+        - shop
+      summary: Delete a shop's saved template message
+      operationId: deleteShopTemplate
+      parameters:
+        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/TemplateID"
+      responses:
+        "200":
+          description: "OK: Template message deleted."
+        "400":
+          description: "Bad Request: Check path parameters."
         "404":
           description: "Not Found: Shop not found."
         "500":
@@ -1382,6 +1466,16 @@ components:
       properties:
         shopConfig:
           $ref: "#/components/schemas/ShopConfig"
+    ShopTemplateArray:
+      type: object
+      required:
+        - templates
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShopTemplate"
+
     # /... data models
     PresignedURL:
       type: object
@@ -1744,6 +1838,12 @@ components:
     ConversationID:
       in: path
       name: conversation_id
+      schema:
+        type: string
+      required: true
+    TemplateID:
+      in: path
+      name: template_id
       schema:
         type: string
       required: true

@@ -213,4 +213,7 @@ type DBClient interface {
 
 	// AddShopNewTemplateMessage adds a new template message to a shop's config.
 	AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error)
+
+	// DeleteShopTemplateMessage removes a template from a shop_config's templates
+	DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (err error)
 }

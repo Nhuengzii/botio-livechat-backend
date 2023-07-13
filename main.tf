@@ -77,29 +77,39 @@ module "shops" {
         MONGODB_DATABASE    = var.mongo_database
       }
     }
+    delete_template = {
+      handler_name = "delete_template"
+      handler_path = format("%s/cmd/lambda/shops/delete_template", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
+    get_templates = {
+      handler_name = "get_templates"
+      handler_path = format("%s/cmd/lambda/shops/get_templates", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
+    post_templates = {
+      handler_name = "post_templates"
+      handler_path = format("%s/cmd/lambda/shops/post_templates", path.root)
+      environment_variables = {
+        DISCORD_WEBHOOK_URL = var.discord_webhook_url
+        MONGODB_URI         = var.mongo_uri
+        MONGODB_DATABASE    = var.mongo_database
+      }
+    }
   }
 }
 
 module "bucket" {
   source      = "./modules/bucket"
   bucket_name = var.s3_bucket_name
-}
-
-resource "aws_api_gateway_deployment" "rest_api" {
-  rest_api_id = module.rest_api.id
-  lifecycle {
-    create_before_destroy = true
-  }
-  triggers = {
-    always_run = timestamp()
-  }
-  # depends_on = [module.websocket_api]
-}
-
-resource "aws_api_gateway_stage" "dev" {
-  rest_api_id   = module.rest_api.id
-  deployment_id = aws_api_gateway_deployment.rest_api.id
-  stage_name    = "dev"
 }
 
 output "rest_api" {
