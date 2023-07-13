@@ -58,6 +58,13 @@ module "template_enable_cors" {
   api_resource_id = aws_api_gateway_resource.templates.id
 }
 
+module "template_id_enable_cors" {
+  source          = "squidfunk/api-gateway-enable-cors/aws"
+  version         = "0.3.3"
+  api_id          = var.rest_api_id
+  api_resource_id = aws_api_gateway_resource.template_id.id
+}
+
 data "aws_iam_policy_document" "assume_role_lambda" {
   statement {
     actions = ["sts:AssumeRole"]
