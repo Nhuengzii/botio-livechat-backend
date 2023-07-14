@@ -59,14 +59,31 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-	err = c.handlePostMessageRequest(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
+	stdMessage, err := c.sendMessage(ctx, shopID, pageID, conversationID, bot, postMessageRequestBody)
 	if err != nil {
 		if errors.Is(err, errUnsupportedAttachmentType) {
 			return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-	return apigateway.NewProxyResponse(200, "OK", "*"), nil
+
+	stdMessageJSON, err := json.Marshal(stdMessage)
+	err = c.snsClient.PublishMessage(c.snsTopicARN, string(stdMessageJSON))
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
+	response := postmessage.Response{
+		RecipientID: stdMessage.Source.UserID,
+		MessageID:   stdMessage.MessageID,
+		Timestamp:   stdMessage.Timestamp,
+	}
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
+	}
+
+	return apigateway.NewProxyResponse(200, string(responseJSON), "*"), nil
 }
 
 func main() {
