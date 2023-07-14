@@ -5,7 +5,7 @@ type LineTemplateButtons struct {
 	ThumbnailImageURL string               `json:"thumbnailImageUrl,omitempty"`
 	Title             string               `json:"title,omitempty"`
 	Text              string               `json:"text"`
-	DefaultAction     LineTemplateAction   `json:"defaultAction,omitempty"`
+	DefaultAction     *LineTemplateAction  `json:"defaultAction,omitempty"`
 	Actions           []LineTemplateAction `json:"actions"` // up to 4 actions
 }
 
@@ -24,7 +24,7 @@ type LineTemplateCarouselColumn struct {
 	ThumbnailImageURL string               `json:"thumbnailImageUrl,omitempty"`
 	Title             string               `json:"title,omitempty"`
 	Text              string               `json:"text"`
-	DefaultAction     LineTemplateAction   `json:"defaultAction,omitempty"`
+	DefaultAction     *LineTemplateAction  `json:"defaultAction,omitempty"`
 	Actions           []LineTemplateAction `json:"actions"` // up to 3 actions
 }
 

@@ -24,10 +24,6 @@ func toLineAudioMessage(req postmessage.Request) *linebot.AudioMessage {
 func toLineButtonsTemplateMessage(req postmessage.Request) *linebot.TemplateMessage {
 	altText := req.Attachment.Payload.LineTemplateButtons.AltText
 
-	defaultActionLabel := req.Attachment.Payload.LineTemplateButtons.DefaultAction.Label
-	defaultActionURI := req.Attachment.Payload.LineTemplateButtons.DefaultAction.URI
-	defaultAction := linebot.NewURIAction(defaultActionLabel, defaultActionURI)
-
 	actions := []linebot.TemplateAction{}
 	for _, action := range req.Attachment.Payload.LineTemplateButtons.Actions {
 		actions = append(actions, linebot.NewURIAction(action.Label, action.URI))
@@ -37,8 +33,15 @@ func toLineButtonsTemplateMessage(req postmessage.Request) *linebot.TemplateMess
 		ThumbnailImageURL: req.Attachment.Payload.LineTemplateButtons.ThumbnailImageURL,
 		Title:             req.Attachment.Payload.LineTemplateButtons.Title,
 		Text:              req.Attachment.Payload.LineTemplateButtons.Text,
-		DefaultAction:     defaultAction,
 		Actions:           actions,
+	}
+
+	if req.Attachment.Payload.LineTemplateButtons.DefaultAction != nil {
+		defaultAction := linebot.NewURIAction(
+			req.Attachment.Payload.LineTemplateButtons.DefaultAction.Label,
+			req.Attachment.Payload.LineTemplateButtons.DefaultAction.URI,
+		)
+		buttonsTemplate.WithDefaultAction(defaultAction)
 	}
 
 	return linebot.NewTemplateMessage(altText, buttonsTemplate)
@@ -64,23 +67,28 @@ func toLineCarouselTemplateMessage(req postmessage.Request) *linebot.TemplateMes
 	altText := req.Attachment.Payload.LineTemplateCarousel.AltText
 
 	columns := []*linebot.CarouselColumn{}
-	for _, column := range req.Attachment.Payload.LineTemplateCarousel.Columns {
-		defaultActionLabel := column.DefaultAction.Label
-		defaultActionURI := column.DefaultAction.URI
-		defaultAction := linebot.NewURIAction(defaultActionLabel, defaultActionURI)
-
+	for _, reqCarouselColumn := range req.Attachment.Payload.LineTemplateCarousel.Columns {
 		actions := []linebot.TemplateAction{}
-		for _, action := range column.Actions {
+		for _, action := range reqCarouselColumn.Actions {
 			actions = append(actions, linebot.NewURIAction(action.Label, action.URI))
 		}
 
-		columns = append(columns, &linebot.CarouselColumn{
-			ThumbnailImageURL: column.ThumbnailImageURL,
-			Title:             column.Title,
-			Text:              column.Text,
-			DefaultAction:     defaultAction,
+		column := &linebot.CarouselColumn{
+			ThumbnailImageURL: reqCarouselColumn.ThumbnailImageURL,
+			Title:             reqCarouselColumn.Title,
+			Text:              reqCarouselColumn.Text,
 			Actions:           actions,
-		})
+		}
+
+		if reqCarouselColumn.DefaultAction != nil {
+			defaultAction := linebot.NewURIAction(
+				reqCarouselColumn.DefaultAction.Label,
+				reqCarouselColumn.DefaultAction.URI,
+			)
+			column.WithDefaultAction(defaultAction)
+		}
+
+		columns = append(columns, column)
 	}
 
 	carouselTemplate := &linebot.CarouselTemplate{
@@ -94,10 +102,10 @@ func toLineImageCarouselTemplateMessage(req postmessage.Request) *linebot.Templa
 	altText := req.Attachment.Payload.LineTemplateImageCarousel.AltText
 
 	columns := []*linebot.ImageCarouselColumn{}
-	for _, column := range req.Attachment.Payload.LineTemplateImageCarousel.Columns {
+	for _, reqImageCarouselColumn := range req.Attachment.Payload.LineTemplateImageCarousel.Columns {
 		columns = append(columns, &linebot.ImageCarouselColumn{
-			ImageURL: column.ImageURL,
-			Action:   linebot.NewURIAction(column.Action.Label, column.Action.URI),
+			ImageURL: reqImageCarouselColumn.ImageURL,
+			Action:   linebot.NewURIAction(reqImageCarouselColumn.Action.Label, reqImageCarouselColumn.Action.URI),
 		})
 	}
 
