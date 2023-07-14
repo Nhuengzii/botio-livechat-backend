@@ -15,17 +15,17 @@ import (
 
 var errUnsupportedAttachmentType = errors.New("unsupported attachment type")
 
-func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, req postmessage.Request) (err error) {
+func (c *config) sendMessage(ctx context.Context, shopID string, pageID string, conversationID string, bot *linebot.Client, req postmessage.Request) (_ *stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("handlePostMessageRequest: %w", err)
+			err = fmt.Errorf("sendMessage: %w", err)
 		}
 	}()
 
 	// check conversation exists
 	err = c.dbClient.CheckConversationExists(ctx, conversationID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	attachments := []stdmessage.Attachment{}
@@ -33,7 +33,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 	if req.Message != "" {
 		_, err = bot.PushMessage(conversationID, toLineTextMessage(req)).Do()
 		if err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		// attachment
@@ -41,7 +41,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeImage:
 			_, err = bot.PushMessage(conversationID, toLineImageMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -51,7 +51,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeVideo:
 			_, err = bot.PushMessage(conversationID, toLineVideoMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -61,7 +61,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeAudio:
 			_, err = bot.PushMessage(conversationID, toLineAudioMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -71,7 +71,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeLineTemplateButtons:
 			_, err = bot.PushMessage(conversationID, toLineButtonsTemplateMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
@@ -83,7 +83,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 				},
 			)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -93,7 +93,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeLineTemplateConfirm:
 			_, err = bot.PushMessage(conversationID, toLineConfirmTemplateMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
@@ -105,7 +105,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 				},
 			)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -115,7 +115,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeLineTemplateCarousel:
 			_, err = bot.PushMessage(conversationID, toLineCarouselTemplateMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
@@ -127,7 +127,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 				},
 			)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -137,7 +137,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		case stdmessage.AttachmentTypeLineTemplateImageCarousel:
 			_, err = bot.PushMessage(conversationID, toLineImageCarouselTemplateMessage(req)).Do()
 			if err != nil {
-				return err
+				return nil, err
 			}
 			stdMessagePayloadSrcJSON, err := json.Marshal(
 				struct {
@@ -149,7 +149,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 				},
 			)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			attachment := stdmessage.Attachment{
 				AttachmentType: stdmessage.AttachmentType(req.Attachment.AttachmentType),
@@ -157,7 +157,7 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 			}
 			attachments = append(attachments, attachment)
 		default:
-			return fmt.Errorf("%w: %v", errUnsupportedAttachmentType, req.Attachment.AttachmentType)
+			return nil, fmt.Errorf("%w: %v", errUnsupportedAttachmentType, req.Attachment.AttachmentType)
 		}
 	}
 
@@ -177,11 +177,5 @@ func (c *config) handlePostMessageRequest(ctx context.Context, shopID string, pa
 		ReplyTo:     nil,
 	}
 
-	stdMessageJSON, err := json.Marshal(stdMessage)
-	err = c.snsClient.PublishMessage(c.snsTopicARN, string(stdMessageJSON))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return &stdMessage, nil
 }
