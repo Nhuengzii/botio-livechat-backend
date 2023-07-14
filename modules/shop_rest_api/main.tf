@@ -112,11 +112,6 @@ locals {
       resource_id   = aws_api_gateway_resource.config.id
       resource_path = aws_api_gateway_resource.config.path
     }
-    patch_config = {
-      method        = "PATCH"
-      resource_id   = aws_api_gateway_resource.config.id
-      resource_path = aws_api_gateway_resource.config.path
-    }
     post_templates = {
       method        = "POST"
       resource_id   = aws_api_gateway_resource.templates.id
