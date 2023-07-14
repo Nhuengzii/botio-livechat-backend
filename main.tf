@@ -68,15 +68,6 @@ module "shops" {
         MONGODB_DATABASE    = var.mongo_database
       }
     }
-    patch_config = {
-      handler_name = "patch_config"
-      handler_path = format("%s/cmd/lambda/shops/patch_config", path.root)
-      environment_variables = {
-        DISCORD_WEBHOOK_URL = var.discord_webhook_url
-        MONGODB_URI         = var.mongo_uri
-        MONGODB_DATABASE    = var.mongo_database
-      }
-    }
     delete_template = {
       handler_name = "delete_template"
       handler_path = format("%s/cmd/lambda/shops/delete_template", path.root)
