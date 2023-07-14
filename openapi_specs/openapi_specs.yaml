@@ -10,7 +10,7 @@ servers:
   - url: "https://{id}.execute-api.ap-southeast-1.amazonaws.com/{stage}"
     variables:
       id:
-        default: "1ai1vqnymh"
+        default: "ze3s644f2h"
       stage:
         default: "dev"
 tags:
@@ -254,11 +254,13 @@ paths:
                             title: "View Product"
                           - url: "https://example.com/product/2"
                             title: "View Product"
-
-
       responses:
         "200":
           description: "OK: Message sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -516,10 +518,13 @@ paths:
                             title: "View Product"
                           - url: "https://example.com/product/2"
                             title: "View Product"
-
       responses:
         "200":
           description: "OK: Message sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -826,6 +831,10 @@ paths:
       responses:
         "200":
           description: "OK: Message sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -1475,7 +1484,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ShopTemplate"
-
     # /... data models
     PresignedURL:
       type: object
@@ -1483,6 +1491,20 @@ components:
         - presignedURL
       properties:
         presignedURL:
+          type: string
+    # post message response
+    PostMessageResponse:
+      type: object
+      required:
+        - recipient_id
+        - message_id
+        - timestamp
+      properties:
+        recipient_id:
+          type: string
+        message_id:
+          type: string
+        timestamp:
           type: string
     # common attachment types
     PostMessageAttachmentPayloadImage:
