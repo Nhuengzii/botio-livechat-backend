@@ -17,6 +17,6 @@ type Response struct {
 //
 // *** only 1 field can exists at the same time. ***
 type Filter struct {
-	ParticipantsUsername string `json:"with_participants_username"` // filter conversations by participants's username
-	Message              string `json:"with_message"`               // filter conversations by messages that its contain
+	ParticipantsUsername string `json:"withParticipantsUsername"` // filter conversations by participants's username
+	Message              string `json:"withMessage"`              // filter conversations by messages that its contain
 }
