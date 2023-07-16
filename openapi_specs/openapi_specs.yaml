@@ -1429,20 +1429,22 @@ components:
           $ref: "#/components/schemas/Shop"
     ShopAvailablePagesArray:
       type: object
+      required:
+        - availablePages
       properties:
-        available_pages:
+        availablePages:
           type: array
           items:
             $ref: "#/components/schemas/PageInfo"
     PageInfo:
       type: object
       required:
-        - platform_name
-        - page_id
+        - platformName
+        - pageID
       properties:
-        platform_name:
+        platformName:
           type: string
-        page_id:
+        pageID:
           type: string
     ShopConfig:
       type: object
