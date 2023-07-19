@@ -217,7 +217,7 @@ type DBClient interface {
 	AddShopNewTemplateMessage(ctx context.Context, template templates.Template) (err error)
 
 	// GetShopTemplateMessage returns array of template messages of specific shop.
-	GetShopTemplateMessage(ctx context.Context, shopID string) (_ []templates.Template, err error)
+	GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error)
 
 	// DeleteShopTemplateMessage removes a template from a shop_config's templates
 	DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (deletedCount int, err error)

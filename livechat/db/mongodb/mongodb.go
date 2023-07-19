@@ -1109,7 +1109,7 @@ func (c *Client) GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.C
 }
 
 // GetShopTemplateMessage returns array of template messages of specific shop.
-func (c *Client) GetShopTemplateMessage(ctx context.Context, shopID string) (_ []templates.Template, err error) {
+func (c *Client) GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.GetShopTemplateMessage: %w", err)
