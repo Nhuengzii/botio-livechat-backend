@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
 	"os"
 	"time"
@@ -34,12 +33,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		return apigateway.NewProxyResponse(400, "BadRequest: template_id must not be empty.", "*"), nil
 	}
 
-	err = c.dbClient.DeleteShopTemplateMessage(ctx, shopID, templateID)
+	deletedCount, err := c.dbClient.DeleteShopTemplateMessage(ctx, shopID, templateID)
 	if err != nil {
-		if errors.Is(err, mongodb.ErrNoDocuments) {
-			return apigateway.NewProxyResponse(404, "NotFound: Shop not found.", "*"), nil
-		}
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
+	}
+	if deletedCount == 0 {
+		return apigateway.NewProxyResponse(404, "NotFound: Shop not found.", "*"), nil
 	}
 
 	return apigateway.NewProxyResponse(200, "OK: Template message deleted.", "*"), nil
@@ -60,6 +59,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 		CollectionShopConfig:    "shop_config",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/delete_template/main.main: " + err.Error()

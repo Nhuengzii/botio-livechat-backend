@@ -32,7 +32,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		return apigateway.NewProxyResponse(400, "BadRequest: shop_id must not be empty.", "*"), nil
 	}
 
-	shopConfig, err := c.dbClient.GetShopConfig(ctx, shopID)
+	templates, err := c.dbClient.GetShopTemplateMessage(ctx, shopID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, "NotFound: shop_id not found.", "*"), nil
@@ -41,7 +41,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 
 	response := getshoptemplates.Response{
-		Templates: shopConfig.Templates,
+		Templates: templates,
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
@@ -65,6 +65,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 		CollectionShopConfig:    "shop_config",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/get_templates/main.main: " + err.Error()

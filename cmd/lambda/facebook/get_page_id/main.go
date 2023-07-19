@@ -60,6 +60,7 @@ func main() {
 		Database:                mongodbDatabase,
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
+		CollectionTemplates:     "templates",
 	})
 	c := config{
 		discordWebhookURL: discordWebhookURL,
