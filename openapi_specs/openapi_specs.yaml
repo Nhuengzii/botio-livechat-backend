@@ -204,7 +204,7 @@ paths:
                             - "video"
                             - "audio"
                             - "file"
-                            - "facebook-template-generic"
+                            - "facebookTemplateGeneric"
                         payload:
                           oneOf:
                             - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
@@ -243,9 +243,9 @@ paths:
               facebook template generic:
                 value:
                   attachment:
-                    type: "facebook-template-generic"
+                    type: "facebookTemplateGeneric"
                     payload:
-                      fb_template_generic:
+                      facebookTemplateGeneric:
                         title: "Your wishlist"
                         message: "Take a look at these great deals!"
                         picture: "https://example.com/image.jpg"
@@ -468,7 +468,7 @@ paths:
                             - "video"
                             - "audio"
                             - "file"
-                            - "instagram-template-generic"
+                            - "instagramTemplateGeneric"
                         payload:
                           oneOf:
                             - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
@@ -507,9 +507,9 @@ paths:
               instagram template generic:
                 value:
                   attachment:
-                    type: "instagram-template-generic"
+                    type: "instagramTemplateGeneric"
                     payload:
-                      ig_template_generic:
+                      instagramTemplateGeneric:
                         title: "Your wishlist"
                         message: "Take a look at these great deals!"
                         picture: "https://example.com/image.jpg"
@@ -711,10 +711,10 @@ paths:
                             - "image"
                             - "video"
                             - "audio"
-                            - "line-template-buttons"
-                            - "line-template-confirm"
-                            - "line-template-carousel"
-                            - "line-template-image-carousel"
+                            - "lineTemplateButtons"
+                            - "lineTemplateConfirm"
+                            - "lineTemplateCarousel"
+                            - "lineTemplateImageCarousel"
                         payload:
                           oneOf:
                             - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
@@ -749,9 +749,9 @@ paths:
               line template buttons:
                 value:
                   attachment:
-                    type: "line-template-buttons"
+                    type: "lineTemplateButtons"
                     payload:
-                      line_template_buttons:
+                      lineTemplateButtons:
                         altText: "You have a new buttons template message!"
                         text: "Please select an option."
                         actions:
@@ -766,9 +766,9 @@ paths:
               line template confirm:
                 value:
                   attachment:
-                    type: "line-template-confirm"
+                    type: "lineTemplateConfirm"
                     payload:
-                      line_template_confirm:
+                      lineTemplateConfirm:
                         altText: "You have a new confirm template message!"
                         text: "Please select an option."
                         actions:
@@ -779,9 +779,9 @@ paths:
               line template carousel:
                 value:
                   attachment:
-                    type: "line-template-carousel"
+                    type: "lineTemplateCarousel"
                     payload:
-                      line_template_carousel:
+                      lineTemplateCarousel:
                         altText: "You have a new carousel template message!"
                         columns:
                           - text: "Please select an option."
@@ -811,9 +811,9 @@ paths:
               line template image carousel:
                 value:
                   attachment:
-                    type: "line-template-image-carousel"
+                    type: "lineTemplateImageCarousel"
                     payload:
-                      line_template_image_carousel:
+                      lineTemplateImageCarousel:
                         altText: "You have a new image carousel template message!"
                         columns:
                           - imageUrl: "https://example.com/image1.jpg"
@@ -1543,30 +1543,30 @@ components:
     PostMessageAttachmentPayloadLineTemplateButtons:
       type: object
       required:
-        - line_template_buttons
+        - lineTemplateButtons
       properties:
-        line_template_buttons:
+        lineTemplateButtons:
           $ref: "#/components/schemas/LineTemplateButtons"
     PostMessageAttachmentPayloadLineTemplateConfirm:
       type: object
       required:
-        - line_template_confirm
+        - lineTemplateConfirm
       properties:
-        line_template_confirm:
+        lineTemplateConfirm:
           $ref: "#/components/schemas/LineTemplateConfirm"
     PostMessageAttachmentPayloadLineTemplateCarousel:
       type: object
       required:
-        - line_template_carousel
+        - lineTemplateCarousel
       properties:
-        line_template_carousel:
+        lineTemplateCarousel:
           $ref: "#/components/schemas/LineTemplateCarousel"
     PostMessageAttachmentPayloadLineTemplateImageCarousel:
       type: object
       required:
-        - line_template_image_carousel
+        - lineTemplateImageCarousel
       properties:
-        line_template_image_carousel:
+        lineTemplateImageCarousel:
           $ref: "#/components/schemas/LineTemplateImageCarousel"
     LineTemplateButtons:
       type: object
@@ -1757,9 +1757,9 @@ components:
     PostMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
       required:
-        - fb_template_generic
+        - facebookTemplateGeneric
       properties:
-        fb_template_generic:
+        facebookTemplateGeneric:
           $ref: "#/components/schemas/FacebookTemplateGeneric"
     FacebookTemplateGeneric:
       type: object
@@ -1802,9 +1802,9 @@ components:
     PostMessageAttachmentPayloadInstagramGeneric:
       type: object
       required:
-        - ig_template_generic
+        - instagramTemplateGeneric
       properties:
-        ig_template_generic:
+        instagramTemplateGeneric:
           $ref: "#/components/schemas/InstagramTemplateGeneric"
     InstagramTemplateGeneric:
       type: object
@@ -1910,7 +1910,6 @@ components:
           withParticipantsUsername:
             type: string
             description: Only list conversations that contain this username (display name).
-
           withMessage:
             type: string
             description: Only list conversations that contain messages containing this string.

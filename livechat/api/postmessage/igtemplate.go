@@ -1,42 +1,42 @@
 package postmessage
 
-// An IGButton contains a instagram template button object informations.
-type IGButton struct {
+// An InstagramButton contains a instagram template button object information.
+type InstagramButton struct {
 	URL   string `json:"url"`   // URL of the web_url type button action.
 	Title string `json:"title"` // title of the button. (the text showed on button)
 }
 
-// An IGDefaultAction contains an instagram template's default action informations.
+// An InstagramDefaultAction contains an instagram template's default action information.
 //
 // Instagram template's default actions is an action perform when use click on any part of the template
-// that doesn't have a button. Contains body close to that of an IGButton except for the lack of Title field.
-type IGDefaultAction struct {
+// that doesn't have a button. Contains body close to that of an InstagramButton except for the lack of Title field.
+type InstagramDefaultAction struct {
 	URL string `json:"url"` // URL of the web_url type button action.
 }
 
-// An IGTemplateGeneric contains instagram generic template informations.
+// An InstagramTemplateGeneric contains instagram generic template information.
 //
-// *** request must have a title and one of the any other fields ***
+// *** request must have a title and at least one of other fields ***
 //
 // multiple buttons will align as a row
-type IGTemplateGeneric struct {
-	Title         string           `json:"title"`                    // title of the template
-	Message       string           `json:"message,omitempty"`        // text message on the template
-	Picture       string           `json:"picture,omitempty"`        // image show on the template
-	Button        []IGButton       `json:"buttons,omitempty"`        // buttons shows on the template, maximum 3 buttons allow for a template
-	DefaultAction *IGDefaultAction `json:"default_action,omitempty"` // the default action of the template
+type InstagramTemplateGeneric struct {
+	Title         string                  `json:"title"`                   // title of the template
+	Message       string                  `json:"message,omitempty"`       // text message on the template
+	Picture       string                  `json:"picture,omitempty"`       // image show on the template
+	Button        []InstagramButton       `json:"buttons,omitempty"`       // buttons shows on the template, maximum 3 buttons allow for a template
+	DefaultAction *InstagramDefaultAction `json:"defaultAction,omitempty"` // the default action of the template
 }
 
-type IGTemplateButton struct{}
+type InstagramTemplateButton struct{}
 
-type IGTemplateCoupon struct{}
+type InstagramTemplateCoupon struct{}
 
-type IGTemplateCustomerFeedback struct{}
+type InstagramTemplateCustomerFeedback struct{}
 
-type IGTemplateMedia struct{}
+type InstagramTemplateMedia struct{}
 
-type IGTemplateProduct struct{}
+type InstagramTemplateProduct struct{}
 
-type IGTemplateReceipt struct{}
+type InstagramTemplateReceipt struct{}
 
-type IGTemplateStructuredInformation struct{}
+type InstagramTemplateStructuredInformation struct{}

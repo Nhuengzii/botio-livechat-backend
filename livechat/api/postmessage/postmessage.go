@@ -5,7 +5,7 @@ package postmessage
 
 // A Request contains request body of the api request.
 //
-// *** only 1 field can exists at the same time. ***
+// *** only 1 field can exist at the same time. ***
 type Request struct {
 	Message    string     `json:"message"`    // send normal text message.
 	Attachment Attachment `json:"attachment"` // send a message with an attachment.
@@ -15,12 +15,12 @@ type Request struct {
 type Attachment struct {
 	// should return error if the AttachmentType request does not match any of supported AttachmentType define in stdmessage package.
 	AttachmentType string  `json:"type"`    // type of the attachment.
-	Payload        Payload `json:"payload"` // store informations of the attachment.
+	Payload        Payload `json:"payload"` // store information of the attachment.
 }
 
-// A Payload store informations of the attachment.
+// A Payload store information of the attachment.
 //
-// *** only 1 field can exists at the same time. ***
+// *** only 1 field can exist at the same time. ***
 //
 // For facebook and instagram multiple templates specified will create a carousel.
 //
@@ -31,34 +31,34 @@ type Payload struct {
 	//[facebook templates]: https://developers.facebook.com/docs/messenger-platform/send-messages/templates
 	//
 	// Multiple templates specified will create a carousel
-	FBTemplateGeneric []FBTemplateGeneric `json:"fb_template_generic"` // request's facebook generic template informations.
+	FacebookTemplateGeneric []FacebookTemplateGeneric `json:"facebookTemplateGeneric"` // request's facebook generic template information.
 
 	// [instagram generic template]: https://developers.facebook.com/docs/messenger-platform/instagram/features/generic-template
 	// [instagram product template]: https://developers.facebook.com/docs/messenger-platform/instagram/features/product-template
-	IGTemplateGeneric []IGTemplateGeneric `json:"ig_template_generic"` // request's intagram generic template informations.
+	InstagramTemplateGeneric []InstagramTemplateGeneric `json:"instagramTemplateGeneric"` // request's instagram generic template information.
 
 	// [line templates]: https://developers.line.biz/en/docs/messaging-api/message-types/#template-messages
-	LineTemplateButtons       LineTemplateButtons       `json:"line_template_buttons"`        // request's line buttons template informations.
-	LineTemplateCarousel      LineTemplateCarousel      `json:"line_template_carousel"`       // request's line carousel template informations.
-	LineTemplateImageCarousel LineTemplateImageCarousel `json:"line_template_image_carousel"` // request's line image carousel template informations.
-	LineTemplateConfirm       LineTemplateConfirm       `json:"line_template_confirm"`        // request's line confirm button template informations.
+	LineTemplateButtons       LineTemplateButtons       `json:"lineTemplateButtons"`       // request's line buttons template information.
+	LineTemplateCarousel      LineTemplateCarousel      `json:"lineTemplateCarousel"`      // request's line carousel template information.
+	LineTemplateImageCarousel LineTemplateImageCarousel `json:"lineTemplateImageCarousel"` // request's line image carousel template information.
+	LineTemplateConfirm       LineTemplateConfirm       `json:"lineTemplateConfirm"`       // request's line confirm button template information.
 
 	/* Templates below are currently unsupported
-	FBTemplateButton                []FBTemplateButton                `json:"fb_template_button"`
-	FBTemplateCoupon                []FBTemplateCoupon                `json:"fb_template_coupon"`
-	FBTemplateCustomerFeedback      []FBTemplateCustomerFeedback      `json:"fb_template_customer_feedback"`
-	FBTemplateMedia                 []FBTemplateMedia                 `json:"fb_template_media"`
-	FBTemplateProduct               []FBTemplateProduct               `json:"fb_template_product"`
-	FBTemplateReceipt               []FBTemplateReceipt               `json:"fb_template_receipt"`
-	FBTemplateStructuredInformation []FBTemplateStructuredInformation `json:"fb_template_structured_information"`
+	FacebookTemplateButton                []FacebookTemplateButton                `json:"facebookTemplateButton"`
+	FacebookTemplateCoupon                []FacebookTemplateCoupon                `json:"facebookTemplateCoupon"`
+	FacebookTemplateCustomerFeedback      []FacebookTemplateCustomerFeedback      `json:"facebookTemplateCustomerFeedback"`
+	FacebookTemplateProduct               []FacebookTemplateProduct               `json:"facebookTemplateProduct"`
+	FacebookTemplateMedia                 []FacebookTemplateMedia                 `json:"facebookTemplateMedia"`
+	FacebookTemplateReceipt               []FacebookTemplateReceipt               `json:"facebookTemplateReceipt"`
+	FacebookTemplateStructuredInformation []FacebookTemplateStructuredInformation `json:"facebookTemplateStructuredInformation"`
 
-	IGTemplateProduct []IGTemplateProduct `json:"ig_template_product"`
+	InstagramTemplateProduct []InstagramTemplateProduct `json:"instagramTemplateProduct"`
 	*/
 }
 
 // A Response contains response body of the api request in case the call's a success.
 type Response struct {
-	RecipientID string `json:"recipientID"` // platform specific message reciever ID
+	RecipientID string `json:"recipientID"` // platform specific message receiver ID
 	MessageID   string `json:"messageID"`   // platform specific requested message's message id
 	Timestamp   int64  `json:"timestamp"`   // sent message's timestamp
 }
