@@ -5,10 +5,17 @@ terraform {
       version = "5.1.0"
     }
   }
+  backend "s3" {
+    bucket = "botio-livechat-terraform-state"
+    key    = "terraform.tfstate"
+    region = "ap-southeast-1"
+  }
 }
 
 provider "aws" {
-  region = "ap-southeast-1"
+  region     = "ap-southeast-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 module "rest_api" {
