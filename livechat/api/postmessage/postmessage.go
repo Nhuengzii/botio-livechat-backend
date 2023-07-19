@@ -58,7 +58,7 @@ type Payload struct {
 
 // A Response contains response body of the api request in case the call's a success.
 type Response struct {
-	RecipientID string `json:"recipient_id"` // platform specific message reciever ID
-	MessageID   string `json:"message_id"`   // platform specific requested message's message id
-	Timestamp   int64  `json:"timestamp"`    // sent message's timestamp
+	RecipientID string `json:"recipientID"` // platform specific message reciever ID
+	MessageID   string `json:"messageID"`   // platform specific requested message's message id
+	Timestamp   int64  `json:"timestamp"`   // sent message's timestamp
 }

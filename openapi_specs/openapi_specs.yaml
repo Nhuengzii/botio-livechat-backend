@@ -1496,13 +1496,13 @@ components:
     PostMessageResponse:
       type: object
       required:
-        - recipient_id
-        - message_id
+        - recipientID
+        - messageID
         - timestamp
       properties:
-        recipient_id:
+        recipientID:
           type: string
-        message_id:
+        messageID:
           type: string
         timestamp:
           type: string
