@@ -1,3 +1,5 @@
+aws_access_key = "sdad"
+aws_secret_key = "sdakd"
 mongo_uri           = "mongodb_uri"
 mongo_database      = "mongodb_database"
 discord_webhook_url = "discord_webhook_url"
