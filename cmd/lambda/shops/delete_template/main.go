@@ -38,7 +38,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), nil
 	}
 	if deletedCount == 0 {
-		return apigateway.NewProxyResponse(404, "NotFound: Shop not found.", "*"), nil
+		return apigateway.NewProxyResponse(404, "NotFound: Template not found.", "*"), nil
 	}
 
 	return apigateway.NewProxyResponse(200, "OK: Template message deleted.", "*"), nil

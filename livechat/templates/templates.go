@@ -5,6 +5,6 @@ package templates
 // Template is a shop's saved template message data model
 type Template struct {
 	ShopID  string `bson:"shopID" json:"shopID"`
-	ID      string `bson:"id" json:"id"`
+	ID      string `bson:"templateID" json:"templateID"`
 	Payload string `bson:"payload" json:"payload"`
 }
