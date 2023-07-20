@@ -94,7 +94,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.UpdateConversationOnNewMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.UpdateConversationOnDeletedMessage: %w", err)
 		}
 	}()
 	if message.IsDeleted {
@@ -186,6 +186,7 @@ func (c *Client) UpdateConversationOnNewMessage(ctx context.Context, message *st
 			"$set": bson.D{
 				{Key: "lastActivity", Value: lastActivity},
 				{Key: "updatedTime", Value: message.Timestamp},
+				{Key: "lastUserActivityTime", Value: message.Timestamp},
 				{Key: "unread", Value: currentUnread + 1},
 			},
 		}
