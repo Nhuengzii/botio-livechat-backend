@@ -67,6 +67,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/facebook/standardize_webhook/main.main: " + err.Error()

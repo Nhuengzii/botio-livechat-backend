@@ -1452,14 +1452,9 @@ components:
       type: object
       required:
         - shopID
-        - templates
       properties:
         shopID:
           type: string
-        templates:
-          type: array
-          items:
-            $ref: "#/components/schemas/shopTemplate"
     shopTemplate:
       type: object
       required:
