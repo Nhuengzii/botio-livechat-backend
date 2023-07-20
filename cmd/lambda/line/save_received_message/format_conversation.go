@@ -36,7 +36,8 @@ func newStdConversation(bot *linebot.Client, message *stdmessage.StdMessage) (_ 
 				ProfilePic: stdconversation.Payload{Src: userProfile.PictureURL},
 			},
 		},
-		LastActivity: lastActivity,
-		Unread:       1,
+		LastActivity:         lastActivity,
+		LastUserActivityTime: message.Timestamp,
+		Unread:               1,
 	}, nil
 }
