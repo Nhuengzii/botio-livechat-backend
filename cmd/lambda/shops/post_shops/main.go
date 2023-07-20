@@ -62,8 +62,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 
 	newShopConfig := shopcfg.Config{
-		ShopID:    newShopID,
-		Templates: []shopcfg.Template{},
+		ShopID: newShopID,
 	}
 	err = c.dbClient.InsertShopConfig(ctx, newShopConfig)
 	if err != nil {
@@ -95,6 +94,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 		CollectionShopConfig:    "shop_config",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/post_shops/main.main: " + err.Error()

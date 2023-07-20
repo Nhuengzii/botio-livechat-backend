@@ -2,9 +2,11 @@ package livechat
 
 import (
 	"context"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/templates"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
@@ -212,8 +214,11 @@ type DBClient interface {
 	GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.Config, err error)
 
 	// AddShopNewTemplateMessage adds a new template message to a shop's config.
-	AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error)
+	AddShopNewTemplateMessage(ctx context.Context, template templates.Template) (err error)
+
+	// GetShopTemplateMessage returns array of template messages of specific shop.
+	GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error)
 
 	// DeleteShopTemplateMessage removes a template from a shop_config's templates
-	DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (err error)
+	DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (deletedCount int, err error)
 }

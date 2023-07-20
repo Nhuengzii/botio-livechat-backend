@@ -5,10 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getall"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/getshop"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
-	"strings"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/templates"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
@@ -35,6 +37,7 @@ type Target struct {
 	CollectionMessages      string // Messages collection name
 	CollectionShops         string // Shops collection name
 	CollectionShopConfig    string // ShopConfig collection name
+	CollectionTemplates     string // Templates collection name
 }
 
 // NewClient returns a new Client which contains mongodb client inside.
@@ -312,7 +315,6 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
 	messages := []stdmessage.StdMessage{}
 	err = cur.All(ctx, &messages)
 	if err != nil {
@@ -1106,62 +1108,69 @@ func (c *Client) GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.C
 	return &config, nil
 }
 
+// GetShopTemplateMessage returns array of template messages of specific shop.
+func (c *Client) GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("mongodb.Client.GetShopTemplateMessage: %w", err)
+		}
+	}()
+
+	coll := c.client.Database(c.Database).Collection(c.CollectionTemplates)
+	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+	}
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	template := []templates.Template{}
+	err = cur.All(ctx, &template)
+	if err != nil {
+		return nil, err
+	}
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+	return template, nil
+}
+
 // AddShopNewTemplateMessage adds a new template message to a shop's config.
-func (c *Client) AddShopNewTemplateMessage(ctx context.Context, shopID string, template shopcfg.Template) (err error) {
+func (c *Client) AddShopNewTemplateMessage(ctx context.Context, template templates.Template) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.AddShopNewTemplateMessage: %w", err)
 		}
 	}()
 
-	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
-	filter := bson.D{
-		{Key: "shopID", Value: shopID},
-	}
-	update := bson.D{
-		{Key: "$push", Value: bson.D{
-			{Key: "templates", Value: template},
-		}},
-	}
-
-	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	coll := c.client.Database(c.Database).Collection(c.CollectionTemplates)
+	_, err = coll.InsertOne(ctx, template)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrNoDocuments
-		}
-		return err
+		return fmt.Errorf("mongodb.Client.AddShopNewTemplateMessage: %w", err)
 	}
-
 	return nil
 }
 
-// DeleteShopTemplateMessage removes a template from a shop_config's templates
-func (c *Client) DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (err error) {
+// DeleteShopTemplateMessage removes a template from a shop_config's templates and return number of deleted document.
+//
+// return error if it occurs.
+func (c *Client) DeleteShopTemplateMessage(ctx context.Context, shopID string, templateID string) (deleteCount int, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.DeleteShopTemplateMessage: %w", err)
 		}
 	}()
 
-	coll := c.client.Database(c.Database).Collection(c.CollectionShopConfig)
+	coll := c.client.Database(c.Database).Collection(c.CollectionTemplates)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
-	}
-	update := bson.D{
-		{Key: "$pull", Value: bson.D{
-			{Key: "templates", Value: bson.D{
-				{Key: "id", Value: templateID},
-			}},
-		}},
+		{Key: "templateID", Value: templateID},
 	}
 
-	err = coll.FindOneAndUpdate(ctx, filter, update).Err()
+	delResult, err := coll.DeleteOne(ctx, filter)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrNoDocuments
-		}
-		return err
+		return 0, err
 	}
 
-	return nil
+	return int(delResult.DeletedCount), err
 }

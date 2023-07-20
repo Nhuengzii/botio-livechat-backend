@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchshopcfg"
-	"github.com/Nhuengzii/botio-livechat-backend/livechat/shopcfg"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"time"
+
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/patchshopcfg"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/templates"
+	"github.com/google/uuid"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 
@@ -46,11 +47,12 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}
 
 	newTemplateID := uuid.New().String()
-	newTemplate := shopcfg.Template{
+	newTemplate := templates.Template{
+		ShopID:  shopID,
 		ID:      newTemplateID,
 		Payload: patchShopCfgRequest.TemplatePayload,
 	}
-	err = c.dbClient.AddShopNewTemplateMessage(ctx, shopID, newTemplate)
+	err = c.dbClient.AddShopNewTemplateMessage(ctx, newTemplate)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil
@@ -83,6 +85,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 		CollectionShopConfig:    "shop_config",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/post_templates/main.main: " + err.Error()

@@ -16,11 +16,11 @@ func fmtBasicPayload(payload postmessage.Payload) (*reqfbsendmessage.AttachmentF
 }
 
 func fmtGenericTemplatePayload(payload postmessage.Payload) (*reqfbsendmessage.AttachmentFacebookPayload, error) {
-	if len(payload.FBTemplateGeneric) == 0 {
+	if len(payload.FacebookTemplateGeneric) == 0 {
 		return nil, errNoPayloadFoundForTemplatePayload
 	}
 	var genericTemplate []reqfbsendmessage.Template // reqfbsendmessage.GenericTemplate
-	for _, element := range payload.FBTemplateGeneric {
+	for _, element := range payload.FacebookTemplateGeneric {
 		var buttons []reqfbsendmessage.Button
 		for _, button := range element.Button {
 			buttons = append(buttons, reqfbsendmessage.Button{
