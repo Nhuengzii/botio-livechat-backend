@@ -37,8 +37,8 @@ paths:
         For use by facebook to verify a webhook endpoint.
       operationId: verifyFacebookWebhook
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Webhook handler is up and running."
@@ -56,8 +56,8 @@ paths:
         For use by facebook to send webhook events.
       operationId: facebookWebhook
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Webhook events received."
@@ -76,16 +76,16 @@ paths:
       summary: Get a facebook conversation
       operationId: getFacebookConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       responses:
         "200":
           description: "OK: Conversation found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationWrapper"
+                $ref: "#/components/schemas/conversationWrapper"
         "400":
           description: "Bad request: Check path parameters."
         "404":
@@ -98,11 +98,11 @@ paths:
       summary: Update a facebook conversation's field(s)
       operationId: patchFacebookConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PatchConversation"
+        $ref: "#/components/requestBodies/patchConversation"
       responses:
         "200":
           description: "OK: Conversation updated."
@@ -119,18 +119,18 @@ paths:
       summary: List a facebook page's conversations
       operationId: listFacebookPageConversations
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListConversationsFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listConversationsFilter"
       responses:
         "200":
           description: "OK: Conversations found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationArray"
+                $ref: "#/components/schemas/conversationArray"
         "204":
           description: "No Content: No conversations found"
         "400":
@@ -146,19 +146,19 @@ paths:
       summary: List a facebook conversation's messages
       operationId: listFacebookConversationMessages
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListMessagesFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listMessagesFilter"
       responses:
         "200":
           description: "OK: Messages found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageArray"
+                $ref: "#/components/schemas/messageArray"
         "204":
           description: "No Content: No messages found"
         "400":
@@ -173,9 +173,10 @@ paths:
       summary: Send a message to a facebook conversation
       operationId: postFacebookMessage
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
+        - $ref: "#/components/parameters/psid"
       requestBody:
         content:
           application/json:
@@ -207,11 +208,11 @@ paths:
                             - "facebookTemplateGeneric"
                         payload:
                           oneOf:
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFacebookTemplateGeneric"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadFile"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadFacebookTemplateGeneric"
             examples:
               text:
                 value:
@@ -246,21 +247,21 @@ paths:
                     type: "facebookTemplateGeneric"
                     payload:
                       facebookTemplateGeneric:
-                        title: "Your wishlist"
-                        message: "Take a look at these great deals!"
-                        picture: "https://example.com/image.jpg"
-                        buttons:
-                          - url: "https://example.com/product/1"
-                            title: "View Product"
-                          - url: "https://example.com/product/2"
-                            title: "View Product"
+                        - title: "Your wishlist"
+                          message: "Take a look at these great deals!"
+                          picture: "https://example.com/image.jpg"
+                          buttons:
+                            - url: "https://example.com/product/1"
+                              title: "View Product"
+                            - url: "https://example.com/product/2"
+                              title: "View Product"
       responses:
         "200":
           description: "OK: Message sent"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostMessageResponse"
+                $ref: "#/components/schemas/postMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -276,15 +277,15 @@ paths:
         Get a facebook page's unread and all conversations counts.
       operationId: getFacebookPageConversationStatus
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageConversationStatus"
+                $ref: "#/components/schemas/pageConversationStatus"
         "400":
           description: "Bad Request: Check path parameters."
         "404":
@@ -301,8 +302,8 @@ paths:
         For use by instagram to verify a webhook endpoint.
       operationId: verifyInstagramWebhook
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Webhook handler is up and running."
@@ -320,8 +321,8 @@ paths:
         For use by instagram to send webhook events.
       operationId: instagramWebhook
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Webhook events received."
@@ -340,16 +341,16 @@ paths:
       summary: Get an instagram conversation
       operationId: getInstagramConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       responses:
         "200":
           description: "OK: Conversation found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationWrapper"
+                $ref: "#/components/schemas/conversationWrapper"
         "400":
           description: "Bad request: Check path parameters."
         "404":
@@ -362,11 +363,11 @@ paths:
       summary: Update an instagram conversation's field(s)
       operationId: patchInstagramConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PatchConversation"
+        $ref: "#/components/requestBodies/patchConversation"
       responses:
         "200":
           description: "OK: Conversation updated."
@@ -383,18 +384,18 @@ paths:
       summary: List an instagram page's conversations
       operationId: listInstagramPageConversations
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListConversationsFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listConversationsFilter"
       responses:
         "200":
           description: "OK: Conversations found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationArray"
+                $ref: "#/components/schemas/conversationArray"
         "204":
           description: "No Content: No conversations found"
         "400":
@@ -410,19 +411,19 @@ paths:
       summary: List an instagram conversation's messages
       operationId: listInstagramConversationMessages
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListMessagesFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listMessagesFilter"
       responses:
         "200":
           description: "OK: Messages found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageArray"
+                $ref: "#/components/schemas/messageArray"
         "204":
           description: "No Content: No messages found"
         "400":
@@ -437,9 +438,10 @@ paths:
       summary: Send a message to an instagram conversation
       operationId: postInstagramMessage
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
+        - $ref: "#/components/parameters/psid"
       requestBody:
         content:
           application/json:
@@ -471,11 +473,11 @@ paths:
                             - "instagramTemplateGeneric"
                         payload:
                           oneOf:
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadFile"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadInstagramGeneric"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadFile"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadInstagramGeneric"
             examples:
               text:
                 value:
@@ -510,21 +512,21 @@ paths:
                     type: "instagramTemplateGeneric"
                     payload:
                       instagramTemplateGeneric:
-                        title: "Your wishlist"
-                        message: "Take a look at these great deals!"
-                        picture: "https://example.com/image.jpg"
-                        buttons:
-                          - url: "https://example.com/product/1"
-                            title: "View Product"
-                          - url: "https://example.com/product/2"
-                            title: "View Product"
+                        - title: "Your wishlist"
+                          message: "Take a look at these great deals!"
+                          picture: "https://example.com/image.jpg"
+                          buttons:
+                            - url: "https://example.com/product/1"
+                              title: "View Product"
+                            - url: "https://example.com/product/2"
+                              title: "View Product"
       responses:
         "200":
           description: "OK: Message sent"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostMessageResponse"
+                $ref: "#/components/schemas/postMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -540,15 +542,15 @@ paths:
         Get an instagram page's unread and all conversation counts.
       operationId: getInstagramPageConversationStatus
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageConversationStatus"
+                $ref: "#/components/schemas/pageConversationStatus"
         "400":
           description: "Bad Request: Check path parameters."
         "404":
@@ -565,8 +567,8 @@ paths:
         For use by line to send webhook events.
       operationId: lineWebhook
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Webhook events received."
@@ -585,16 +587,16 @@ paths:
       summary: Get a line conversation
       operationId: getLineConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       responses:
         "200":
           description: "OK: Conversation found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationWrapper"
+                $ref: "#/components/schemas/conversationWrapper"
         "400":
           description: "Bad request: Check path parameters."
         "404":
@@ -607,11 +609,11 @@ paths:
       summary: Update a line conversation's field(s)
       operationId: patchLineConversation
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       requestBody:
-        $ref: "#/components/requestBodies/PatchConversation"
+        $ref: "#/components/requestBodies/patchConversation"
       responses:
         "200":
           description: "OK: Conversation updated."
@@ -628,18 +630,18 @@ paths:
       summary: List a line page's conversations
       operationId: listLinePageConversations
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListConversationsFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listConversationsFilter"
       responses:
         "200":
           description: "OK: Conversations found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationArray"
+                $ref: "#/components/schemas/conversationArray"
         "204":
           description: "No Content: No conversations found"
         "400":
@@ -655,19 +657,19 @@ paths:
       summary: List a line conversation's messages
       operationId: listLineConversationMessages
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListMessagesFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listMessagesFilter"
       responses:
         "200":
           description: "OK: Messages found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageArray"
+                $ref: "#/components/schemas/messageArray"
         "204":
           description: "No Content: No messages found"
         "400":
@@ -682,9 +684,9 @@ paths:
       summary: Send a message to a line conversation
       operationId: postLineMessage
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
-        - $ref: "#/components/parameters/ConversationID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
+        - $ref: "#/components/parameters/conversationID"
       requestBody:
         content:
           application/json:
@@ -717,13 +719,13 @@ paths:
                             - "lineTemplateImageCarousel"
                         payload:
                           oneOf:
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadImage"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadVideo"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadAudio"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateButtons"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateConfirm"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateCarousel"
-                            - $ref: "#/components/schemas/PostMessageAttachmentPayloadLineTemplateImageCarousel"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadImage"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadVideo"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadAudio"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadLineTemplateButtons"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadLineTemplateConfirm"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadLineTemplateCarousel"
+                            - $ref: "#/components/schemas/postMessageAttachmentPayloadLineTemplateImageCarousel"
             examples:
               text:
                 value:
@@ -834,7 +836,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostMessageResponse"
+                $ref: "#/components/schemas/postMessageResponse"
         "400":
           description: "Bad Request: Check path parameters and request body."
         "404":
@@ -850,15 +852,15 @@ paths:
         Get a line page's unread and all conversations counts.
       operationId: getLinePageConversationStatus
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/PageID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/pageID"
       responses:
         "200":
           description: "OK: Page's conversation status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageConversationStatus"
+                $ref: "#/components/schemas/pageConversationStatus"
         "400":
           description: "Bad Request: Check path parameters."
         "404":
@@ -873,14 +875,14 @@ paths:
       summary: List a shop's all platforms' conversations status.
       operationId: ListShopAllPlatformsConversationsStatus
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       responses:
         "200":
           description: "OK: Status found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopPlatformsConversationsStatusArray"
+                $ref: "#/components/schemas/shopPlatformsConversationsStatusArray"
         "204":
           description: "No Content: No status found."
         "400":
@@ -896,17 +898,17 @@ paths:
       summary: List a shop's all platforms' conversations.
       operationId: listShopAllPlatformsConversations
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/Skip"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/ListConversationsFilter"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/skip"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/listConversationsFilter"
       responses:
         "200":
           description: "OK: Conversations found"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationArray"
+                $ref: "#/components/schemas/conversationArray"
         "204":
           description: "No Content: No conversations found."
         "400":
@@ -967,14 +969,14 @@ paths:
       summary: List a shop's available pages
       operationId: listShopAvailablePages
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       responses:
         "200":
           description: "OK: Pages found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopAvailablePagesArray"
+                $ref: "#/components/schemas/shopAvailablePagesArray"
         "204":
           description: "No Content: No pages found."
         "400":
@@ -989,7 +991,7 @@ paths:
       summary: Update a shop's information
       operationId: patchShop
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       requestBody:
         content:
           application/json:
@@ -1026,14 +1028,14 @@ paths:
       summary: Get a shop's config
       operationId: getShopConfig
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       responses:
         "200":
           description: "OK: Config found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopConfigWrapper"
+                $ref: "#/components/schemas/shopConfigWrapper"
         "400":
           description: "Bad Request: Check path parameters."
         "404":
@@ -1049,7 +1051,7 @@ paths:
         Use `POST /shops/{shop_id}/config/templates` to add a new shop config template instead.
       operationId: patchShopConfig
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       requestBody:
         content:
           application/json:
@@ -1090,7 +1092,7 @@ paths:
       summary: Add a new shop's saved template message
       operationId: postShopTemplate
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       requestBody:
         content:
           application/json:
@@ -1130,14 +1132,14 @@ paths:
       summary: List a shop's saved template messages
       operationId: listShopTemplates
       parameters:
-        - $ref: "#/components/parameters/ShopID"
+        - $ref: "#/components/parameters/shopID"
       responses:
         "200":
           description: "OK: Template messages found."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ShopTemplateArray"
+                $ref: "#/components/schemas/shopTemplateArray"
         "204":
           description: "No Content: No template messages found."
         "400":
@@ -1153,8 +1155,8 @@ paths:
       summary: Delete a shop's saved template message
       operationId: deleteShopTemplate
       parameters:
-        - $ref: "#/components/parameters/ShopID"
-        - $ref: "#/components/parameters/TemplateID"
+        - $ref: "#/components/parameters/shopID"
+        - $ref: "#/components/parameters/templateID"
       responses:
         "200":
           description: "OK: Template message deleted."
@@ -1184,14 +1186,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PresignedURL"
+                $ref: "#/components/schemas/presignedURL"
         "400":
           description: "Bad Request: Check query string parameters."
         "500":
           description: "Internal Server Error"
 components:
   schemas:
-    Message:
+    message:
       required:
         - shopID
         - platform
@@ -1219,18 +1221,18 @@ components:
           type: integer
           format: int64
         source:
-          $ref: "#/components/schemas/Source"
+          $ref: "#/components/schemas/source"
         message:
           type: string
         attachments:
           type: array
           items:
-            $ref: "#/components/schemas/Attachment"
+            $ref: "#/components/schemas/attachment"
         replyTo:
-          $ref: "#/components/schemas/RepliedMessage"
+          $ref: "#/components/schemas/repliedMessage"
         isDeleted:
           type: boolean
-    Source:
+    source:
       required:
         - userID
         - userType
@@ -1240,7 +1242,7 @@ components:
           type: string
         userType:
           type: string
-    Attachment:
+    attachment:
       required:
         - attachmentType
         - payload
@@ -1249,22 +1251,22 @@ components:
         attachmentType:
           type: string
         payload:
-          $ref: "#/components/schemas/Payload"
-    Payload:
+          $ref: "#/components/schemas/payload"
+    payload:
       required:
         - src
       type: object
       properties:
         src:
           type: string
-    RepliedMessage:
+    repliedMessage:
       required:
         - messageID
       type: object
       properties:
         messageID:
           type: string
-    Conversation:
+    conversation:
       required:
         - shopID
         - platform
@@ -1286,19 +1288,19 @@ components:
         conversationID:
           type: string
         conversationPic:
-          $ref: "#/components/schemas/Payload"
+          $ref: "#/components/schemas/payload"
         updatedTime:
           type: integer
           format: int64
         participants:
           type: array
           items:
-            $ref: "#/components/schemas/Participant"
+            $ref: "#/components/schemas/participant"
         lastActivity:
           type: string
         unread:
           type: integer
-    Participant:
+    participant:
       required:
         - userID
         - username
@@ -1310,8 +1312,8 @@ components:
         username:
           type: string
         profilePic:
-          $ref: "#/components/schemas/Payload"
-    ConversationArray:
+          $ref: "#/components/schemas/payload"
+    conversationArray:
       required:
         - conversations
       type: object
@@ -1319,8 +1321,8 @@ components:
         conversations:
           type: array
           items:
-            $ref: "#/components/schemas/Conversation"
-    MessageArray:
+            $ref: "#/components/schemas/conversation"
+    messageArray:
       required:
         - messages
       type: object
@@ -1328,22 +1330,22 @@ components:
         messages:
           type: array
           items:
-            $ref: "#/components/schemas/Message"
-    ConversationWrapper:
+            $ref: "#/components/schemas/message"
+    conversationWrapper:
       required:
         - conversation
       type: object
       properties:
         conversation:
-          $ref: "#/components/schemas/Conversation"
-    MessageWrapper:
+          $ref: "#/components/schemas/conversation"
+    messageWrapper:
       required:
         - message
       type: object
       properties:
         message:
-          $ref: "#/components/schemas/Message"
-    PageConversationStatus:
+          $ref: "#/components/schemas/message"
+    pageConversationStatus:
       type: object
       required:
         - unreadConversations
@@ -1354,7 +1356,7 @@ components:
         allConversations:
           type: integer
     # /{shop_id}/all/... data models
-    ShopPlatformsConversationsStatusArray:
+    shopPlatformsConversationsStatusArray:
       type: object
       required:
         - statuses
@@ -1362,8 +1364,8 @@ components:
         statuses:
           type: array
           items:
-            $ref: "#/components/schemas/PlatformConversationsStatus"
-    PlatformConversationsStatus:
+            $ref: "#/components/schemas/platformConversationsStatus"
+    platformConversationsStatus:
       type: object
       required:
         - platform
@@ -1377,7 +1379,7 @@ components:
         allConversations:
           type: integer
     # /shops/... data models
-    Shop:
+    shop:
       type: object
       required:
         - shopID
@@ -1387,30 +1389,30 @@ components:
         facebookPageID:
           type: string
         facebookAuthentication:
-          $ref: "#/components/schemas/FacebookAuthentication"
+          $ref: "#/components/schemas/facebookAuthentication"
         instagramPageID:
           type: string
         instagramAuthentication:
-          $ref: "#/components/schemas/InstagramAuthentication"
+          $ref: "#/components/schemas/instagramAuthentication"
         linePageID:
           type: string
         lineAuthentication:
-          $ref: "#/components/schemas/LineAuthentication"
-    FacebookAuthentication:
+          $ref: "#/components/schemas/lineAuthentication"
+    facebookAuthentication:
       type: object
       required:
         - accessToken
       properties:
         accessToken:
           type: string
-    InstagramAuthentication:
+    instagramAuthentication:
       type: object
       required:
         - accessToken
       properties:
         accessToken:
           type: string
-    LineAuthentication:
+    lineAuthentication:
       type: object
       required:
         - accessToken
@@ -1420,14 +1422,14 @@ components:
           type: string
         secret:
           type: string
-    ShopWrapper:
+    shopWrapper:
       type: object
       required:
         - shop
       properties:
         shop:
-          $ref: "#/components/schemas/Shop"
-    ShopAvailablePagesArray:
+          $ref: "#/components/schemas/shop"
+    shopAvailablePagesArray:
       type: object
       required:
         - availablePages
@@ -1435,8 +1437,8 @@ components:
         availablePages:
           type: array
           items:
-            $ref: "#/components/schemas/PageInfo"
-    PageInfo:
+            $ref: "#/components/schemas/pageInfo"
+    pageInfo:
       type: object
       required:
         - platformName
@@ -1446,7 +1448,7 @@ components:
           type: string
         pageID:
           type: string
-    ShopConfig:
+    shopConfig:
       type: object
       required:
         - shopID
@@ -1457,8 +1459,8 @@ components:
         templates:
           type: array
           items:
-            $ref: "#/components/schemas/ShopTemplate"
-    ShopTemplate:
+            $ref: "#/components/schemas/shopTemplate"
+    shopTemplate:
       type: object
       required:
         - id
@@ -1468,14 +1470,14 @@ components:
           type: string
         payload:
           type: string
-    ShopConfigWrapper:
+    shopConfigWrapper:
       type: object
       required:
         - shopConfig
       properties:
         shopConfig:
-          $ref: "#/components/schemas/ShopConfig"
-    ShopTemplateArray:
+          $ref: "#/components/schemas/shopConfig"
+    shopTemplateArray:
       type: object
       required:
         - templates
@@ -1483,9 +1485,9 @@ components:
         templates:
           type: array
           items:
-            $ref: "#/components/schemas/ShopTemplate"
+            $ref: "#/components/schemas/shopTemplate"
     # /... data models
-    PresignedURL:
+    presignedURL:
       type: object
       required:
         - presignedURL
@@ -1493,7 +1495,7 @@ components:
         presignedURL:
           type: string
     # post message response
-    PostMessageResponse:
+    postMessageResponse:
       type: object
       required:
         - recipientID
@@ -1507,7 +1509,7 @@ components:
         timestamp:
           type: string
     # common attachment types
-    PostMessageAttachmentPayloadImage:
+    postMessageAttachmentPayloadImage:
       type: object
       required:
         - src
@@ -1515,7 +1517,7 @@ components:
         src:
           type: string
           description: "URL of the image"
-    PostMessageAttachmentPayloadVideo:
+    postMessageAttachmentPayloadVideo:
       type: object
       required:
         - src
@@ -1523,7 +1525,7 @@ components:
         src:
           type: string
           description: "URL of the video"
-    PostMessageAttachmentPayloadAudio:
+    postMessageAttachmentPayloadAudio:
       type: object
       required:
         - src
@@ -1531,7 +1533,7 @@ components:
         src:
           type: string
           description: "URL of the audio"
-    PostMessageAttachmentPayloadFile:
+    postMessageAttachmentPayloadFile:
       type: object
       required:
         - src
@@ -1540,35 +1542,35 @@ components:
           type: string
           description: "URL of the file"
     # line template messages
-    PostMessageAttachmentPayloadLineTemplateButtons:
+    postMessageAttachmentPayloadLineTemplateButtons:
       type: object
       required:
         - lineTemplateButtons
       properties:
         lineTemplateButtons:
-          $ref: "#/components/schemas/LineTemplateButtons"
-    PostMessageAttachmentPayloadLineTemplateConfirm:
+          $ref: "#/components/schemas/lineTemplateButtons"
+    postMessageAttachmentPayloadLineTemplateConfirm:
       type: object
       required:
         - lineTemplateConfirm
       properties:
         lineTemplateConfirm:
-          $ref: "#/components/schemas/LineTemplateConfirm"
-    PostMessageAttachmentPayloadLineTemplateCarousel:
+          $ref: "#/components/schemas/lineTemplateConfirm"
+    postMessageAttachmentPayloadLineTemplateCarousel:
       type: object
       required:
         - lineTemplateCarousel
       properties:
         lineTemplateCarousel:
-          $ref: "#/components/schemas/LineTemplateCarousel"
-    PostMessageAttachmentPayloadLineTemplateImageCarousel:
+          $ref: "#/components/schemas/lineTemplateCarousel"
+    postMessageAttachmentPayloadLineTemplateImageCarousel:
       type: object
       required:
         - lineTemplateImageCarousel
       properties:
         lineTemplateImageCarousel:
-          $ref: "#/components/schemas/LineTemplateImageCarousel"
-    LineTemplateButtons:
+          $ref: "#/components/schemas/lineTemplateImageCarousel"
+    lineTemplateButtons:
       type: object
       required:
         - altText
@@ -1599,15 +1601,15 @@ components:
             Max character limit: 60 (message with an image or title)
 
         defaultAction:
-          $ref: "#/components/schemas/LineTemplateAction"
+          $ref: "#/components/schemas/lineTemplateAction"
         actions:
           type: array
           description: |
             Action when tapped
             Max objects: 4
           items:
-            $ref: "#/components/schemas/LineTemplateAction"
-    LineTemplateConfirm:
+            $ref: "#/components/schemas/lineTemplateAction"
+    lineTemplateConfirm:
       type: object
       required:
         - altText
@@ -1633,8 +1635,8 @@ components:
             2 objects only
 
           items:
-            $ref: "#/components/schemas/LineTemplateAction"
-    LineTemplateCarousel:
+            $ref: "#/components/schemas/lineTemplateAction"
+    lineTemplateCarousel:
       type: object
       required:
         - altText
@@ -1653,8 +1655,8 @@ components:
             Max objects: 10
 
           items:
-            $ref: "#/components/schemas/LineTemplateCarouselColumn"
-    LineTemplateCarouselColumn:
+            $ref: "#/components/schemas/lineTemplateCarouselColumn"
+    lineTemplateCarouselColumn:
       type: object
       required:
         - text
@@ -1685,7 +1687,7 @@ components:
             Max character limit: 60 (message with an image or title)
 
         defaultAction:
-          $ref: "#/components/schemas/LineTemplateAction"
+          $ref: "#/components/schemas/lineTemplateAction"
         actions:
           type: array
           description: |
@@ -1693,8 +1695,8 @@ components:
             Max objects: 3
 
           items:
-            $ref: "#/components/schemas/LineTemplateAction"
-    LineTemplateImageCarousel:
+            $ref: "#/components/schemas/lineTemplateAction"
+    lineTemplateImageCarousel:
       type: object
       required:
         - altText
@@ -1713,8 +1715,8 @@ components:
             Max objects: 10
 
           items:
-            $ref: "#/components/schemas/LineTemplateImageCarouselColumn"
-    LineTemplateImageCarouselColumn:
+            $ref: "#/components/schemas/lineTemplateImageCarouselColumn"
+    lineTemplateImageCarouselColumn:
       type: object
       required:
         - imageUrl
@@ -1732,8 +1734,8 @@ components:
             Max file size: 10 MB
 
         action:
-          $ref: "#/components/schemas/LineTemplateAction"
-    LineTemplateAction:
+          $ref: "#/components/schemas/lineTemplateAction"
+    lineTemplateAction:
       type: object
       required:
         - uri
@@ -1754,14 +1756,16 @@ components:
             tel:
 
     # facebook template messages
-    PostMessageAttachmentPayloadFacebookTemplateGeneric:
+    postMessageAttachmentPayloadFacebookTemplateGeneric:
       type: object
       required:
         - facebookTemplateGeneric
       properties:
         facebookTemplateGeneric:
-          $ref: "#/components/schemas/FacebookTemplateGeneric"
-    FacebookTemplateGeneric:
+          type: array
+          items:
+            $ref: "#/components/schemas/facebookTemplateGeneric"
+    facebookTemplateGeneric:
       type: object
       description: |
         Requires title and at least one of the following elements: message, picture, or buttons.
@@ -1778,10 +1782,10 @@ components:
         buttons:
           type: array
           items:
-            $ref: "#/components/schemas/FacebookButton"
+            $ref: "#/components/schemas/facebookButton"
         default_action:
-          $ref: "#/components/schemas/FacebookDefaultAction"
-    FacebookButton:
+          $ref: "#/components/schemas/facebookDefaultAction"
+    facebookButton:
       type: object
       required:
         - url
@@ -1791,7 +1795,7 @@ components:
           type: string
         title:
           type: string
-    FacebookDefaultAction:
+    facebookDefaultAction:
       type: object
       required:
         - url
@@ -1799,14 +1803,16 @@ components:
         url:
           type: string
     # instagram template messages
-    PostMessageAttachmentPayloadInstagramGeneric:
+    postMessageAttachmentPayloadInstagramGeneric:
       type: object
       required:
         - instagramTemplateGeneric
       properties:
         instagramTemplateGeneric:
-          $ref: "#/components/schemas/InstagramTemplateGeneric"
-    InstagramTemplateGeneric:
+          type: array
+          items:
+            $ref: "#/components/schemas/instagramTemplateGeneric"
+    instagramTemplateGeneric:
       type: object
       description: |
         Requires title and at least one of the following elements: message, picture, or buttons.
@@ -1823,10 +1829,10 @@ components:
         buttons:
           type: array
           items:
-            $ref: "#/components/schemas/InstagramButton"
+            $ref: "#/components/schemas/instagramButton"
         default_action:
-          $ref: "#/components/schemas/InstagramDefaultAction"
-    InstagramButton:
+          $ref: "#/components/schemas/instagramDefaultAction"
+    instagramButton:
       type: object
       required:
         - url
@@ -1836,7 +1842,7 @@ components:
           type: string
         title:
           type: string
-    InstagramDefaultAction:
+    instagramDefaultAction:
       type: object
       required:
         - url
@@ -1845,46 +1851,46 @@ components:
           type: string
   parameters:
     # path parameters
-    ShopID:
+    shopID:
       in: path
       name: shop_id
       schema:
         type: string
       required: true
-    PageID:
+    pageID:
       in: path
       name: page_id
       schema:
         type: string
       required: true
-    ConversationID:
+    conversationID:
       in: path
       name: conversation_id
       schema:
         type: string
       required: true
-    TemplateID:
+    templateID:
       in: path
       name: template_id
       schema:
         type: string
       required: true
     # query string parameters
-    Skip:
+    skip:
       in: query
       name: skip
       schema:
         type: integer
         default: 0
       required: false
-    Limit:
+    limit:
       in: query
       name: limit
       schema:
         type: integer
         default: infinity
       required: false
-    ListMessagesFilter:
+    listMessagesFilter:
       in: query
       name: filter
       schema:
@@ -1898,12 +1904,11 @@ components:
           value:
             withMessage: hello
       required: false
-    ListConversationsFilter:
+    listConversationsFilter:
       in: query
       name: filter
       description: |
         Only one filter field can be provided at a time.
-
       schema:
         type: object
         properties:
@@ -1920,10 +1925,17 @@ components:
         conversations containing message "hello":
           value:
             withMessage: hello
-
       required: false
+    psid:
+      in: query
+      name: psid
+      description: |
+        The PSID of the user to send the message to (used for facebook and instagram).
+      schema:
+        type: string
+      required: true
   requestBodies:
-    PatchConversation:
+    patchConversation:
       content:
         application/json:
           schema:
