@@ -47,6 +47,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,shops}/**/*.go"
     }
     get_shop_id = {
       handler_name = "get_shop_id"
@@ -56,6 +57,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,shops}/**/*.go"
     }
     patch_shop_id = {
       handler_name = "patch_shop_id"
@@ -65,6 +67,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,shops}/**/*.go"
     }
     get_config = {
       handler_name = "get_config"
@@ -74,6 +77,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api}/**/*.go"
     }
     delete_template = {
       handler_name = "delete_template"
@@ -83,6 +87,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,templates}/**/*.go"
     }
     get_templates = {
       handler_name = "get_templates"
@@ -92,6 +97,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,templates}/**/*.go"
     }
     post_templates = {
       handler_name = "post_templates"
@@ -101,6 +107,7 @@ module "shops" {
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
+      dependencies = "{discord,db,apigateway,api,templates}/**/*.go"
     }
   }
 }

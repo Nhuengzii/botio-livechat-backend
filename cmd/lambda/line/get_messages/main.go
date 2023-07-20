@@ -100,6 +100,7 @@ func main() {
 		CollectionConversations: "conversations",
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/line/get_messages/main.main: " + err.Error()

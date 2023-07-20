@@ -74,8 +74,9 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 				},
 			},
 		},
-		LastActivity: lastActivity,
-		Unread:       1,
+		LastActivity:         lastActivity,
+		LastUserActivityTime: message.Timestamp,
+		Unread:               1,
 	}
 	return newConversation, nil
 }

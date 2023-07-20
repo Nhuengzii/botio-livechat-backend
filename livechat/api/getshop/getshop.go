@@ -3,10 +3,10 @@ package getshop
 import "github.com/Nhuengzii/botio-livechat-backend/livechat/shops"
 
 type Response struct {
-	AvailablePages []PlatformPageID `json:"available_pages"`
+	AvailablePages []PlatformPageID `json:"availablePages"`
 }
 
 type PlatformPageID struct {
-	PlatformName shops.Platform `json:"platform_name"`
-	PageID       string         `json:"page_id"`
+	PlatformName shops.Platform `json:"platformName"`
+	PageID       string         `json:"pageID"`
 }

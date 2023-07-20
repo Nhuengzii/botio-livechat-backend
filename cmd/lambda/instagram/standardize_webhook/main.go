@@ -65,6 +65,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionConversations: "conversations",
 		CollectionShops:         "shops",
+		CollectionTemplates:     "templates",
 	})
 	c := config{
 		discordWebhookURL: discordWebhookURL,

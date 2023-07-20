@@ -15,5 +15,5 @@ type Response struct {
 
 // A Filter contains api request's query string parameters for filtering return result.
 type Filter struct {
-	Message string `json:"with_message"` // filter messages that contains the text message
+	Message string `json:"withMessage"` // filter messages that contains the text message
 }

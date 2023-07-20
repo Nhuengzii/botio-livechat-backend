@@ -22,22 +22,22 @@ const (
 	AttachmentTypeAudio                           AttachmentType = "audio"
 	AttachmentTypeFile                            AttachmentType = "file"
 	AttachmentTypeSticker                         AttachmentType = "sticker"
-	AttachmentTypeLineEmoji                       AttachmentType = "line-emoji"
-	AttachmentTypeLineTemplateButtons             AttachmentType = "line-template-buttons"
-	AttachmentTypeLineTemplateConfirm             AttachmentType = "line-template-confirm"
-	AttachmentTypeLineTemplateCarousel            AttachmentType = "line-template-carousel"
-	AttachmentTypeLineTemplateImageCarousel       AttachmentType = "line-template-image-carousel"
-	AttachmentTypeLineFlex                        AttachmentType = "line-flex"
-	AttachmentTypeFBTemplateButton                AttachmentType = "facebook-template-button"
-	AttachmentTypeFBTemplateCoupon                AttachmentType = "facebook-template-coupon"
-	AttachmentTypeFBTemplateCustomerFeedback      AttachmentType = "facebook-template-customer-feedback"
-	AttachmentTypeFBTemplateGeneric               AttachmentType = "facebook-template-generic"
-	AttachmentTypeFBTemplateMedia                 AttachmentType = "facebook-template-media"
-	AttachmentTypeFBTemplateProduct               AttachmentType = "facebook-template-product"
-	AttachmentTypeFBTemplateReceipt               AttachmentType = "facebook-template-receipt"
-	AttachmentTypeFBTemplateStructuredInformation AttachmentType = "facebook-template-structured-information"
-	AttachmentTypeIGTemplateGeneric               AttachmentType = "instagram-template-generic"
-	AttachmentTypeIGTemplateProduct               AttachmentType = "instagram-template-product"
+	AttachmentTypeLineEmoji                       AttachmentType = "lineEmoji"
+	AttachmentTypeLineTemplateButtons             AttachmentType = "lineTemplateButtons"
+	AttachmentTypeLineTemplateConfirm             AttachmentType = "lineTemplateConfirm"
+	AttachmentTypeLineTemplateCarousel            AttachmentType = "lineTemplateCarousel"
+	AttachmentTypeLineTemplateImageCarousel       AttachmentType = "lineTemplateImageCarousel"
+	AttachmentTypeLineFlex                        AttachmentType = "lineFlex"
+	AttachmentTypeFBTemplateButton                AttachmentType = "facebookTemplateButton"
+	AttachmentTypeFBTemplateCoupon                AttachmentType = "facebookTemplateCoupon"
+	AttachmentTypeFBTemplateCustomerFeedback      AttachmentType = "facebookTemplateCustomerFeedback"
+	AttachmentTypeFBTemplateGeneric               AttachmentType = "facebookTemplateGeneric"
+	AttachmentTypeFBTemplateMedia                 AttachmentType = "facebookTemplateMedia"
+	AttachmentTypeFBTemplateProduct               AttachmentType = "facebookTemplateProduct"
+	AttachmentTypeFBTemplateReceipt               AttachmentType = "facebookTemplateReceipt"
+	AttachmentTypeFBTemplateStructuredInformation AttachmentType = "facebookTemplateStructuredInformation"
+	AttachmentTypeIGTemplateGeneric               AttachmentType = "instagramTemplateGeneric"
+	AttachmentTypeIGTemplateProduct               AttachmentType = "instagramTemplateProduct"
 )
 
 // A StdMessage contains various information about specific message.
@@ -94,26 +94,26 @@ type Attachment struct {
 //
 // # Line specific AttachmentTypes.
 //   - sticker
-//   - line-emoji
-//   - line-template-buttons
-//   - line-template-confirm
-//   - line-template-carousel
-//   - line-template-image-carousel
-//   - line-flex
+//   - lineEmoji
+//   - lineTemplateButtons
+//   - lineTemplateConfirm
+//   - lineTemplateCarousel
+//   - lineTemplateImageCarousel
+//   - lineFlex
 //
 // # Facebook specific AttachmentTypes.
-//   - facebook-template-button
-//   - facebook-template-coupon
-//   - facebook-template-customer-feedback.
-//   - facebook-template-generic
-//   - facebook-template-media
-//   - facebook-template-product
-//   - facebook-template-receipt
-//   - facebook-template-structured-information
+//   - facebookTemplateButton
+//   - facebookTemplateCoupon
+//   - facebookTemplateCustomerFeedback.
+//   - facebookTemplateGeneric
+//   - facebookTemplateMedia
+//   - facebookTemplateProduct
+//   - facebookTemplateReceipt
+//   - facebookTemplateStructuredInformation
 //
 // # Instagram specific AttachmentTypes.
-//   - instagram-template-generic
-//   - instagram-template-product
+//   - instagramTemplateGeneric
+//   - instagramTemplateProduct
 type AttachmentType string
 
 // A Payload contains Src the content of media type attachments (image,video,audio,file).

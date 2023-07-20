@@ -16,11 +16,11 @@ func fmtBasicPayload(payload postmessage.Payload) (*reqigsendmessage.AttachmentI
 }
 
 func fmtGenericTemplatePayload(payload postmessage.Payload) (*reqigsendmessage.AttachmentInstagramPayload, error) {
-	if len(payload.IGTemplateGeneric) == 0 {
+	if len(payload.InstagramTemplateGeneric) == 0 {
 		return nil, errNoPayloadFoundForTemplatePayload
 	}
 	var genericTemplate []reqigsendmessage.Template // reqigsendmessage.GenericTemplate
-	for _, element := range payload.IGTemplateGeneric {
+	for _, element := range payload.InstagramTemplateGeneric {
 		var buttons []reqigsendmessage.Button
 		for _, button := range element.Button {
 			buttons = append(buttons, reqigsendmessage.Button{

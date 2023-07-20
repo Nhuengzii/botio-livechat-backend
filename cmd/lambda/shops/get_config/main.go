@@ -66,6 +66,7 @@ func main() {
 		CollectionMessages:      "messages",
 		CollectionShops:         "shops",
 		CollectionShopConfig:    "shop_config",
+		CollectionTemplates:     "templates",
 	})
 	if err != nil {
 		logMessage := "cmd/lambda/shops/get_config/main.main: " + err.Error()
