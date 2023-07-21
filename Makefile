@@ -6,7 +6,7 @@ init:
 
 deploy:
 	terraform apply -auto-approve
-	terraform apply -auto-approve
+	([ $$? -ne 0 ] && terraform apply -auto-approve))
 	@echo "Deployed!"
 
 destroy:
