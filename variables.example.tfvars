@@ -11,8 +11,5 @@ s3_bucket_name           = "botio_lifechat_bucket_name"
 facebook_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 facebook_webhook_verification_string = "ddddddddddddddd"
 
-mongo_collection_line_conversations = "mongodb_collection_line_conversations"
-mongo_collection_line_messages      = "mongodb_collection_line_messages"
-
 instagram_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 instagram_webhook_verification_string = "ddddddddddddddd"
