@@ -17,6 +17,5 @@ line_channel_access_token           = "line_channel_access_token"
 mongo_collection_line_conversations = "mongodb_collection_line_conversations"
 mongo_collection_line_messages      = "mongodb_collection_line_messages"
 
-instagram_access_token                = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 instagram_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 instagram_webhook_verification_string = "ddddddddddddddd"

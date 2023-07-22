@@ -46,10 +46,6 @@ variable "mongo_collection_line_messages" {
   type = string
 }
 
-variable "instagram_access_token" {
-  type = string
-}
-
 variable "instagram_app_secret" {
   type = string
 }
