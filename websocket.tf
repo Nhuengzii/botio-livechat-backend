@@ -1,15 +1,3 @@
-resource "aws_apigatewayv2_api" "botio_livechat_websocket" {
-  name                       = "botio_livechat_websocket"
-  protocol_type              = "WEBSOCKET"
-  route_selection_expression = "$request.body.action"
-}
-
-resource "aws_apigatewayv2_stage" "botio_livechat_websocket_dev" {
-  api_id      = aws_apigatewayv2_api.botio_livechat_websocket.id
-  name        = "dev"
-  auto_deploy = true
-}
-
 
 module "websocket_api" {
   source                   = "./modules/websocket_api"
@@ -21,6 +9,6 @@ module "websocket_api" {
 
 output "websocket_api" {
   value = {
-    id = aws_apigatewayv2_api.botio_livechat_websocket.id
+    id = module.websocket_api.websocket_api_id
   }
 }
