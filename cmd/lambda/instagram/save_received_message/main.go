@@ -67,7 +67,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 				return err
 			}
 		} else {
-			err = c.dbClient.UpdateConversationOnDeletedMessage(ctx, &receiveMessage)
+			err = c.dbClient.UpdateConversationOnDeletedMessage(ctx, receiveMessage)
 			if err != nil {
 				return err
 			}

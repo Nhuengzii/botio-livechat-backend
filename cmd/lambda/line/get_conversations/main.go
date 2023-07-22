@@ -61,7 +61,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		conversations, err = c.dbClient.QueryConversations(ctx, shopID, pageID, skipPtr, limitPtr)
+		conversations, err = c.dbClient.ListConversations(ctx, shopID, stdconversation.PlatformLine, pageID, skipPtr, limitPtr)
 	} else {
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
@@ -69,9 +69,9 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
 		if (filter.ParticipantsUsername != "") && (filter.Message == "") {
-			conversations, err = c.dbClient.QueryConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
+			conversations, err = c.dbClient.ListConversationsWithParticipantsName(ctx, shopID, stdconversation.PlatformLine, pageID, filter.ParticipantsUsername, skipPtr, limitPtr)
 		} else if (filter.ParticipantsUsername == "") && (filter.Message != "") {
-			conversations, err = c.dbClient.QueryConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, skipPtr, limitPtr)
+			conversations, err = c.dbClient.ListConversationsWithMessage(ctx, shopID, stdconversation.PlatformLine, pageID, filter.Message, skipPtr, limitPtr)
 		} else {
 			return apigateway.NewProxyResponse(400, errTwoFilterParamsInOneRequest.Error(), "*"), nil
 		}
