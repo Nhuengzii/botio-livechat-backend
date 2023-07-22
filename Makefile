@@ -5,8 +5,8 @@ init:
 	@echo "Initialized!"
 
 deploy:
-	terraform apply -auto-approve
-	terraform apply -auto-approve
+	terraform apply -auto-approve -var-file="terraform.tfvars"
+	terraform apply -auto-approve -var-file="terraform.tfvars"
 	@echo "Deployed!"
 	
 destroy:
