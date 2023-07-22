@@ -14,10 +14,6 @@ variable "redis_password" {
   type = string
 }
 
-variable "line_channel_secret" {
-  type = string
-}
-
 variable "discord_webhook_url" {
   type = string
 }
