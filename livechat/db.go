@@ -67,7 +67,7 @@ type DBClient interface {
 	//   - skip(integer): number of result messages to skip. Skip value should not be negative.
 	//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 	QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) ([]stdmessage.StdMessage, error)
-	// QueryMessages return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
+	// QueryMessagesWithMessage return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
 	// Only return messages in specific platform.
 	// Return an empty slice if none were found.
 	// Return an error if it occurs.
@@ -156,7 +156,7 @@ type DBClient interface {
 	//   - skip(integer): number of result messages to skip. Skip value should not be negative.
 	//   - limit(integer): number of maximum messages result. Limit value should not be negative.
 	QueryConversationsOfAllPlatformsWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
-	// QueryConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+	// QueryConversationsOfAllPlatformsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
 	// Return conversations in all platform.
 	// Return an empty slice if none were found.
 	// Return an error if it occurs.
@@ -216,7 +216,7 @@ type DBClient interface {
 	// AddShopNewTemplateMessage adds a new template message to a shop's config.
 	AddShopNewTemplateMessage(ctx context.Context, template templates.Template) (err error)
 
-	// GetShopTemplateMessage returns array of template messages of specific shop.
+	// GetShopTemplateMessages returns array of template messages of specific shop.
 	GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error)
 
 	// DeleteShopTemplateMessage removes a template from a shop_config's templates

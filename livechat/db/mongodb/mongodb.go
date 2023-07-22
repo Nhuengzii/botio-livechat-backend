@@ -327,7 +327,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-// QueryMessages return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
+// QueryMessagesWithMessage return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
 // Only return messages in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -690,7 +690,7 @@ func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx contex
 	return conversations, nil
 }
 
-// QueryConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+// QueryConversationsOfAllPlatformsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
 // Return conversations in all platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -1109,7 +1109,7 @@ func (c *Client) GetShopConfig(ctx context.Context, shopID string) (_ *shopcfg.C
 	return &config, nil
 }
 
-// GetShopTemplateMessage returns array of template messages of specific shop.
+// GetShopTemplateMessages returns array of template messages of specific shop.
 func (c *Client) GetShopTemplateMessages(ctx context.Context, shopID string) (_ []templates.Template, err error) {
 	defer func() {
 		if err != nil {
