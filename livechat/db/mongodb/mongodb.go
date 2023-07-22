@@ -91,7 +91,7 @@ func (c *Client) InsertMessage(ctx context.Context, message *stdmessage.StdMessa
 // Return an error if it occurs.
 //
 // update last activity if the unsent message was the last message
-func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message *stdmessage.StdMessage) (err error) {
+func (c *Client) UpdateConversationOnDeletedMessage(ctx context.Context, message stdmessage.StdMessage) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.UpdateConversationOnDeletedMessage: %w", err)

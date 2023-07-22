@@ -29,7 +29,7 @@ type DBClient interface {
 	// Return an error if it occurs.
 	//
 	// update last activity if the unsent message was the last message
-	UpdateConversationOnDeletedMessage(ctx context.Context, message *stdmessage.StdMessage) error
+	UpdateConversationOnDeletedMessage(ctx context.Context, message stdmessage.StdMessage) error
 	// UpdateConversationOnNewMessage update a conversation based on recieved new message events.
 	// Return an error if it occurs.
 	//
