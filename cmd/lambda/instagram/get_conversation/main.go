@@ -48,7 +48,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 	//**end path params checking//
 
-	stdConversation, err := c.dbClient.GetConversation(ctx, shopID, stdconversation.Platform("facebook"), pageID, conversationID)
+	stdConversation, err := c.dbClient.GetConversation(ctx, shopID, stdconversation.Platform("instagram"), pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
