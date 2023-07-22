@@ -29,7 +29,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 			return err
 		}
 		pageID := hookBody.Destination
-		page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
+		page, err := c.dbClient.GetLineAuthentication(ctx, pageID)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func (c *config) handler(ctx context.Context, sqsEvent events.SQSEvent) (err err
 		if err != nil {
 			return err
 		}
-		shop, err := c.dbClient.QueryShop(ctx, pageID)
+		shop, err := c.dbClient.GetShop(ctx, pageID)
 		if err != nil {
 			return err
 		}

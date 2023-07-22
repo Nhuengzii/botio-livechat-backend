@@ -9,12 +9,12 @@ import (
 )
 
 func (c *config) NewStdMessage(ctx context.Context, messaging Messaging, pageID string) (*stdmessage.StdMessage, error) {
-	shop, err := c.dbClient.QueryShop(ctx, pageID)
+	shop, err := c.dbClient.GetShop(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}
 
-	instagramCredentials, err := c.dbClient.QueryInstagramAuthentication(ctx, pageID)
+	instagramCredentials, err := c.dbClient.GetInstagramAuthentication(ctx, pageID)
 	if err != nil {
 		return nil, err
 	}

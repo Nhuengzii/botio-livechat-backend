@@ -41,7 +41,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	if err != nil {
 		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}
-	page, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
+	page, err := c.dbClient.GetLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil

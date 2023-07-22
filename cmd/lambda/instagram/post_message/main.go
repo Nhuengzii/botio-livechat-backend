@@ -68,7 +68,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-	igCredentials, err := c.dbClient.QueryInstagramAuthentication(ctx, pageID)
+	igCredentials, err := c.dbClient.GetInstagramAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil
@@ -80,7 +80,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 	}
 
-	shop, err := c.dbClient.QueryShop(ctx, pageID)
+	shop, err := c.dbClient.GetShop(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil

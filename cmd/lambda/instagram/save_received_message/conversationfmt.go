@@ -16,7 +16,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 			err = fmt.Errorf("lambda/instagram/save_received_message/main.newStdConversation: %w", err)
 		}
 	}()
-	instagramCredentials, err := c.dbClient.QueryInstagramAuthentication(ctx, message.PageID)
+	instagramCredentials, err := c.dbClient.GetInstagramAuthentication(ctx, message.PageID)
 	if err != nil {
 		return nil, err
 	}

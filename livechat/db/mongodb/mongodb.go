@@ -278,7 +278,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 	return nil
 }
 
-// QueryMessages return a slice of stdmessage.StdMessage in a specific conversation.
+// ListMessages return a slice of stdmessage.StdMessage in a specific conversation.
 // Only return messages in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -290,10 +290,10 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) ListMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryMessages: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListMessages: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
@@ -327,7 +327,7 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 	return messages, nil
 }
 
-// QueryMessagesWithMessage return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
+// ListMessagesWithMessage return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
 // Only return messages in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -341,10 +341,10 @@ func (c *Client) QueryMessages(ctx context.Context, shopID string, pageID string
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) ListMessagesWithMessage(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, message string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryMessagesWithMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListMessagesWithMessage: %w", err)
 		}
 	}()
 
@@ -384,12 +384,12 @@ func (c *Client) QueryMessagesWithMessage(ctx context.Context, shopID string, pl
 	return messages, nil
 }
 
-// QueryConversation return a specific stdconversation.StdConversation that match the conversationID.
+// GetConversation return a specific stdconversation.StdConversation that match the conversationID.
 // Return an error if it occurs.
-func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
+func (c *Client) GetConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversation: %w", err)
+			err = fmt.Errorf("mongodb.Client.GetConversation: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
@@ -409,7 +409,7 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 	return &conversation, nil
 }
 
-// QueryConversations return a slice of stdconversation.StdConversation in a page.
+// ListConversations return a slice of stdconversation.StdConversation in a page.
 // Only return conversations in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -421,10 +421,10 @@ func (c *Client) QueryConversation(ctx context.Context, shopID string, pageID st
 //
 //   - skip(integer): number of result conversations to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum conversations result. Limit value should not be negative.
-func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversations: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListConversations: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
@@ -458,7 +458,7 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 	return conversations, nil
 }
 
-// QueryConversationsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
+// ListConversationsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
 // Only return conversations in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -472,10 +472,10 @@ func (c *Client) QueryConversations(ctx context.Context, shopID string, pageID s
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversationsWithParticipantsName(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListConversationsWithParticipantsName: %w", err)
 		}
 	}()
 
@@ -513,7 +513,7 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 	return conversations, nil
 }
 
-// QueryConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+// ListConversationsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
 // Only return conversations in specific platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -527,10 +527,10 @@ func (c *Client) QueryConversationsWithParticipantsName(ctx context.Context, sho
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversationsWithMessage(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListConversationsWithMessage: %w", err)
 		}
 	}()
 
@@ -594,7 +594,7 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 	return conversations, nil
 }
 
-// QueryConversationsOfAllPlatforms return a slice of stdconversation.StdConversation in a page.
+// ListConversationsOfAllPlatforms return a slice of stdconversation.StdConversation in a page.
 // Return conversations in all platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -606,7 +606,7 @@ func (c *Client) QueryConversationsWithMessage(ctx context.Context, shopID strin
 //
 //   - skip(integer): number of result conversations to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum conversations result. Limit value should not be negative.
-func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
+func (c *Client) ListConversationsOfAllPlatforms(ctx context.Context, shopID string, skip *int, limit *int) ([]stdconversation.StdConversation, error) {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
@@ -637,7 +637,7 @@ func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID st
 	return conversations, nil
 }
 
-// QueryConversationsOfAllPlatformsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
+// ListConversationsOfAllPlatformsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
 // Return conversations in all platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -651,10 +651,10 @@ func (c *Client) QueryConversationsOfAllPlatforms(ctx context.Context, shopID st
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversationsOfAllPlatformsWithParticipantsName(ctx context.Context, shopID string, name string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversationsWithParticipantsName: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListConversationsWithParticipantsName: %w", err)
 		}
 	}()
 
@@ -690,7 +690,7 @@ func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx contex
 	return conversations, nil
 }
 
-// QueryConversationsOfAllPlatformsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
+// ListConversationsOfAllPlatformsWithMessage return a slice of stdconversation.StdConversation in a specific page that has text message containing input message string.
 // Return conversations in all platform.
 // Return an empty slice if none were found.
 // Return an error if it occurs.
@@ -704,10 +704,10 @@ func (c *Client) QueryConversationsOfAllPlatformsWithParticipantsName(ctx contex
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) QueryConversationsOfAllPlatformsWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversationsOfAllPlatformsWithMessage(ctx context.Context, shopID string, message string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryConversationsWithMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.ListConversationsWithMessage: %w", err)
 		}
 	}()
 
@@ -769,12 +769,12 @@ func (c *Client) QueryConversationsOfAllPlatformsWithMessage(ctx context.Context
 	return conversations, nil
 }
 
-// QueryShop return shops.Shop that contains a matching pageID of any platform.
+// GetShop return shops.Shop that contains a matching pageID of any platform.
 // Return an error if it occurs.
-func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
+func (c *Client) GetShop(ctx context.Context, pageID string) (_ *shops.Shop, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.QueryShop: %w", err)
+			err = fmt.Errorf("mongodb.Client.GetShop: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -802,14 +802,14 @@ func (c *Client) QueryShop(ctx context.Context, pageID string) (_ *shops.Shop, e
 	return &shop, nil
 }
 
-// QueryFacebookAuthentication return shops.FacebookAuthentication that contains a matching pageID of facebook platform.
+// GetFacebookAuthentication return shops.FacebookAuthentication that contains a matching pageID of facebook platform.
 // Return an error if it occurs.
 //
 // Can be use to get access token
-func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string) (_ *shops.FacebookAuthentication, err error) {
+func (c *Client) GetFacebookAuthentication(ctx context.Context, pageID string) (_ *shops.FacebookAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryFacebookAuthentication: %w", err)
+			err = fmt.Errorf("mongodb.GetFacebookAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -827,14 +827,14 @@ func (c *Client) QueryFacebookAuthentication(ctx context.Context, pageID string)
 	return &shop.FacebookAuthentication, nil
 }
 
-// QueryLineAuthentication return shops.QueryLineAuthentication that contains a matching pageID of line platform.
+// GetLineAuthentication return shops.GetLineAuthentication that contains a matching pageID of line platform.
 // Return an error if it occurs.
 //
 // Can be use to get access token
-func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ *shops.LineAuthentication, err error) {
+func (c *Client) GetLineAuthentication(ctx context.Context, pageID string) (_ *shops.LineAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryLineAuthentication: %w", err)
+			err = fmt.Errorf("mongodb.GetLineAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -852,14 +852,14 @@ func (c *Client) QueryLineAuthentication(ctx context.Context, pageID string) (_ 
 	return &shop.LineAuthentication, nil
 }
 
-// QueryInstagramAuthentication return shops.QueryInstagramAuthentication that contains a matching pageID of instagram platform.
+// GetInstagramAuthentication return shops.GetInstagramAuthentication that contains a matching pageID of instagram platform.
 // Return an error if it occurs.
 //
 // Can be use to get access token
-func (c *Client) QueryInstagramAuthentication(ctx context.Context, pageID string) (_ *shops.InstagramAuthentication, err error) {
+func (c *Client) GetInstagramAuthentication(ctx context.Context, pageID string) (_ *shops.InstagramAuthentication, err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.QueryInstagramAuthentication: %w", err)
+			err = fmt.Errorf("mongodb.GetInstagramAuthentication: %w", err)
 		}
 	}()
 	coll := c.client.Database(c.Database).Collection(c.CollectionShops)
@@ -1136,18 +1136,18 @@ func (c *Client) GetShopTemplateMessages(ctx context.Context, shopID string) (_ 
 	return template, nil
 }
 
-// AddShopNewTemplateMessage adds a new template message to a shop's config.
-func (c *Client) AddShopNewTemplateMessage(ctx context.Context, template templates.Template) (err error) {
+// InsertShopTemplateMessage adds a new template message to a shop's config.
+func (c *Client) InsertShopTemplateMessage(ctx context.Context, template templates.Template) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("mongodb.Client.AddShopNewTemplateMessage: %w", err)
+			err = fmt.Errorf("mongodb.Client.InsertShopTemplateMessage: %w", err)
 		}
 	}()
 
 	coll := c.client.Database(c.Database).Collection(c.CollectionTemplates)
 	_, err = coll.InsertOne(ctx, template)
 	if err != nil {
-		return fmt.Errorf("mongodb.Client.AddShopNewTemplateMessage: %w", err)
+		return fmt.Errorf("mongodb.Client.InsertShopTemplateMessage: %w", err)
 	}
 	return nil
 }

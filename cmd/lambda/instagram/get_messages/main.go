@@ -70,7 +70,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	}
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok {
-		stdMessages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
+		stdMessages, err = c.dbClient.ListMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
@@ -78,7 +78,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		var filter getmessages.Filter
 		err := json.Unmarshal([]byte(filterQueryString), &filter)
 
-		stdMessages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformInstagram, pageID, conversationID, filter.Message, skipPtr, limitPtr)
+		stdMessages, err = c.dbClient.ListMessagesWithMessage(ctx, shopID, stdmessage.PlatformInstagram, pageID, conversationID, filter.Message, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
