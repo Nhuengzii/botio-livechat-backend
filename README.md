@@ -5,6 +5,12 @@ The BotioLivechat Service is a powerful platform that brings together multiple c
 ## Table of Contents
 
 - [Features](#features)
+- [Requirements](#requirements)
+- [Configurations](#configurations)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Technologies](#technologies)
+- [Other Services!](#other-services!)
 
 ## Features
 
