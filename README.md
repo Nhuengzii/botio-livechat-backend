@@ -2,6 +2,10 @@
 
 The BotioLivechat Service is a powerful platform that brings together multiple chat platforms into a centralized and seamless communication hub. It allows businesses and organizations to streamline their customer support, sales, and engagement processes by integrating various chat channels into a single, user-friendly interface. This service is designed to enhance efficiency, boost customer satisfaction, and simplify chat management for businesses of all sizes.
 
+## Table of Contents
+
+- [Features](#features)
+
 ## Features
 
 - Centralized `Facebook, Instagram, Line` chat services into one communication platform!
