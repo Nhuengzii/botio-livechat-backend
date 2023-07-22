@@ -5,16 +5,24 @@ terraform {
       version = "5.1.0"
     }
   }
+  backend "s3" {
+    bucket = "botio-livechat-terraform-state"
+    key    = "terraform.tfstate"
+    region = "ap-southeast-1"
+  }
 }
 
 provider "aws" {
-  region = "ap-southeast-1"
+  region     = "ap-southeast-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 module "rest_api" {
-  source        = "./modules/root_rest_api"
-  rest_api_name = "botio_livechat_rest_api"
-  s3_bucket_arn = module.bucket.bucket_arn
+  source              = "./modules/root_rest_api"
+  rest_api_name       = "botio_livechat_rest_api"
+  s3_bucket_arn       = module.bucket.bucket_arn
+  rest_api_stage_name = var.rest_api_stage_name
   get_upload_url_handler = {
     handler_name = "get_upload_url"
     handler_path = format("%s/cmd/lambda/root/get_upload_url", path.root)

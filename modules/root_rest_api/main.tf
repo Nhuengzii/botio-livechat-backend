@@ -94,8 +94,8 @@ resource "aws_api_gateway_deployment" "rest_api" {
   depends_on = [module.get_upload_url.method, module.get_upload_url.integration]
 }
 
-resource "aws_api_gateway_stage" "dev" {
+resource "aws_api_gateway_stage" "stage" {
   rest_api_id   = aws_api_gateway_rest_api.rest_api.id
   deployment_id = aws_api_gateway_deployment.rest_api.id
-  stage_name    = "dev"
+  stage_name    = var.rest_api_stage_name
 }

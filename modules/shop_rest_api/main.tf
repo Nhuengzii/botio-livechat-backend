@@ -88,6 +88,7 @@ module "handlers" {
   handler_path          = each.value.handler_path
   role_arn              = aws_iam_role.assume_role_lambda.arn
   environment_variables = each.value.environment_variables
+  dependencies          = each.value.dependencies
 }
 
 locals {
