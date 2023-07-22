@@ -23,7 +23,6 @@ module "instagram" {
       handler_path = format("%s/cmd/lambda/instagram/validate_webhook", path.root)
       environment_variables = {
         APP_SECRET                            = var.instagram_app_secret
-        ACCESS_TOKEN                          = var.instagram_access_token
         INSTAGRAM_WEBHOOK_VERIFICATION_STRING = var.instagram_webhook_verification_string
         DISCORD_WEBHOOK_URL                   = var.discord_webhook_url
       }
@@ -33,7 +32,6 @@ module "instagram" {
       handler_name = "instagram_get_conversations"
       handler_path = format("%s/cmd/lambda/instagram/get_conversations", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.instagram_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -44,7 +42,6 @@ module "instagram" {
       handler_name = "instagram_get_conversation"
       handler_path = format("%s/cmd/lambda/instagram/get_conversation", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.instagram_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -55,7 +52,6 @@ module "instagram" {
       handler_name = "instagram_patch_conversation"
       handler_path = format("%s/cmd/lambda/instagram/patch_conversation", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.instagram_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -66,7 +62,6 @@ module "instagram" {
       handler_name = "instagram_get_messages"
       handler_path = format("%s/cmd/lambda/instagram/get_messages", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.instagram_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -98,7 +93,6 @@ module "instagram" {
       handler_path = format("%s/cmd/lambda/instagram/save_received_message", path.root)
       environment_variables = {
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
-        ACCESS_TOKEN        = var.instagram_access_token
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }
