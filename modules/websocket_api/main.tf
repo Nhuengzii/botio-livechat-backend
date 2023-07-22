@@ -51,6 +51,19 @@ data "aws_iam_policy_document" "assume_role" {
     actions = ["sts:AssumeRole"]
   }
 }
+
+resource "aws_apigatewayv2_api" "botio_livechat_websocket" {
+  name                       = "botio_livechat_websocket"
+  protocol_type              = "WEBSOCKET"
+  route_selection_expression = "$request.body.action"
+}
+
+resource "aws_apigatewayv2_stage" "websocket_api_stage" {
+  api_id      = aws_apigatewayv2_api.botio_livechat_websocket.id
+  name        = "dev"
+  auto_deploy = true
+}
+
 resource "aws_iam_role" "assume_role_lambda" {
   name               = "assume_role_for_route_handlers"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -67,7 +80,7 @@ resource "aws_lambda_permission" "allow_execution_from_api_websocket" {
   action        = "lambda:InvokeFunction"
   function_name = module.routes_handler[each.key].lambda.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = format("%s/*/%s", var.websocket_api_execution_arn, each.value.route_key)
+  source_arn    = format("%s/*/%s", aws_apigatewayv2_api.botio_livechat_websocket.execution_arn, each.value.route_key)
 }
 
 
@@ -80,7 +93,7 @@ module "routes_handler" {
   environment_variables = {
     REDIS_ADDR       = local.redis_addr
     REDIS_PASSWORD   = local.redis_password
-    WEBSOCKET_API_ID = var.websocket_api_id
+    WEBSOCKET_API_ID = aws_apigatewayv2_api.botio_livechat_websocket.id
   }
   role_arn     = aws_iam_role.assume_role_lambda.arn
   dependencies = "{discord,cache,snswrapper,sqswraper,stdmessage,websocketwrapper,apigateway}/**/*.go"
@@ -90,12 +103,12 @@ resource "aws_apigatewayv2_route" "routes_with_handler" {
   for_each  = local.routes_with_handler
   route_key = each.value.route_key
   target    = format("integrations/%s", aws_apigatewayv2_integration.route_handlers[each.key].id)
-  api_id    = var.websocket_api_id
+  api_id    = aws_apigatewayv2_api.botio_livechat_websocket.id
 }
 
 resource "aws_apigatewayv2_integration" "route_handlers" {
   for_each                  = local.routes_with_handler
-  api_id                    = var.websocket_api_id
+  api_id                    = aws_apigatewayv2_api.botio_livechat_websocket.id
   integration_type          = "AWS_PROXY"
   integration_uri           = module.routes_handler[each.key].lambda.invoke_arn
   integration_method        = "POST"
@@ -123,14 +136,14 @@ resource "aws_iam_policy" "allow_execute_api" {
       {
         Action   = "execute-api:*"
         Effect   = "Allow"
-        Resource = format("%s/*", var.websocket_api_execution_arn)
+        Resource = format("%s/*", aws_apigatewayv2_api.botio_livechat_websocket.execution_arn)
       }
     ]
   })
 }
 
 resource "aws_apigatewayv2_deployment" "botio_livechat_websocket_dev" {
-  api_id      = var.websocket_api_id
+  api_id      = aws_apigatewayv2_api.botio_livechat_websocket.id
   description = "dev"
   triggers = {
     always_run = timestamp()
@@ -151,7 +164,7 @@ module "relay_received_message" {
     REDIS_ADDR          = local.redis_addr
     REDIS_PASSWORD      = local.redis_password
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
-    WEBSOCKET_API_ID    = var.websocket_api_id
+    WEBSOCKET_API_ID    = aws_apigatewayv2_api.botio_livechat_websocket.id
   }
   dependencies = "{discord,cache,snswrapper,sqswraper,stdmessage,websocketwrapper,apigateway}/**/*.go"
 }

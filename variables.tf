@@ -69,3 +69,12 @@ variable "aws_secret_key" {
   type = string
 }
 
+variable "rest_api_stage_name" {
+  type    = string
+  default = "dev"
+}
+
+variable "websocket_api_stage_name" {
+  type    = string
+  default = "dev"
+}
