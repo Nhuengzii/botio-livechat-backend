@@ -30,9 +30,9 @@ Create mongoDB's database with following collections.
 - shops
 - templates
 
-### Redist3
+### Redis
 
-Create Redist's database.
+Create Redis's database.
 
 ### Discord (Optional)
 
