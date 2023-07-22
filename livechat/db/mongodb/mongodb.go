@@ -231,9 +231,12 @@ func (c *Client) UpdateConversationUnread(ctx context.Context, shopID string, pl
 // If other errors occured CheckConversationExists will return that error.
 //
 // If the conversation was found CheckConversationExists return nil
-func (c *Client) CheckConversationExists(ctx context.Context, conversationID string) error {
+func (c *Client) CheckConversationExists(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) error {
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
+		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
 	}
 	err := coll.FindOne(ctx, filter).Err()

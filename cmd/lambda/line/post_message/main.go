@@ -10,6 +10,7 @@ import (
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/snswrapper"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
@@ -37,7 +38,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.Platform("line"), pageID, conversationID)
 	if err != nil {
 		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}

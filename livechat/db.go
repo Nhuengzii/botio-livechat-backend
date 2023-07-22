@@ -42,7 +42,7 @@ type DBClient interface {
 	// If other errors occured CheckConversationExists will return that error.
 	//
 	// If the conversation was found CheckConversationExists return nil
-	CheckConversationExists(ctx context.Context, conversationID string) error
+	CheckConversationExists(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) error
 	// RemoveDeletedMessage update specific message's fields on unsend message events.
 	// Return an error if it occurs.
 	//
