@@ -389,7 +389,7 @@ func (c *Client) ListMessagesWithMessage(ctx context.Context, shopID string, pla
 
 // GetConversation return a specific stdconversation.StdConversation that match the conversationID.
 // Return an error if it occurs.
-func (c *Client) GetConversation(ctx context.Context, shopID string, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
+func (c *Client) GetConversation(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) (_ *stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.GetConversation: %w", err)
@@ -399,6 +399,7 @@ func (c *Client) GetConversation(ctx context.Context, shopID string, pageID stri
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
 		{Key: "pageID", Value: pageID},
+		{Key: "platform", Value: platform},
 		{Key: "conversationID", Value: conversationID},
 	}
 	var conversation stdconversation.StdConversation

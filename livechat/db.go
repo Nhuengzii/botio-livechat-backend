@@ -53,7 +53,7 @@ type DBClient interface {
 	RemoveDeletedMessage(ctx context.Context, shopID string, platform stdmessage.Platform, conversationID string, messageID string) error
 	// GetConversation return a specific stdconversation.StdConversation that match the conversationID.
 	// Return an error if it occurs.
-	GetConversation(ctx context.Context, shopID string, pageID string, conversationID string) (*stdconversation.StdConversation, error)
+	GetConversation(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, conversationID string) (*stdconversation.StdConversation, error)
 	// ListMessages return a slice of stdmessage.StdMessage in a specific conversation.
 	// Only return messages in specific platform.
 	// Return an empty slice if none were found.
