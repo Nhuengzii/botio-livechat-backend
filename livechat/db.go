@@ -66,7 +66,7 @@ type DBClient interface {
 	//
 	//   - skip(integer): number of result messages to skip. Skip value should not be negative.
 	//   - limit(integer): number of maximum messages result. Limit value should not be negative.
-	ListMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) ([]stdmessage.StdMessage, error)
+	ListMessages(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, skip *int, limit *int) ([]stdmessage.StdMessage, error)
 	// ListMessagesWithMessage return a slice of stdmessage.StdMessage in a specific conversation that has text message containing specified message string.
 	// Only return messages in specific platform.
 	// Return an empty slice if none were found.

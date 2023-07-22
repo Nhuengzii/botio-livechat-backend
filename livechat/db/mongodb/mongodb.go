@@ -293,7 +293,7 @@ func (c *Client) RemoveDeletedMessage(ctx context.Context, shopID string, platfo
 //
 //   - skip(integer): number of result messages to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum messages result. Limit value should not be negative.
-func (c *Client) ListMessages(ctx context.Context, shopID string, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
+func (c *Client) ListMessages(ctx context.Context, shopID string, platform stdmessage.Platform, pageID string, conversationID string, skip *int, limit *int) (_ []stdmessage.StdMessage, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.ListMessages: %w", err)
