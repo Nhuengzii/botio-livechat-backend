@@ -68,7 +68,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 
 	filterQueryString, ok := request.QueryStringParameters["filter"]
 	if !ok { // no need to query with filter
-		stdConversations, err = c.dbClient.ListConversations(ctx, shopID, pageID, skipPtr, limitPtr)
+		stdConversations, err = c.dbClient.ListConversations(ctx, shopID, stdconversation.PlatformFacebook, pageID, skipPtr, limitPtr)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}

@@ -302,6 +302,7 @@ func (c *Client) ListMessages(ctx context.Context, shopID string, platform stdme
 	coll := c.client.Database(c.Database).Collection(c.CollectionMessages)
 	filter := bson.M{
 		"shopID":         shopID,
+		"platform":       platform,
 		"pageID":         pageID,
 		"conversationID": conversationID,
 	}
@@ -398,8 +399,8 @@ func (c *Client) GetConversation(ctx context.Context, shopID string, platform st
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
-		{Key: "pageID", Value: pageID},
 		{Key: "platform", Value: platform},
+		{Key: "pageID", Value: pageID},
 		{Key: "conversationID", Value: conversationID},
 	}
 	var conversation stdconversation.StdConversation
@@ -425,7 +426,7 @@ func (c *Client) GetConversation(ctx context.Context, shopID string, platform st
 //
 //   - skip(integer): number of result conversations to skip. Skip value should not be negative.
 //   - limit(integer): number of maximum conversations result. Limit value should not be negative.
-func (c *Client) ListConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
+func (c *Client) ListConversations(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, skip *int, limit *int) (_ []stdconversation.StdConversation, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("mongodb.Client.ListConversations: %w", err)
@@ -434,6 +435,7 @@ func (c *Client) ListConversations(ctx context.Context, shopID string, pageID st
 	coll := c.client.Database(c.Database).Collection(c.CollectionConversations)
 	filter := bson.D{
 		{Key: "shopID", Value: shopID},
+		{Key: "platform", Value: platform},
 		{Key: "pageID", Value: pageID},
 	}
 

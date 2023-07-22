@@ -38,7 +38,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.Platform("line"), pageID, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.PlatformLine, pageID, conversationID)
 	if err != nil {
 		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}

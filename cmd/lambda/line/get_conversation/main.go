@@ -32,7 +32,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	shopID := pathParameters["shop_id"]
 	pageID := pathParameters["page_id"]
 	conversationID := pathParameters["conversation_id"]
-	conversation, err := c.dbClient.GetConversation(ctx, shopID, stdconversation.Platform("line"), pageID, conversationID)
+	conversation, err := c.dbClient.GetConversation(ctx, shopID, stdconversation.PlatformLine, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil

@@ -94,7 +94,7 @@ type DBClient interface {
 	//
 	//   - skip(integer): number of result conversations to skip. Skip value should not be negative.
 	//   - limit(integer): number of maximum conversations result. Limit value should not be negative.
-	ListConversations(ctx context.Context, shopID string, pageID string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
+	ListConversations(ctx context.Context, shopID string, platform stdconversation.Platform, pageID string, skip *int, limit *int) ([]stdconversation.StdConversation, error)
 	// ListConversationsWithParticipantsName return a slice of stdconversation.StdConversation in a specific page that has participants name containing input name string.
 	// Only return conversations in specific platform.
 	// Return an empty slice if none were found.

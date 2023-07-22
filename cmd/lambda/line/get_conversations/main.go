@@ -61,7 +61,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		conversations, err = c.dbClient.ListConversations(ctx, shopID, pageID, skipPtr, limitPtr)
+		conversations, err = c.dbClient.ListConversations(ctx, shopID, stdconversation.PlatformLine, pageID, skipPtr, limitPtr)
 	} else {
 		filter := getconversations.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)

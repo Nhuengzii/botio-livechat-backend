@@ -63,7 +63,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if !ok {
 		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
 	}
-	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.Platform("facebook"), pageID, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.PlatformFacebook, pageID, conversationID)
 	if err != nil {
 		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}

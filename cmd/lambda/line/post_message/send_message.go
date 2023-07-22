@@ -24,7 +24,7 @@ func (c *config) sendMessage(ctx context.Context, shopID string, pageID string, 
 	}()
 
 	// check conversation exists
-	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.Platform("line"), pageID, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.PlatformLine, pageID, conversationID)
 	if err != nil {
 		return nil, err
 	}
