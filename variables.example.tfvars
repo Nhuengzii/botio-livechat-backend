@@ -12,7 +12,6 @@ facebook_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 facebook_webhook_verification_string = "ddddddddddddddd"
 
 line_channel_secret                 = "line_channel_secret"
-line_channel_access_token           = "line_channel_access_token"
 mongo_collection_line_conversations = "mongodb_collection_line_conversations"
 mongo_collection_line_messages      = "mongodb_collection_line_messages"
 

@@ -18,10 +18,6 @@ variable "line_channel_secret" {
   type = string
 }
 
-variable "line_channel_access_token" {
-  type = string
-}
-
 variable "discord_webhook_url" {
   type = string
 }
