@@ -1,7 +1,7 @@
 .PHONY: deploy init destroy
 
 init:
-	terraform init
+	terraform init -backend-config="terraform_backend.conf"
 	@echo "Initialized!"
 
 deploy:

@@ -34,9 +34,10 @@ variable "instagram_webhook_verification_string" {
   type = string
 }
 
-variable "s3_bucket_name" {
+variable "media_storage_bucket_name" {
   type = string
 }
+
 variable "aws_access_key" {
   type = string
 }

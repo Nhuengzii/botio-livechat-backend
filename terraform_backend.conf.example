@@ -1,0 +1,3 @@
+bucket="botio-livechat-terraform-state"
+region="ap-southeast-1"
+key="botio-livechat-terraform-state.tfstate"
