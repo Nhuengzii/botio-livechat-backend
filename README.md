@@ -49,13 +49,17 @@ Can be Used for logging. **Discord logging take some resources and time**, Recom
 
 ### Line bot
 
-### Setup
-
+### Terraform
 - Have `Terraform CLI` (1.2.0+) installed.
+
+### AWS
+- Have AWS account
+- Crete S3 bucket for store Terraform's state files.
 - Have `AWS CLI` installed.
-- get `aws access key` and `aws secret access key` from AWS's console.
-- copy `variables.example.tfvars` to `terraform.tfvars`
-- edit value of each keys in `terraform.tfvars`
+
+
+
+
 
 ## Configurations
 
@@ -70,7 +74,7 @@ mongo_database           = "mongodb_database" #MongoDB's database name.
 discord_webhook_url      = "discord_webhook_url" #Discord text channel's webhook URL for logging.
 redis_addr               = "redis_addr" #Redis database address.
 redis_password           = "redis_password" #Redis database password.
-s3_bucket_name           = "botio_lifechat_bucket_name"  #S3 storage bucket name
+media_storage_bucket_name           = "botio-lifechat-bucket-name"  #S3 storage bucket name
 
 facebook_app_secret                  = "facebook_app_secret" #Facebook app secret. Can be retrieved via facebook's developer console.
 facebook_webhook_verification_string = "facebook_webhook_verification_string" #Set to the same value with facebook's developer console's webhook setup.
@@ -84,11 +88,16 @@ instagram_webhook_verification_string = "instagram_webhook_verification_string" 
 ## Usage
 
 All deployment changes will happen on your registered AWS account. **Do not forget to destroy the deployment before deleting your local repository otherwise you will need to clean the deployed services yourself!**
-
+### Setup
+- copy `terraform_backend.conf.example` to `terraform_backend.conf`
+- edit value of each keys in `terraform_backend.conf`
+- initialize Terraform by running command `make init`
+- get `aws access key` and `aws secret access key`
+-  copy `variables.example.tfvars` to `terraform.tfvars`
+- edit value of each keys in `terraform.tfvars`
 ### Deploy
 
-- initialize terraform by running command `make init`
-- make sure that values in terraform.tfvars are valid
+- make sure that values in `terraform.tfvars` are valid
 - run command `make deploy`
 
 ### Apply
@@ -97,7 +106,7 @@ All deployment changes will happen on your registered AWS account. **Do not forg
 
 ### Destroy
 
-- empty s3 bucket that use to store image (s3_bucket_name key in `terraform.tfvars`)
+- empty S3 bucket that use to store image
 - run `make destroy` to destroy the system
 
 ## API Documentation
