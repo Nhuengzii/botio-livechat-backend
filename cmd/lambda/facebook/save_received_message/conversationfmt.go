@@ -16,7 +16,7 @@ func (c *config) newStdConversation(ctx context.Context, message *stdmessage.Std
 			err = fmt.Errorf("lambda/facebook/save_received_message/main.newStdConversation: %w", err)
 		}
 	}()
-	facebookCredentials, err := c.dbClient.QueryFacebookAuthentication(ctx, message.PageID)
+	facebookCredentials, err := c.dbClient.GetFacebookAuthentication(ctx, message.PageID)
 	if err != nil {
 		return nil, err
 	}

@@ -39,3 +39,4 @@ botio_livechat_websocket_typing_broadcast_handler/botio_livechat_websocket_typin
 **/handler.zip
 variables.auto.tfvars
 terraform.tfvars
+terraform_backend.conf

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/api/postmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdmessage"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
@@ -23,7 +24,7 @@ func (c *config) sendMessage(ctx context.Context, shopID string, pageID string, 
 	}()
 
 	// check conversation exists
-	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.PlatformLine, pageID, conversationID)
 	if err != nil {
 		return nil, err
 	}

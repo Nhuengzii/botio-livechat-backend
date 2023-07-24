@@ -23,7 +23,6 @@ module "facebook" {
       handler_path = format("%s/cmd/lambda/facebook/validate_webhook", path.root)
       environment_variables = {
         APP_SECRET                           = var.facebook_app_secret
-        ACCESS_TOKEN                         = var.facebook_access_token
         FACEBOOK_WEBHOOK_VERIFICATION_STRING = var.facebook_webhook_verification_string
         DISCORD_WEBHOOK_URL                  = var.discord_webhook_url
       }
@@ -33,7 +32,6 @@ module "facebook" {
       handler_name = "facebook_get_conversations"
       handler_path = format("%s/cmd/lambda/facebook/get_conversations", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.facebook_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -54,7 +52,6 @@ module "facebook" {
       handler_name = "facebook_get_conversation"
       handler_path = format("%s/cmd/lambda/facebook/get_conversation", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.facebook_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -65,7 +62,6 @@ module "facebook" {
       handler_name = "facebook_get_messages"
       handler_path = format("%s/cmd/lambda/facebook/get_messages", path.root)
       environment_variables = {
-        ACCESS_TOKEN        = var.facebook_access_token
         MONGODB_DATABASE    = var.mongo_database
         MONGODB_URI         = var.mongo_uri
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
@@ -97,7 +93,6 @@ module "facebook" {
       handler_path = format("%s/cmd/lambda/facebook/save_received_message", path.root)
       environment_variables = {
         DISCORD_WEBHOOK_URL = var.discord_webhook_url
-        ACCESS_TOKEN        = var.facebook_access_token
         MONGODB_URI         = var.mongo_uri
         MONGODB_DATABASE    = var.mongo_database
       }

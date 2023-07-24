@@ -25,7 +25,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	}()
 	pathParameters := req.PathParameters
 	pageID := pathParameters["page_id"]
-	shop, err := c.dbClient.QueryLineAuthentication(ctx, pageID)
+	shop, err := c.dbClient.GetLineAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, "Not Found", "*"), err

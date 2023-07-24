@@ -6,9 +6,6 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "botio-livechat-terraform-state"
-    key    = "terraform.tfstate"
-    region = "ap-southeast-1"
   }
 }
 
@@ -115,7 +112,7 @@ module "shops" {
 
 module "bucket" {
   source      = "./modules/bucket"
-  bucket_name = var.s3_bucket_name
+  bucket_name = var.media_storage_bucket_name
 }
 
 output "rest_api" {

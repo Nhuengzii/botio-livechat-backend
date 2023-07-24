@@ -52,7 +52,7 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 		ID:      newTemplateID,
 		Payload: patchShopCfgRequest.TemplatePayload,
 	}
-	err = c.dbClient.AddShopNewTemplateMessage(ctx, newTemplate)
+	err = c.dbClient.InsertShopTemplateMessage(ctx, newTemplate)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, "Not Found: Shop not found.", "*"), nil

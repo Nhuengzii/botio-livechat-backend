@@ -13,6 +13,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/apigateway"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -46,7 +47,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
 	}
 	//**end path params checking//
-	stdConversation, err := c.dbClient.QueryConversation(ctx, shopID, pageID, conversationID)
+	stdConversation, err := c.dbClient.GetConversation(ctx, shopID, stdconversation.PlatformFacebook, pageID, conversationID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil

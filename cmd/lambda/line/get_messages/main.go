@@ -62,14 +62,14 @@ func (c *config) handler(ctx context.Context, req events.APIGatewayProxyRequest)
 	queryStringParameters := req.QueryStringParameters
 	filterString, ok := queryStringParameters["filter"]
 	if !ok {
-		messages, err = c.dbClient.QueryMessages(ctx, shopID, pageID, conversationID, skipPtr, limitPtr)
+		messages, err = c.dbClient.ListMessages(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, skipPtr, limitPtr)
 	} else {
 		filter := getmessages.Filter{}
 		err = json.Unmarshal([]byte(filterString), &filter)
 		if err != nil {
 			return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 		}
-		messages, err = c.dbClient.QueryMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, skipPtr, limitPtr)
+		messages, err = c.dbClient.ListMessagesWithMessage(ctx, shopID, stdmessage.PlatformLine, pageID, conversationID, filter.Message, skipPtr, limitPtr)
 	}
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err

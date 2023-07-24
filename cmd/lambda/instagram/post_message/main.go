@@ -14,6 +14,7 @@ import (
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/db/mongodb"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/discord"
 	"github.com/Nhuengzii/botio-livechat-backend/livechat/external_api/instagram/reqigsendmessage"
+	"github.com/Nhuengzii/botio-livechat-backend/livechat/stdconversation"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -49,6 +50,10 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if !ok {
 		return apigateway.NewProxyResponse(400, errNoPSIDParam.Error(), "*"), nil
 	}
+	shopID, ok := request.PathParameters["shop_id"]
+	if !ok {
+		return apigateway.NewProxyResponse(400, errNoShopIDPath.Error(), "*"), nil
+	}
 	pageID, ok := request.PathParameters["page_id"]
 	if !ok {
 		return apigateway.NewProxyResponse(400, errNoPageIDPath.Error(), "*"), nil
@@ -57,7 +62,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if !ok {
 		return apigateway.NewProxyResponse(400, errNoConversationIDPath.Error(), "*"), nil
 	}
-	err = c.dbClient.CheckConversationExists(ctx, conversationID)
+	err = c.dbClient.CheckConversationExists(ctx, shopID, stdconversation.PlatformInstagram, pageID, conversationID)
 	if err != nil {
 		return apigateway.NewProxyResponse(404, errConversationNotExist.Error(), "*"), nil
 	}
@@ -68,7 +73,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 	if err != nil {
 		return apigateway.NewProxyResponse(500, "Internal Server Error", "*"), err
 	}
-	igCredentials, err := c.dbClient.QueryInstagramAuthentication(ctx, pageID)
+	igCredentials, err := c.dbClient.GetInstagramAuthentication(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil
@@ -80,7 +85,7 @@ func (c *config) handler(ctx context.Context, request events.APIGatewayProxyRequ
 		return apigateway.NewProxyResponse(400, err.Error(), "*"), nil
 	}
 
-	shop, err := c.dbClient.QueryShop(ctx, pageID)
+	shop, err := c.dbClient.GetShop(ctx, pageID)
 	if err != nil {
 		if errors.Is(err, mongodb.ErrNoDocuments) {
 			return apigateway.NewProxyResponse(404, errPageNotExist.Error(), "*"), nil

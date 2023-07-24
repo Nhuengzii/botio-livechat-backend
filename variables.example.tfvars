@@ -1,22 +1,15 @@
-aws_access_key           = "sdad"
-aws_secret_key           = "sdakd"
-rest_api_stage_name      = "dev"
-websocket_api_stage_name = "dev"
-mongo_database           = "mongodb_database"
-discord_webhook_url      = "discord_webhook_url"
-redis_addr               = "redis_addr"
-redis_password           = "redis_password"
-s3_bucket_name           = "botio_lifechat_bucket_name"
+aws_access_key            = "aws_access_key"      #AWS account's access key. Can be retrieved via AWS's console.
+aws_secret_key            = "aws_secret_key"      #AWS account's secret access key. Can be retrieved via AWS's console.
+rest_api_stage_name       = "dev"                 #Deployment stage for REST api endpoints.
+websocket_api_stage_name  = "dev"                 #Deployment stage for websocket endpoints.
+mongo_database            = "mongodb_database"    #MongoDB's database name.
+discord_webhook_url       = "discord_webhook_url" #Discord text channel's webhook URL for logging.
+redis_addr                = "redis_addr"          #Redis database address.
+redis_password            = "redis_password"      #Redis database password.
+media_storage_bucket_name = "name"
 
-facebook_access_token                = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-facebook_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
-facebook_webhook_verification_string = "ddddddddddddddd"
+facebook_app_secret                  = "facebook_app_secret"                  #Facebook app secret. Can be retrieved via facebook's developer console.
+facebook_webhook_verification_string = "facebook_webhook_verification_string" #Set to the same value with facebook's developer console's webhook setup.
 
-line_channel_secret                 = "line_channel_secret"
-line_channel_access_token           = "line_channel_access_token"
-mongo_collection_line_conversations = "mongodb_collection_line_conversations"
-mongo_collection_line_messages      = "mongodb_collection_line_messages"
-
-instagram_access_token                = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-instagram_app_secret                  = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
-instagram_webhook_verification_string = "ddddddddddddddd"
+instagram_app_secret                  = "instagram_app_secret"                  #Instagram app secret. Can be retrieved via facebook's developer console.
+instagram_webhook_verification_string = "instagram_webhook_verification_string" #Set to the same value with facebook's developer console's webhook setup.
