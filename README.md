@@ -48,6 +48,8 @@ Can be Used for logging. **Discord logging take some resources and time**, Recom
 - For instagram webhook services subscribe to `messages` webhook.
 
 ### Line bot
+- [Getting started with the Messaging API](https://developers.line.biz/en/docs/messaging-api/getting-started/)
+- [Building a bot](https://developers.line.biz/en/docs/messaging-api/building-bot/)
 
 ### Terraform
 - Have `Terraform CLI` (1.2.0+) installed.
