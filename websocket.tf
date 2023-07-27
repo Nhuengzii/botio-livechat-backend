@@ -10,5 +10,6 @@ module "websocket_api" {
 output "websocket_api" {
   value = {
     id = module.websocket_api.websocket_api_id
+    base_url = format("wss://%s.execute-api.ap-southeast-1.amazonaws.com/%s", module.websocket_api.websocket_api_id, var.websocket_api_stage_name)
   }
 }
