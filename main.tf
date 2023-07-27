@@ -118,5 +118,6 @@ module "bucket" {
 output "rest_api" {
   value = {
     id = module.rest_api.id
+    base_url = format("https://%s.execute-api.ap-southeast-1.amazonaws.com/%s", module.rest_api.id, var.rest_api_stage_name)
   }
 }
