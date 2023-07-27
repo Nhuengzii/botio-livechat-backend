@@ -1,3 +1,8 @@
+# the name of the bucket where the terraform state is stored
 bucket="botio-livechat-terraform-state"
+
+# the region of the bucket where the terraform state is stored
 region="ap-southeast-1"
+
+# the name of the terraform state file, this doesn't have to be the same as the bucket name.
 key="botio-livechat-terraform-state.tfstate"
