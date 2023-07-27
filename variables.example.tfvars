@@ -2,6 +2,7 @@ aws_access_key            = "aws_access_key"      #AWS account's access key. Can
 aws_secret_key            = "aws_secret_key"      #AWS account's secret access key. Can be retrieved via AWS's console.
 rest_api_stage_name       = "dev"                 #Deployment stage for REST api endpoints.
 websocket_api_stage_name  = "dev"                 #Deployment stage for websocket endpoints.
+mongo_uri                 = "mongodb_uri"         #MongoDB's connection URI.
 mongo_database            = "mongodb_database"    #MongoDB's database name.
 discord_webhook_url       = "discord_webhook_url" #Discord text channel's webhook URL for logging.
 redis_addr                = "redis_addr"          #Redis database address.
