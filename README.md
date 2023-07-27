@@ -56,7 +56,7 @@ Can be Used for logging. **Discord logging take some resources and time**, Recom
 
 ### AWS
 - Have AWS account
-- Crete S3 bucket for store Terraform's state files.
+- Create S3 bucket for storing Terraform's state files. This must be created manually.
 - Have `AWS CLI` installed.
 
 
@@ -94,7 +94,7 @@ All deployment changes will happen on your registered AWS account. **Do not forg
 - copy `terraform_backend.conf.example` to `terraform_backend.conf`
 - edit value of each keys in `terraform_backend.conf`
 - initialize Terraform by running command `make init`
-- get `aws access key` and `aws secret access key`
+- get `aws access key` and `aws secret access key` ready
 -  copy `variables.example.tfvars` to `terraform.tfvars`
 - edit value of each keys in `terraform.tfvars`
 ### Deploy
@@ -104,11 +104,11 @@ All deployment changes will happen on your registered AWS account. **Do not forg
 
 ### Apply
 
-- run `make apply` to apply change to the Lambdas.
+- run `make apply` to apply changes to the Lambdas.
 
 ### Destroy
 
-- empty S3 bucket that use to store image
+- empty the S3 bucket that stores media files
 - run `make destroy` to destroy the system
 
 ## API Documentation
